@@ -101,7 +101,7 @@ public class LimelightDistance extends LinearOpMode {
             LLResult result = limelight.getLatestResult();
             if (result.isValid()) {
                 // Access general information
-                Pose3D botpose = result.getBotpose();
+               // Pose3D botpose = result.getBotpose();
                 double captureLatency = result.getCaptureLatency();
                 double targetingLatency = result.getTargetingLatency();
                 double parseLatency = result.getParseLatency();
@@ -109,17 +109,27 @@ public class LimelightDistance extends LinearOpMode {
                 telemetry.addData("Parse Latency", parseLatency);
                 telemetry.addData("PythonOutput", java.util.Arrays.toString(result.getPythonOutput()));
 
-                if (result.getPythonOutput() != null && result.getPythonOutput().length >= 5) {
-                    // Access specific values by their index
-                    double targetX = result.getPythonOutput()[0];
-                    double targetY = result.getPythonOutput()[1];
-                    double targetWidth = result.getPythonOutput()[2];
-                    double targetHeight = result.getPythonOutput()[3];
-                    double confidence = result.getPythonOutput()[4];
+
+                if (result != null && result.isValid()){
+                    double[] pythonOutputs = result.getPythonOutput();
+                    if (pythonOutputs != null && pythonOutputs.length > 0){
+                        double targetX = pythonOutputs[0];
+                        double targetY = pythonOutputs[1];
+
+//                // alternate untested (prob worse ngl) logic for getting from logic tables ↓
+//                if (result.getPythonOutput() != null ) {
+//                    // Access specific values by their index
+//                    double targetX = result.getPythonOutput()[0];
+//                    double targetY = result.getPythonOutput()[1];
+//                    double targetWidth = result.getPythonOutput()[2];
+//                    double targetHeight = result.getPythonOutput()[3];
+//                    double confidence = result.getPythonOutput()[4];
+
 
                     // Now you can use these variables for other tasks,
                     // such as driving the robot
-                    if (confidence > 0.5) { // Only use the data if confidence is high enough
+                   // if (confidence > 0.5) { // Only use the data if confidence is high enough
+
                         telemetry.addData("Detected Object - Python", "X: %.2f, Y: %.2f", targetX, targetY);
                         // Example usage: drive the robot based on the target's position
                         // myDriveSystem.driveTowards(targetX);
