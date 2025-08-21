@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.util.Range;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
-@TeleOp(name = "Chipi Rebuld TeleOp", group = "Test")
+@TeleOp(name = "Tank Teleop", group = "Test")
 public class TankDriveTeleOp extends OpMode {
 
     private GamepadEx player1;
