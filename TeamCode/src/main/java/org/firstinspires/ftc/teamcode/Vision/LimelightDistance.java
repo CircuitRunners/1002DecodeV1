@@ -100,21 +100,35 @@ public class LimelightDistance extends LinearOpMode {
 
             LLResult result = limelight.getLatestResult();
             if (result.isValid()) {
-                // Access general information
-               // Pose3D botpose = result.getBotpose();
-                double captureLatency = result.getCaptureLatency();
-                double targetingLatency = result.getTargetingLatency();
-                double parseLatency = result.getParseLatency();
-                telemetry.addData("LL Latency", captureLatency + targetingLatency);
-                telemetry.addData("Parse Latency", parseLatency);
-                telemetry.addData("PythonOutput", java.util.Arrays.toString(result.getPythonOutput()));
+                double[] pythonOutputs = result.getPythonOutput();
 
+                // Check if the array is valid and has enough elements
+                if (pythonOutputs != null && pythonOutputs.length >= 5) {
 
-                if (result != null && result.isValid()){
-                    double[] pythonOutputs = result.getPythonOutput();
-                    if (pythonOutputs != null && pythonOutputs.length > 0){
-                        double targetX = pythonOutputs[0];
-                        double targetY = pythonOutputs[1];
+                    // Get the values you want
+                    double targetDetectedFlag = pythonOutputs[0]; // 1.0 if target is detected
+                    double targetX = pythonOutputs[1];            // X-coordinate of the target
+                    double targetY = pythonOutputs[2];            // Y-coordinate of the target
+                    double targetAngle = pythonOutputs[3];        // Angle of the target
+                    double numContours = pythonOutputs[4];        // Number of detected contours
+
+                    // Check if a target was actually detected (based on your Python code's flag)
+                    if (targetDetectedFlag == 1.0) {
+                        telemetry.addData("Python Target", "X: %.2f, Y: %.2f", targetX, targetY);
+                        telemetry.addData("Target Angle", "%.2f", targetAngle);
+                        telemetry.addData("Number of Contours", "%d", (int) numContours);
+
+                        // Use targetY for your distance calculation
+                        telemetry.addData("Calculated Distance", calculateDistance(targetY));
+                    } else {
+                        telemetry.addData("Python Output", "No target detected.");
+                    }
+                } else {
+                    telemetry.addData("Python Output", "No valid data available.");
+                }
+            } else {
+                telemetry.addData("Limelight", "No data available");
+            }
 
 //                // alternate untested (prob worse ngl) logic for getting from logic tables ↓
 //                if (result.getPythonOutput() != null ) {
@@ -130,13 +144,7 @@ public class LimelightDistance extends LinearOpMode {
                     // such as driving the robot
                    // if (confidence > 0.5) { // Only use the data if confidence is high enough
 
-                        telemetry.addData("Detected Object - Python", "X: %.2f, Y: %.2f", targetX, targetY);
-                        // Example usage: drive the robot based on the target's position
-                        // myDriveSystem.driveTowards(targetX);
 
-                        telemetry.addData("Distance???", calculateDistance(targetY));
-                    }
-                }
 
 
 //                telemetry.addData("tx", result.getTx());
@@ -146,50 +154,50 @@ public class LimelightDistance extends LinearOpMode {
 
                 // telemetry.addData("Botpose", botpose.toString());
 
-                // Access barcode results
-                List<LLResultTypes.BarcodeResult> barcodeResults = result.getBarcodeResults();
-                for (LLResultTypes.BarcodeResult br : barcodeResults) {
-                    telemetry.addData("Barcode", "Data: %s", br.getData());
-                }
+//                // Access barcode results
+//                List<LLResultTypes.BarcodeResult> barcodeResults = result.getBarcodeResults();
+//                for (LLResultTypes.BarcodeResult br : barcodeResults) {
+//                    telemetry.addData("Barcode", "Data: %s", br.getData());
+//                }
+//
+//                // Access classifier results
+//                List<LLResultTypes.ClassifierResult> classifierResults = result.getClassifierResults();
+//                for (LLResultTypes.ClassifierResult cr : classifierResults) {
+//                    telemetry.addData("Classifier", "Class: %s, Confidence: %.2f", cr.getClassName(), cr.getConfidence());
+//                }
 
-                // Access classifier results
-                List<LLResultTypes.ClassifierResult> classifierResults = result.getClassifierResults();
-                for (LLResultTypes.ClassifierResult cr : classifierResults) {
-                    telemetry.addData("Classifier", "Class: %s, Confidence: %.2f", cr.getClassName(), cr.getConfidence());
-                }
-
-                // Access detector results
-                List<LLResultTypes.DetectorResult> detectorResults = result.getDetectorResults();
-                for (LLResultTypes.DetectorResult dr : detectorResults) {
-                    telemetry.addData("Detector", "Class: %s, Area: %.2f", dr.getClassName(), dr.getTargetArea());
-                    telemetry.addData("target x degrees", dr.getTargetXDegrees());
-                    telemetry.addData("target y degrees", dr.getTargetYDegrees());
-                    telemetry.addData("Confidence", dr.getConfidence());
-
-
-
-
-                }
-
-                // Access fiducial results
-                List<LLResultTypes.FiducialResult> fiducialResults = result.getFiducialResults();
-                for (LLResultTypes.FiducialResult fr : fiducialResults) {
-                    telemetry.addData("Fiducial", "ID: %d, Family: %s, X: %.2f, Y: %.2f", fr.getFiducialId(), fr.getFamily(), fr.getTargetXDegrees(), fr.getTargetYDegrees());
-                }
-
-                // Access color results
-                List<LLResultTypes.ColorResult> colorResults = result.getColorResults();
-                for (LLResultTypes.ColorResult cr : colorResults) {
-                    telemetry.addData("Color", "X: %.2f, Y: %.2f", cr.getTargetXDegrees(), cr.getTargetYDegrees());
-                }
-            } else {
-                telemetry.addData("Limelight", "No data available");
+//                // Access detector results
+//                List<LLResultTypes.DetectorResult> detectorResults = result.getDetectorResults();
+//                for (LLResultTypes.DetectorResult dr : detectorResults) {
+//                    telemetry.addData("Detector", "Class: %s, Area: %.2f", dr.getClassName(), dr.getTargetArea());
+//                    telemetry.addData("target x degrees", dr.getTargetXDegrees());
+//                    telemetry.addData("target y degrees", dr.getTargetYDegrees());
+//                    telemetry.addData("Confidence", dr.getConfidence());
+//
+//
+//
+//
+//                }
+//
+//                // Access fiducial results
+//                List<LLResultTypes.FiducialResult> fiducialResults = result.getFiducialResults();
+//                for (LLResultTypes.FiducialResult fr : fiducialResults) {
+//                    telemetry.addData("Fiducial", "ID: %d, Family: %s, X: %.2f, Y: %.2f", fr.getFiducialId(), fr.getFamily(), fr.getTargetXDegrees(), fr.getTargetYDegrees());
+//                }
+//
+//                // Access color results
+//                List<LLResultTypes.ColorResult> colorResults = result.getColorResults();
+//                for (LLResultTypes.ColorResult cr : colorResults) {
+//                    telemetry.addData("Color", "X: %.2f, Y: %.2f", cr.getTargetXDegrees(), cr.getTargetYDegrees());
+//                }
+//            } else {
+//                telemetry.addData("Limelight", "No data available");
             }
+        telemetry.update();
 
-            telemetry.update();
-        }
         limelight.stop();
     }
+
 
 
     public double calculateDistance(double targetY) {
