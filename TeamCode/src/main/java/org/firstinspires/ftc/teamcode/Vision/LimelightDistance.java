@@ -78,7 +78,7 @@ public class LimelightDistance extends LinearOpMode {
 
         telemetry.setMsTransmissionInterval(11);
 
-        limelight.pipelineSwitch(0);
+        limelight.pipelineSwitch(0);  // switch for different colors - 0 for yellow, 1 for red, 2 for blue
 
         /*
          * Starts polling for data.  If you neglect to call start(), getLatestResult() will return null.
