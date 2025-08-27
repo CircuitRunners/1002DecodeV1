@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.pedroPathing;
 
-import com.pedropathing.control.FilteredPIDFCoefficients;
 import com.pedropathing.control.PIDFCoefficients;
+import com.pedropathing.control.FilteredPIDFCoefficients;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.follower.FollowerConstants;
 import com.pedropathing.ftc.FollowerBuilder;
@@ -17,22 +17,19 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 public class Constants {
 
     public static FollowerConstants followerConstants = new FollowerConstants()
-            .mass(5)
+            .centripetalScaling(0.005)
             .forwardZeroPowerAcceleration(-41.278)
             .lateralZeroPowerAcceleration(-59.7819)
             .translationalPIDFCoefficients(new PIDFCoefficients(0.1, 0, 0.01, 0))
             .headingPIDFCoefficients(new PIDFCoefficients(2, 0, 0.1, 0))
             .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.1, 0, 0, 0.6, 0))
-            .centripetalScaling(0.005);
+            .mass(5);
 
     public static MecanumConstants driveConstants = new MecanumConstants()
             .xVelocity(57.8741)
             .yVelocity(52.295)
             .maxPower(1)
-            .leftFrontMotorName("leftFront")
-            .leftRearMotorName("leftRear")
-            .rightFrontMotorName("rightFront")
-            .rightRearMotorName("rightRear")
+            .leftFrontMotorName("lf")
             .leftFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
             .leftRearMotorDirection(DcMotorSimple.Direction.REVERSE)
             .rightFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
