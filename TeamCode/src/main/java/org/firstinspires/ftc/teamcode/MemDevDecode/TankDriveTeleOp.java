@@ -21,6 +21,7 @@ public class TankDriveTeleOp extends OpMode {
         telemetry.update();
 
         player1 = new GamepadEx(gamepad1);
+
         drive = new TankBot();
         drive.init(hardwareMap);
 

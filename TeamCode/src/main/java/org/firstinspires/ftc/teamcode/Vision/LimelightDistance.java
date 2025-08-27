@@ -78,11 +78,8 @@ public class LimelightDistance extends LinearOpMode {
 
         telemetry.setMsTransmissionInterval(11);
 
-        limelight.pipelineSwitch(0);  // switch for different colors - 0 for yellow, 1 for red, 2 for blue
+        limelight.pipelineSwitch(0);
 
-        /*
-         * Starts polling for data.  If you neglect to call start(), getLatestResult() will return null.
-         */
         limelight.start();
 
         telemetry.addData(">", "Robot Ready.  Press Play.");
@@ -91,34 +88,33 @@ public class LimelightDistance extends LinearOpMode {
 
         while (opModeIsActive()) {
             LLStatus status = limelight.getStatus();
-            telemetry.addData("Name", "%s",
-                    status.getName());
+            telemetry.addData("Name", "%s", status.getName());
             telemetry.addData("LL", "Temp: %.1fC, CPU: %.1f%%, FPS: %d",
                     status.getTemp(), status.getCpu(), (int) status.getFps());
             telemetry.addData("Pipeline", "Index: %d, Type: %s",
                     status.getPipelineIndex(), status.getPipelineType());
 
             LLResult result = limelight.getLatestResult();
-            if (result.isValid()) {
+
                 double[] pythonOutputs = result.getPythonOutput();
 
                 // Check if the array is valid and has enough elements
                 if (pythonOutputs != null && pythonOutputs.length >= 5) {
-
-                    // Get the values you want
-                    double targetDetectedFlag = pythonOutputs[0]; // 1.0 if target is detected
-                    double targetX = pythonOutputs[1];            // X-coordinate of the target
-                    double targetY = pythonOutputs[2];            // Y-coordinate of the target
-                    double targetAngle = pythonOutputs[3];        // Angle of the target
-                    double numContours = pythonOutputs[4];        // Number of detected contours
-
-                    // Check if a target was actually detected (based on your Python code's flag)
+                    double targetDetectedFlag = pythonOutputs[0];
                     if (targetDetectedFlag == 1.0) {
+                        double targetX = pythonOutputs[1];
+                        double targetY = pythonOutputs[2];
+                        double targetAngle = pythonOutputs[3];
+                        double numContours = pythonOutputs[4];
+
+
+
+
+
                         telemetry.addData("Python Target", "X: %.2f, Y: %.2f", targetX, targetY);
                         telemetry.addData("Target Angle", "%.2f", targetAngle);
                         telemetry.addData("Number of Contours", "%d", (int) numContours);
-
-                        // Use targetY for your distance calculation
+                       // telemetry.addData("ty", "%.2f", Math.toDegrees(targetY));
                         telemetry.addData("Calculated Distance", calculateDistance(targetY));
                     } else {
                         telemetry.addData("Python Output", "No target detected.");
@@ -126,75 +122,13 @@ public class LimelightDistance extends LinearOpMode {
                 } else {
                     telemetry.addData("Python Output", "No valid data available.");
                 }
-            } else {
-                telemetry.addData("Limelight", "No data available");
-            }
-
-//                // alternate untested (prob worse ngl) logic for getting from logic tables ↓
-//                if (result.getPythonOutput() != null ) {
-//                    // Access specific values by their index
-//                    double targetX = result.getPythonOutput()[0];
-//                    double targetY = result.getPythonOutput()[1];
-//                    double targetWidth = result.getPythonOutput()[2];
-//                    double targetHeight = result.getPythonOutput()[3];
-//                    double confidence = result.getPythonOutput()[4];
-
-
-                    // Now you can use these variables for other tasks,
-                    // such as driving the robot
-                   // if (confidence > 0.5) { // Only use the data if confidence is high enough
-
-
-
-
-//                telemetry.addData("tx", result.getTx());
-//                telemetry.addData("txnc", result.getTxNC());
-//                telemetry.addData("ty", result.getTy());
-//                telemetry.addData("tync", result.getTyNC());
-
-                // telemetry.addData("Botpose", botpose.toString());
-
-//                // Access barcode results
-//                List<LLResultTypes.BarcodeResult> barcodeResults = result.getBarcodeResults();
-//                for (LLResultTypes.BarcodeResult br : barcodeResults) {
-//                    telemetry.addData("Barcode", "Data: %s", br.getData());
-//                }
 //
-//                // Access classifier results
-//                List<LLResultTypes.ClassifierResult> classifierResults = result.getClassifierResults();
-//                for (LLResultTypes.ClassifierResult cr : classifierResults) {
-//                    telemetry.addData("Classifier", "Class: %s, Confidence: %.2f", cr.getClassName(), cr.getConfidence());
-//                }
 
-//                // Access detector results
-//                List<LLResultTypes.DetectorResult> detectorResults = result.getDetectorResults();
-//                for (LLResultTypes.DetectorResult dr : detectorResults) {
-//                    telemetry.addData("Detector", "Class: %s, Area: %.2f", dr.getClassName(), dr.getTargetArea());
-//                    telemetry.addData("target x degrees", dr.getTargetXDegrees());
-//                    telemetry.addData("target y degrees", dr.getTargetYDegrees());
-//                    telemetry.addData("Confidence", dr.getConfidence());
-//
-//
-//
-//
-//                }
-//
-//                // Access fiducial results
-//                List<LLResultTypes.FiducialResult> fiducialResults = result.getFiducialResults();
-//                for (LLResultTypes.FiducialResult fr : fiducialResults) {
-//                    telemetry.addData("Fiducial", "ID: %d, Family: %s, X: %.2f, Y: %.2f", fr.getFiducialId(), fr.getFamily(), fr.getTargetXDegrees(), fr.getTargetYDegrees());
-//                }
-//
-//                // Access color results
-//                List<LLResultTypes.ColorResult> colorResults = result.getColorResults();
-//                for (LLResultTypes.ColorResult cr : colorResults) {
-//                    telemetry.addData("Color", "X: %.2f, Y: %.2f", cr.getTargetXDegrees(), cr.getTargetYDegrees());
-//                }
-//            } else {
-//                telemetry.addData("Limelight", "No data available");
-            }
-        telemetry.update();
+            // The telemetry.update() must be here to be called on every loop
+            telemetry.update();
+        }
 
+        // limelight.stop() is called after the op mode ends
         limelight.stop();
     }
 
@@ -202,13 +136,13 @@ public class LimelightDistance extends LinearOpMode {
 
     public double calculateDistance(double targetY) {
         // Variable for the height of the camera above the floor in inches
-        double cameraHeight = 6.0;
+        double cameraHeight = 6.5;
 
-        // Variable for the angle the camera is mounted at in degrees
-        double cameraMountAngle = 45.0;
+        //  how many degrees is limelight rotated back from perfecetly vertical
+        double cameraMountAngle = 0;
 
         // Constant for the height of the sample in inches
-        double sampleHeight = 1.5;
+        double sampleHeight = 0.75;
 
         // The targetY value from your Python script, representing the vertical angle to the target
         double targetAngle = targetY;
@@ -218,9 +152,9 @@ public class LimelightDistance extends LinearOpMode {
         double targetAngleRad = Math.toRadians(targetAngle);
 
         // Calculate the distance using the formula d = (h2 - h1) / tan(a1 + a2)
-        double distance = (sampleHeight - cameraHeight) / Math.tan(cameraMountAngleRad + targetAngleRad);
+        double distance = (sampleHeight - cameraHeight) / Math.tan(cameraMountAngleRad + targetAngleRad)-8;
 
-        return distance;
+        return (distance * -1);
     }
 
 
