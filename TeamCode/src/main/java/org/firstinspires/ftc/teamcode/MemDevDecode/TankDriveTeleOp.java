@@ -10,7 +10,7 @@ import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 public class TankDriveTeleOp extends OpMode {
 
     private GamepadEx player1;
-    TankBot drive = new TankBot();
+    private TankBot drive;
 
     public double speedMultiply = 1;
 
@@ -20,6 +20,8 @@ public class TankDriveTeleOp extends OpMode {
         telemetry.addLine("Initializing...");
         telemetry.update();
 
+        player1 = new GamepadEx(gamepad1);
+        drive = new TankBot();
         drive.init(hardwareMap);
 
 
@@ -30,7 +32,7 @@ public class TankDriveTeleOp extends OpMode {
 
     @Override
     public void loop() {
-
+        player1.readButtons();
 
         // Update the speed multiplier based on the D-pad
         if (player1.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {

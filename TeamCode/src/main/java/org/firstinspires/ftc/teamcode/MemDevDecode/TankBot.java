@@ -19,8 +19,12 @@ public class TankBot {
         backLeftMotor = hardwareMap.get(DcMotorEx.class, "bl");
         backRightMotor = hardwareMap.get(DcMotorEx.class, "br");
 
-      // frontLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-      //  backLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        /** Below comments are not neccesarily needed - only 2 motors will be reversed.
+         * Just left there for easily adaptability to how robot is built
+         */
+      /* frontLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        backLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE); */
         frontRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         backRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
@@ -52,6 +56,9 @@ public class TankBot {
 
         frontRightMotor.setPower(rightPower);
         backRightMotor.setPower(rightPower);
+
+        /** other way of setting powers using motor object */
+        //setPowers(leftPower, leftPower, rightPower, rightPower);
     }
 
 }
