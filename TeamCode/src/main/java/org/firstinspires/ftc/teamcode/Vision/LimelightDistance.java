@@ -115,7 +115,8 @@ public class LimelightDistance extends LinearOpMode {
                         telemetry.addData("Target Angle", "%.2f", targetAngle);
                         telemetry.addData("Number of Contours", "%d", (int) numContours);
                        // telemetry.addData("ty", "%.2f", Math.toDegrees(targetY));
-                        telemetry.addData("Calculated Distance", calculateDistance(targetY));
+                        telemetry.addData("Calculated Distance Forward/Back", calculateDistance(targetY));
+                        telemetry.addData("Calculated Distance Left/Right (Right should be pos)", calculateLateralOffset(targetX,calculateDistance(targetY)));
                     } else {
                         telemetry.addData("Python Output", "No target detected.");
                     }
@@ -155,6 +156,17 @@ public class LimelightDistance extends LinearOpMode {
         double distance = (sampleHeight - cameraHeight) / Math.tan(cameraMountAngleRad + targetAngleRad)-8;
 
         return (distance * -1);
+    }
+
+
+    public double calculateLateralOffset(double tx, double forwardDistance) {
+        // Convert horizontal angle to radians
+        double txRad = Math.toRadians(tx);
+
+        // Horizontal offset = tan(angle) * forward distance
+        double lateralOffset = Math.tan(txRad) * forwardDistance;
+
+        return lateralOffset;  // positive = right, negative = left
     }
 
 
