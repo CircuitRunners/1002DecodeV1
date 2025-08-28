@@ -166,6 +166,7 @@ public class LimelightDistance extends LinearOpMode {
         // Horizontal offset = tan(angle) * forward distance
         double lateralOffset = Math.tan(txRad) * forwardDistance;
 
+        //returns in inches
         return lateralOffset;  // positive = right, negative = left
     }
 
