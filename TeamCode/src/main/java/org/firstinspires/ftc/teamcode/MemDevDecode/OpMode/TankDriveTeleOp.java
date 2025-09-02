@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.MemDevDecode;
+package org.firstinspires.ftc.teamcode.MemDevDecode.OpMode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -6,11 +6,13 @@ import com.qualcomm.robotcore.util.Range;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
+import org.firstinspires.ftc.teamcode.MemDevDecode.Config.TankDrive;
+
 @TeleOp(name = "Tank Teleop", group = "Test")
 public class TankDriveTeleOp extends OpMode {
 
     private GamepadEx player1;
-    private TankBot drive;
+    private TankDrive drive;
 
     public double speedMultiply = 1;
 
@@ -22,7 +24,7 @@ public class TankDriveTeleOp extends OpMode {
 
         player1 = new GamepadEx(gamepad1);
 
-        drive = new TankBot();
+        drive = new TankDrive();
         drive.init(hardwareMap);
 
 
@@ -63,7 +65,7 @@ public class TankDriveTeleOp extends OpMode {
         telemetry.addData("fr Power", drive.frontRightMotor.getPower());
         telemetry.addData("rl Power", drive.backLeftMotor.getPower());
         telemetry.addData("rr Power", drive.backRightMotor.getPower());
-        telemetry.addData("speed multipy value:",speedMultiply);
+        telemetry.addData("speed multiply value:",speedMultiply);
 
         telemetry.update();
 

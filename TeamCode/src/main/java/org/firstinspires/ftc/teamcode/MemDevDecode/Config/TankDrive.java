@@ -1,11 +1,11 @@
-package org.firstinspires.ftc.teamcode.MemDevDecode;
+package org.firstinspires.ftc.teamcode.MemDevDecode.Config;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-public class TankBot {
+public class TankDrive {
     public DcMotorEx frontLeftMotor;
     public DcMotorEx frontRightMotor;
     public DcMotorEx backLeftMotor;

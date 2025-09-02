@@ -29,7 +29,7 @@ public class Constants {
             .xVelocity(57.8741)
             .yVelocity(52.295)
             .maxPower(1)
-            .leftFrontMotorName("lf")
+            .leftFrontMotorName("fl")
             .leftFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
             .leftRearMotorDirection(DcMotorSimple.Direction.REVERSE)
             .rightFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
