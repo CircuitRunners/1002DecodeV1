@@ -83,7 +83,7 @@ import org.firstinspires.ftc.teamcode.SussyTurret.TurretPIDFTuner;
             if (validTarget) {
                 double error = -tx; // invert if needed
                 if (Math.abs(error) < TurretConstants.deadband) error = 0.0;
-                output = turretPIDF.calculate(error, 0.0);
+                output = turretPIDF.calculate(error, TurretConstants.turretSetPoint);
                 output = Range.clip(output, -TurretConstants.maxPower, TurretConstants.maxPower);
             }
 
@@ -98,6 +98,7 @@ import org.firstinspires.ftc.teamcode.SussyTurret.TurretPIDFTuner;
             telemetry.addData("kF", TurretConstants.kF);
             telemetry.addData("Deadband", TurretConstants.deadband);
             telemetry.addData("MaxPower", TurretConstants.maxPower);
+            telemetry.addData("Set Point", TurretConstants.turretSetPoint);
             telemetry.update();
         }
     }
