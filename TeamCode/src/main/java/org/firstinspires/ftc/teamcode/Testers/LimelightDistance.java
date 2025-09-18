@@ -30,19 +30,13 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
 TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package org.firstinspires.ftc.teamcode.Vision;
+package org.firstinspires.ftc.teamcode.Testers;
 
 import com.qualcomm.hardware.limelightvision.LLResult;
-import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.LLStatus;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-
-import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
-
-import java.util.List;
 
 /*
  * This OpMode illustrates how to use the Limelight3A Vision Sensor.
@@ -96,33 +90,33 @@ public class LimelightDistance extends LinearOpMode {
 
             LLResult result = limelight.getLatestResult();
 
-                double[] pythonOutputs = result.getPythonOutput();
+            double[] pythonOutputs = result.getPythonOutput();
 
-                // Check if the array is valid and has enough elements
-                if (pythonOutputs != null && pythonOutputs.length >= 5) {
-                    double targetDetectedFlag = pythonOutputs[0];
-                    if (targetDetectedFlag == 1.0) {
-                        double targetX = pythonOutputs[1];
-                        double targetY = pythonOutputs[2];
-                        double targetAngle = pythonOutputs[3];
-                        double numContours = pythonOutputs[4];
-
-
+            // Check if the array is valid and has enough elements
+            if (pythonOutputs != null && pythonOutputs.length >= 5) {
+                double targetDetectedFlag = pythonOutputs[0];
+                if (targetDetectedFlag == 1.0) {
+                    double targetX = pythonOutputs[1];
+                    double targetY = pythonOutputs[2];
+                    double targetAngle = pythonOutputs[3];
+                    double numContours = pythonOutputs[4];
 
 
 
-                        telemetry.addData("Python Target", "X: %.2f, Y: %.2f", targetX, targetY);
-                        telemetry.addData("Target Angle", "%.2f", targetAngle);
-                        telemetry.addData("Number of Contours", "%d", (int) numContours);
-                       // telemetry.addData("ty", "%.2f", Math.toDegrees(targetY));
-                        telemetry.addData("Calculated Distance Forward/Back", calculateDistance(targetY));
-                        telemetry.addData("Calculated Distance Left/Right (Right should be pos)", calculateLateralOffset(targetX,calculateDistance(targetY)));
-                    } else {
-                        telemetry.addData("Python Output", "No target detected.");
-                    }
+
+
+                    telemetry.addData("Python Target", "X: %.2f, Y: %.2f", targetX, targetY);
+                    telemetry.addData("Target Angle", "%.2f", targetAngle);
+                    telemetry.addData("Number of Contours", "%d", (int) numContours);
+                    // telemetry.addData("ty", "%.2f", Math.toDegrees(targetY));
+                    telemetry.addData("Calculated Distance Forward/Back", calculateDistance(targetY));
+                    telemetry.addData("Calculated Distance Left/Right (Right should be pos)", calculateLateralOffset(targetX,calculateDistance(targetY)));
                 } else {
-                    telemetry.addData("Python Output", "No valid data available.");
+                    telemetry.addData("Python Output", "No target detected.");
                 }
+            } else {
+                telemetry.addData("Python Output", "No valid data available.");
+            }
 //
 
             // The telemetry.update() must be here to be called on every loop
