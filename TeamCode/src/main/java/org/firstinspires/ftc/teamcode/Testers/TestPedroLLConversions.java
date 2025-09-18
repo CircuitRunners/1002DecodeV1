@@ -19,7 +19,7 @@ import org.firstinspires.ftc.teamcode.MemDevDecode.Config.MecanumDrive;
 @Configurable
 @TeleOp(name = "Field Centric With April Tags Lock - Pedro Units")
 public class TestPedroLLConversions extends OpMode {
-
+//Key - LL is one movement on the coordinate plane = 1 meter vs one movement on pedro plane is 0.5 in
         private MecanumDrive drive;
         private GamepadEx player1;
         private GoBildaPinpointDriver pinpoint;
