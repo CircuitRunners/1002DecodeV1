@@ -2,27 +2,26 @@ package org.firstinspires.ftc.teamcode.V1.Config.util;
 
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.hardware.Gamepad;
-import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-
 public class Poses {
 
-    //  Alliance enum
-    public enum Alliance {
-        RED,
-        BLUE
-    }
+    public enum Alliance { RED, BLUE }
 
-    //  AlliancePose holds both red and blue values
     public static class AlliancePose {
         private final Pose redPose;
         private final Pose bluePose;
 
+        // Explicit values for Red and Blue
         public AlliancePose(Pose redPose, Pose bluePose) {
             this.redPose = redPose;
             this.bluePose = bluePose;
+        }
+
+        // Mirror convenience: Blue is computed automatically
+        public static AlliancePose mirror(Pose redPose) {
+            return new AlliancePose(redPose, redPose.mirror());
         }
 
         public Pose get(Alliance alliance) {
@@ -30,55 +29,40 @@ public class Poses {
         }
     }
 
-    //  Alliance selection (set this before using poses)
+    // 🔹 Alliance selection (same as before)
     public static Alliance currentAlliance = Alliance.RED;
-    private static Gamepad previousGamepad;
+    private static Gamepad previousGamepad = new Gamepad();
 
-    //  Example poses (Red / Blue)
-    public static final AlliancePose startPose = new AlliancePose(
-            new Pose(7.3285, 65.83, 0),   // Red
-            new Pose(-7.3285, 65.83, 0)   // Blue
-    );
+    public static Pose get(AlliancePose p) { return p.get(currentAlliance); }
 
-    public static final AlliancePose sixSpecStartPose = new AlliancePose(
-            new Pose(7.3285, 65.83, 90),   // Red
-            new Pose(-7.3285, 65.83, 0)   // Blue
-    );
-
-    //  Combined push pathchain (example subset)
-    public static final AlliancePose spline1Control = new AlliancePose(
-            new Pose(23, 37, 180),
-            new Pose(-23, 37, 0)
-    );
-
-
-
-    //  Helper method to fetch the correct pose for the current alliance
-    public static Pose get(AlliancePose pose) {
-        return pose.get(currentAlliance);
-    }
-
-    /**
-     * Call this in init_loop() of an auto to allow the driver to change alliance with the D-pad.
-     * D-pad up → RED, D-pad down → BLUE
-     * Also updates telemetry to show the current alliance and instructions.
-     */
     public static void updateAlliance(Gamepad g, Telemetry telemetry) {
-        // Edge detection: trigger only when the button is first pressed
-        if (g.dpad_up && !previousGamepad.dpad_up) {
-            currentAlliance = Alliance.RED;
-        } else if (g.dpad_down && !previousGamepad.dpad_down) {
-            currentAlliance = Alliance.BLUE;
-        }
-
-        // Update previousGamepad state for next loop
+        if (g.dpad_up && !previousGamepad.dpad_up) currentAlliance = Alliance.RED;
+        else if (g.dpad_down && !previousGamepad.dpad_down) currentAlliance = Alliance.BLUE;
         previousGamepad.copy(g);
 
-        //  Telemetry instructions
         telemetry.addLine("--- Alliance Selector ---");
         telemetry.addData("Current Alliance", currentAlliance);
-        telemetry.addLine("Press D-pad UP → RED");
-        telemetry.addLine("Press D-pad DOWN → BLUE");
+        telemetry.addLine("D-pad UP → RED | D-pad DOWN → BLUE");
         telemetry.update();
     }
+
+    // =======================
+    // Example poses
+    // =======================
+
+    // ️Mirrored point (Blue auto-computed)
+    public static final AlliancePose startPose = AlliancePose.mirror(
+            new Pose(7.3285, 65.83, 0)
+    );
+
+    //  Non-mirrored point (explicit different coords)
+    public static final AlliancePose preloadPose = new AlliancePose(
+            new Pose(42, 65.83, 0),     // Red
+            new Pose(-40, 60, Math.toRadians(10))  // Blue custom
+    );
+
+    //  Another mirrored one
+    public static final AlliancePose intakePose = AlliancePose.mirror(
+            new Pose(20, 36, Math.toRadians(90))
+    );
 }
