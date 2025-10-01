@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.V1.OpMode;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -14,6 +15,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.V1.Config.subsystems.LimelightCamera;
 import org.firstinspires.ftc.teamcode.V1.Config.subsystems.MecanumDrive;
 
+import java.util.List;
 import java.util.Locale;
 
 @TeleOp (name = "Quatro Teleop", group = "a")
@@ -29,6 +31,8 @@ public class v1Teleop extends OpMode {
 
     // State variable to manage the heading lock.
     private boolean isHeadingLocked = false;
+
+    private int stateMachine = -1;
 
 
     @Override
@@ -48,6 +52,12 @@ public class v1Teleop extends OpMode {
         limelight.limelightCamera.pipelineSwitch(3);
         limelight.limelightCamera.start();
 
+        // Set up bulk caching
+        List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
+        for (LynxModule hub : allHubs) {
+            hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
+        }
+
         telemetry.addLine("Ready!");
         telemetry.update();
     }
@@ -60,6 +70,14 @@ public class v1Teleop extends OpMode {
         pinpoint.update();
         Pose2D currentPose = pinpoint.getPosition();
 
+
+        boolean leftBumperJustPressed = player1.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER);
+
+
+
+        if (leftBumperJustPressed) {
+                stateMachine = (stateMachine + 1) % 2;
+        }
 
         double forward = player1.getLeftY();
         double strafe = player1.getLeftX();
@@ -122,6 +140,20 @@ public class v1Teleop extends OpMode {
                 currentPose.getY(DistanceUnit.INCH),
                 currentPose.getHeading(AngleUnit.DEGREES)
         );
+
+        switch (stateMachine){
+            case 0:
+
+
+                break;
+            case 1:
+
+
+                break;
+            default:
+                isHeadingLocked = false;
+                break;
+        }
         telemetry.addData("Position", data);
         telemetry.addData("Heading Lock", isHeadingLocked ? "ON" : "OFF");
         telemetry.update();
