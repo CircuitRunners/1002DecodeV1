@@ -1,16 +1,18 @@
 package org.firstinspires.ftc.teamcode.Testers;
 
+import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
+@Configurable
 @TeleOp
 public class ShooterTest extends OpMode {
     public DcMotorEx shooter;
     public GamepadEx player1;
-    double LAUNCHER_TARGET_VELOCITY = 1633; //velocity in ticks per second; 28 ticks per revolution
+    public static double LAUNCHER_TARGET_VELOCITY = 1633; //velocity in ticks per second; 28 ticks per revolution
     final double STOP_SPEED = 0.0;
 
     @Override
