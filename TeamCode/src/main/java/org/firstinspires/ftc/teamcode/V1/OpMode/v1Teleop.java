@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.V1.OpMode;
 
 import com.bylazar.configurables.annotations.Configurable;
+//import com.pedropathing.follower.Follower;
+//import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -15,6 +17,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.V1.Config.subsystems.LimelightCamera;
 import org.firstinspires.ftc.teamcode.V1.Config.subsystems.MecanumDrive;
+import org.firstinspires.ftc.teamcode.V1.Config.util.Poses;
+import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 import java.util.List;
 import java.util.Locale;
@@ -25,6 +29,7 @@ public class v1Teleop extends OpMode {
 
     private MecanumDrive drive;
     TriggerReader leftTriggerReader;
+    //private Follower follower;
 
     private LimelightCamera limelight;
     private GamepadEx player1;
@@ -42,6 +47,13 @@ public class v1Teleop extends OpMode {
         telemetry.addLine("Initializing...");
         telemetry.update();
 
+//        follower = Constants.createFollower(hardwareMap);
+//        follower.setStartingPose(Poses.getStartingPose());
+//        follower.update();
+
+
+      //  Pose2D newPose = new Pose2D(DistanceUnit.MM, Poses.getStartingPose().getX(), Poses.getStartingPose().getY(), AngleUnit.RADIANS, Math.toRadians(Poses.getStartingPose().getHeading()));
+      //  pinpoint.setPosition(newPose);
         player1 = new GamepadEx(gamepad1);
 
         leftTriggerReader = new TriggerReader(
@@ -75,6 +87,7 @@ public class v1Teleop extends OpMode {
         leftTriggerReader.readValue();
         pinpoint.update();
         Pose2D currentPose = pinpoint.getPosition();
+        //follower.update();
 
 
         boolean leftBumperJustPressed = player1.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER);

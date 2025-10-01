@@ -68,6 +68,10 @@ public class Poses {
             new Pose(20, 36, Math.toRadians(90))
     );
 
+    public static final AlliancePose teleopDefaultPose = AlliancePose.mirror(
+            new Pose(72, 72, 0) // change to your preferred TeleOp "spawn" location
+    );
+
     // =======================
     // Cross-OpMode pose storage
     // =======================
@@ -76,16 +80,22 @@ public class Poses {
      * This holds the "last known" robot pose across OpModes.
      * Autonomous should set this at the end, TeleOp should read it on init.
      */
-    public static Pose lastPose = null;
+    private static Pose lastPose = null;
 
+    /** Save a pose (e.g. at end of Auto) */
     public static void savePose(Pose pose) {
         lastPose = pose;
     }
 
-    public static Pose loadPoseOrDefault(Pose fallback) {
-        return (lastPose != null) ? lastPose : fallback;
+    /** Get the correct starting pose: last saved if available, else default startPose */
+    public static Pose getStartingPose() {
+        return (lastPose != null) ? lastPose : get(teleopDefaultPose);
     }
 
+    /** Clear saved pose (optional, e.g. between practice runs) */
+    public static void reset() {
+        lastPose = null;
+    }
     /* usage:
 
     at end of autonomous:
@@ -93,6 +103,6 @@ public class Poses {
     Poses.savePose(follower.getPose());
 
     at start of teleop:
-    Pose startingPose = Poses.loadPoseOrDefault(Poses.get(Poses.startPose));
+    follower.setStartingPose(Poses.getStartingPose());
      */
 }

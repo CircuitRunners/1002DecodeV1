@@ -14,6 +14,7 @@ import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.teamcode.MemDevDecode.Config.MecanumDrive;
 
 @Configurable
@@ -24,6 +25,8 @@ public class TestPedroLLConversions extends OpMode {
         private GamepadEx player1;
         private GoBildaPinpointDriver pinpoint;
         private Limelight3A limelight;
+
+
 
         // PID constants
         public static double HEADING_KP_TX = 0.02;
@@ -78,6 +81,7 @@ public class TestPedroLLConversions extends OpMode {
 
             pinpoint.update();
             Pose2D currentPose = pinpoint.getPosition();
+            limelight.updateRobotOrientation(pinpoint.getPosition().getHeading(AngleUnit.RADIANS));
 
             double finalRotation;
             LLResult result = limelight.getLatestResult();
@@ -87,25 +91,70 @@ public class TestPedroLLConversions extends OpMode {
                 if (result != null && result.isValid()) {
                     for (LLResultTypes.FiducialResult fr : result.getFiducialResults()) {
                         if (fr.getFiducialId() == 20 || fr.getFiducialId() == 24) {
-                            double llX_m = result.getBotpose_MT2().getPosition().x;
-                            double llY_m = result.getBotpose_MT2().getPosition().y;
+                            // Limelight reports in meters (origin = field center)
+//                            double llX_in = result.getBotpose_MT2().getPosition().x * METERS_TO_INCH;
+//                            double llY_in = result.getBotpose_MT2().getPosition().y * METERS_TO_INCH;
+//                            //ur gay
+//                            double headingRad = Math.toRadians(currentPose.getHeading(AngleUnit.DEGREES));
+//
+//// Update Pinpoint pose in inches
+//                            Pose2D newPose = new Pose2D(DistanceUnit.INCH, llX_in, llY_in,
+//                                    AngleUnit.RADIANS, headingRad);
+//                            pinpoint.setPosition(newPose);
+//
+//// Pedro units (2 units per inch)
+//                            robotXP = llX_in * PEDRO_UNITS_PER_INCH;
+//                            robotYP = llY_in * PEDRO_UNITS_PER_INCH;
+//                            robotHeadingDeg = Math.toDegrees(headingRad);
+//
+//                            telemetry.addData("Relocalized with Tag", fr.getFiducialId());
+//                            telemetry.addData("LL meters", "X: %.2f, Y: %.2f", llX_in, llY_in);
+//                            telemetry.addData("LL -> Pedro", "X: %.2f, Y: %.2f", robotXP, robotYP);
+//                            telemetry.addLine("");
+//                            double llX_m = result.getBotpose_MT2().getPosition().x;
+//                            double llY_m = result.getBotpose_MT2().getPosition().y;
 
-                            double xMM = (llX_m * METERS_TO_INCH + CENTER_INCHES) * 25.4;
-                            double yMM = (llY_m * METERS_TO_INCH + CENTER_INCHES) * 25.4;
-                            double headingRad = Math.toRadians(currentPose.getHeading(AngleUnit.DEGREES));
+                           // telemetry.addData("LL raw (m)", "X: %.3f, Y: %.3f", llX_m, llY_m);
+                            if (player1.isDown(GamepadKeys.Button.DPAD_UP) && result != null && result.isValid()) {
+                                Pose3D mt2Pose = result.getBotpose_MT2();
+                                if (mt2Pose != null) {
 
-                            // Use the Pose2D constructor with units
-                            Pose2D newPose = new Pose2D(DistanceUnit.MM, xMM, yMM, AngleUnit.RADIANS, headingRad);
-                            pinpoint.setPosition(newPose);
+                                    // --- Step 1: Raw LL pose (meters, origin=center) ---
+                                    double llX_m = mt2Pose.getPosition().x;
+                                    double llY_m = mt2Pose.getPosition().y;
 
-                            // Update Pedro units
-                            robotXP = (xMM / 25.4) * PEDRO_UNITS_PER_INCH;
-                            robotYP = (yMM / 25.4) * PEDRO_UNITS_PER_INCH;
-                            robotHeadingDeg = Math.toDegrees(headingRad);
+                                    telemetry.addData("[Step1] LL raw (m)", "X: %.2f, Y: %.2f", llX_m, llY_m);
 
-                            telemetry.addData("Relocalized with Tag", fr.getFiducialId());
-                            telemetry.addData("LL meters", "X: %.2f, Y: %.2f", llX_m, llY_m);
-                            telemetry.addData("LL -> Pedro", "X: %.2f, Y: %.2f", robotXP, robotYP);
+                                    // --- Step 2: Convert meters → inches ---
+                                    double llX_in = llX_m * METERS_TO_INCH;
+                                    double llY_in = llY_m * METERS_TO_INCH;
+
+                                    telemetry.addData("[Step2] LL inches (center origin)", "X: %.2f, Y: %.2f", llX_in, llY_in);
+
+                                    // --- Step 3: Shift to bottom-left origin ---
+                                    double llX_in_shifted = llX_in + 72.0;
+                                    double llY_in_shifted = llY_in + 72.0;
+
+                                    telemetry.addData("[Step3] Shifted inches (field origin)", "X: %.2f, Y: %.2f", llX_in_shifted, llY_in_shifted);
+
+                                    // --- Step 4: Update Pinpoint with X/Y only, keep heading from Pinpoint ---
+                                    double currentHeadingRad = currentPose.getHeading(AngleUnit.RADIANS);  // keep heading from Pinpoint
+                                    Pose2D newPose = new Pose2D(DistanceUnit.INCH,
+                                            llX_in_shifted, llY_in_shifted,
+                                            AngleUnit.RADIANS, currentHeadingRad);
+                                    pinpoint.setPosition(newPose);
+
+                                    telemetry.addData("[Step4] Pinpoint Pose", "X: %.2f in, Y: %.2f in, H: %.1f°",
+                                            llX_in_shifted, llY_in_shifted, Math.toDegrees(currentHeadingRad));
+
+
+
+                                    telemetry.addLine("Relocalized MT2 X/Y, kept heading from Pinpoint!");
+                                }
+
+                            }
+
+
                             break;
                         }
                     }
@@ -155,7 +204,7 @@ public class TestPedroLLConversions extends OpMode {
             }
 
             // --- Field-centric drive ---
-            double robotHeadingRad = Math.toRadians(currentPose.getHeading(AngleUnit.DEGREES));
+            double robotHeadingRad = -Math.toRadians(currentPose.getHeading(AngleUnit.DEGREES));
             double theta = Math.atan2(forward, strafe);
             double r = Math.hypot(forward, strafe);
             theta = ((theta - robotHeadingRad + Math.PI) % (2 * Math.PI)) - Math.PI;
@@ -180,15 +229,12 @@ public class TestPedroLLConversions extends OpMode {
             double pinYInches = currentPose.getY(DistanceUnit.INCH);
             double pinHeadingDeg = currentPose.getHeading(AngleUnit.DEGREES);
 
-            robotXP = pinXInches * PEDRO_UNITS_PER_INCH;
-            robotYP = pinYInches * PEDRO_UNITS_PER_INCH;
-            robotHeadingDeg = pinHeadingDeg;
+
 
             // --- Telemetry ---
             telemetry.addData("Position",
-                    "{Pinpoint (in) X: %.2f, Y: %.2f, H: %.1f} -> {Pedro X: %.2f, Y: %.2f, H: %.1f}",
-                    pinXInches, pinYInches, pinHeadingDeg,
-                    robotXP, robotYP, robotHeadingDeg);
+                    "{Pinpoint (in) X: %.2f, Y: %.2f, H: %.1f}",
+                    pinXInches, pinYInches, pinHeadingDeg);
 
             telemetry.addData("--- PID ---", "");
             telemetry.addData("KP", HEADING_KP_TX);
@@ -206,7 +252,7 @@ public class TestPedroLLConversions extends OpMode {
             pinpoint.setOffsets(2.3 * 25.4, 1 * 25.4, DistanceUnit.MM);
             pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
             pinpoint.setEncoderDirections(
-                    GoBildaPinpointDriver.EncoderDirection.REVERSED,
+                    GoBildaPinpointDriver.EncoderDirection.FORWARD,
                     GoBildaPinpointDriver.EncoderDirection.REVERSED
             );
             pinpoint.resetPosAndIMU();
