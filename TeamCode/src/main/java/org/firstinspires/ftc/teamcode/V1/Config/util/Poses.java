@@ -29,7 +29,9 @@ public class Poses {
         }
     }
 
-    // 🔹 Alliance selection (same as before)
+    // =======================
+    // Alliance selection
+    // =======================
     public static Alliance currentAlliance = Alliance.RED;
     private static Gamepad previousGamepad = new Gamepad();
 
@@ -65,4 +67,32 @@ public class Poses {
     public static final AlliancePose intakePose = AlliancePose.mirror(
             new Pose(20, 36, Math.toRadians(90))
     );
+
+    // =======================
+    // Cross-OpMode pose storage
+    // =======================
+
+    /**
+     * This holds the "last known" robot pose across OpModes.
+     * Autonomous should set this at the end, TeleOp should read it on init.
+     */
+    public static Pose lastPose = null;
+
+    public static void savePose(Pose pose) {
+        lastPose = pose;
+    }
+
+    public static Pose loadPoseOrDefault(Pose fallback) {
+        return (lastPose != null) ? lastPose : fallback;
+    }
+
+    /* usage:
+
+    at end of autonomous:
+
+    Poses.savePose(follower.getPose());
+
+    at start of teleop:
+    Pose startingPose = Poses.loadPoseOrDefault(Poses.get(Poses.startPose));
+     */
 }
