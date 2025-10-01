@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
+import com.seattlesolvers.solverslib.gamepad.TriggerReader;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -23,6 +24,7 @@ import java.util.Locale;
 public class v1Teleop extends OpMode {
 
     private MecanumDrive drive;
+    TriggerReader leftTriggerReader;
 
     private LimelightCamera limelight;
     private GamepadEx player1;
@@ -41,6 +43,10 @@ public class v1Teleop extends OpMode {
         telemetry.update();
 
         player1 = new GamepadEx(gamepad1);
+
+        leftTriggerReader = new TriggerReader(
+                player1, GamepadKeys.Trigger.LEFT_TRIGGER
+        );
 
         drive = new MecanumDrive();
         drive.init(hardwareMap);
@@ -66,17 +72,22 @@ public class v1Teleop extends OpMode {
     public void loop() {
 
         player1.readButtons();
-
+        leftTriggerReader.readValue();
         pinpoint.update();
         Pose2D currentPose = pinpoint.getPosition();
 
 
         boolean leftBumperJustPressed = player1.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER);
-
+        boolean leftTriggerJustPressed = leftTriggerReader.wasJustPressed();
 
 
         if (leftBumperJustPressed) {
                 stateMachine = (stateMachine + 1) % 2;
+        }
+
+        if (leftTriggerJustPressed) {
+            stateMachine = (stateMachine - 1) % 2;
+
         }
 
         double forward = player1.getLeftY();
