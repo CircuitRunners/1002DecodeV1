@@ -4,6 +4,8 @@ import com.bylazar.configurables.annotations.Configurable;
 //import com.pedropathing.follower.Follower;
 //import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -15,6 +17,7 @@ import com.seattlesolvers.solverslib.gamepad.TriggerReader;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.teamcode.V1.Config.subsystems.LimelightCamera;
 import org.firstinspires.ftc.teamcode.V1.Config.subsystems.MecanumDrive;
 import org.firstinspires.ftc.teamcode.V1.Config.util.Poses;
@@ -40,6 +43,8 @@ public class v1Teleop extends OpMode {
     private boolean isHeadingLocked = false;
 
     private int stateMachine = -1;
+
+    private static final double METERS_TO_INCH = 39.37;
 
 
     @Override
@@ -87,6 +92,7 @@ public class v1Teleop extends OpMode {
         leftTriggerReader.readValue();
         pinpoint.update();
         Pose2D currentPose = pinpoint.getPosition();
+        updateCoordinates();
         //follower.update();
 
 
@@ -188,11 +194,43 @@ public class v1Teleop extends OpMode {
         limelight.limelightCamera.stop();
     }
 
+    public void updateCoordinates() {
+        LLResult result = limelight.getresult();
+        if (result != null && result.isValid()) {
+            for (LLResultTypes.FiducialResult fr : result.getFiducialResults()) {
+                if (fr.getFiducialId() == 20 || fr.getFiducialId() == 24) {
+                    Pose3D mt2Pose = result.getBotpose_MT2();
+                    if (mt2Pose != null) {
+
+                        double llX_m = mt2Pose.getPosition().x;
+                        double llY_m = mt2Pose.getPosition().y;
+
+                        double llX_in = llX_m * METERS_TO_INCH;
+                        double llY_in = llY_m * METERS_TO_INCH;
+
+                        double llX_in_shifted = llX_in + 72.0;
+                        double llY_in_shifted = llY_in + 72.0;
+
+                        double currentHeadingRad = pinpoint.getPosition().getHeading(AngleUnit.RADIANS);  // keep heading from Pinpoint
+                        Pose2D newPose = new Pose2D(DistanceUnit.INCH,
+                                llX_in_shifted, llY_in_shifted,
+                                AngleUnit.RADIANS, currentHeadingRad);
+                        pinpoint.setPosition(newPose);
+                        telemetry.addData("Pinpoint Pose", "X: %.2f in, Y: %.2f in, H: %.1f°", llX_in_shifted, llY_in_shifted, Math.toDegrees(currentHeadingRad));
+                    }
+                    break;
+                }
+            }
+        }
+
+
+    }
+
     private void configurePinpoint() {
         pinpoint.setOffsets(2.3 * 25.4, 1 * 25.4, DistanceUnit.MM);
         pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
         pinpoint.setEncoderDirections(
-                GoBildaPinpointDriver.EncoderDirection.REVERSED,
+                GoBildaPinpointDriver.EncoderDirection.FORWARD,
                 GoBildaPinpointDriver.EncoderDirection.REVERSED
         );
         pinpoint.resetPosAndIMU();

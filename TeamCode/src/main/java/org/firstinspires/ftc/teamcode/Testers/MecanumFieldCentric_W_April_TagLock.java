@@ -218,7 +218,7 @@ public class MecanumFieldCentric_W_April_TagLock extends OpMode {
         pinpoint.setOffsets(2.3 * 25.4, 1 * 25.4, DistanceUnit.MM);
         pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
         pinpoint.setEncoderDirections(
-                GoBildaPinpointDriver.EncoderDirection.REVERSED,
+                GoBildaPinpointDriver.EncoderDirection.FORWARD,
                 GoBildaPinpointDriver.EncoderDirection.REVERSED
         );
         pinpoint.resetPosAndIMU();

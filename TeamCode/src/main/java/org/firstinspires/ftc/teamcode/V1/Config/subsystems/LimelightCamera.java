@@ -21,7 +21,10 @@ public class LimelightCamera {
         limelightCamera = hardwareMap.get(Limelight3A.class, "limelight");
         //limelight.setPollRateHz(11);
     }
-    
+
+    public LLResult getresult() {
+        return result;
+    }
     
     public double autoAlign() {
 
