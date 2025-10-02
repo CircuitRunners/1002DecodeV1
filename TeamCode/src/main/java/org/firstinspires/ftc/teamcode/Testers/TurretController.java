@@ -1,7 +1,9 @@
 package org.firstinspires.ftc.teamcode.Testers;
 
 import com.pedropathing.math.MathFunctions;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
+@Disabled
 public class TurretController {
     private double minAngle;   // radians, e.g. -Math.PI/2
     private double maxAngle;   // radians, e.g.  Math.PI/2

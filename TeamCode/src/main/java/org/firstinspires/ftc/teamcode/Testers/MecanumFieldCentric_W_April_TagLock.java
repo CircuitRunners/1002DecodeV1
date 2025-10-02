@@ -5,6 +5,7 @@ import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -18,7 +19,7 @@ import org.firstinspires.ftc.teamcode.MemDevDecode.Config.MecanumDrive;
 
 import java.util.List;
 import java.util.Locale;
-
+@Disabled
 @Configurable
 @TeleOp(name = "Field Centric With April Tags Lock")
 public class MecanumFieldCentric_W_April_TagLock extends OpMode {

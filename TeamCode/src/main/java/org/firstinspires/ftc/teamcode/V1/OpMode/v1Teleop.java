@@ -3,6 +3,12 @@ package org.firstinspires.ftc.teamcode.V1.OpMode;
 import com.bylazar.configurables.annotations.Configurable;
 //import com.pedropathing.follower.Follower;
 //import com.pedropathing.geometry.Pose;
+import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.BezierLine;
+import com.pedropathing.geometry.Pose;
+import com.pedropathing.paths.HeadingInterpolator;
+import com.pedropathing.paths.Path;
+import com.pedropathing.paths.PathChain;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
@@ -20,11 +26,10 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.teamcode.V1.Config.subsystems.LimelightCamera;
 import org.firstinspires.ftc.teamcode.V1.Config.subsystems.MecanumDrive;
-import org.firstinspires.ftc.teamcode.V1.Config.util.Poses;
-import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Supplier;
 
 @TeleOp (name = "Quatro Teleop", group = "a")
 @Configurable
@@ -32,7 +37,7 @@ public class v1Teleop extends OpMode {
 
     private MecanumDrive drive;
     TriggerReader leftTriggerReader;
-    //private Follower follower;
+    private Follower follower;
 
     private LimelightCamera limelight;
     private GamepadEx player1;
@@ -45,6 +50,11 @@ public class v1Teleop extends OpMode {
     private int stateMachine = -1;
 
     private static final double METERS_TO_INCH = 39.37;
+    private Supplier<PathChain> pathChain;
+
+    boolean isRedAlliance;
+    boolean automatedDrive = false;
+
 
 
     @Override
@@ -81,6 +91,21 @@ public class v1Teleop extends OpMode {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
         }
 
+        if (isRedAlliance){
+            pathChain = () -> follower.pathBuilder() //Lazy Curve Generation
+                .addPath(new Path(new BezierLine(follower::getPose, new Pose(48, 95))))
+                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(135), 0.8))
+                .build();
+        }
+        else {
+            pathChain = () -> follower.pathBuilder() //Lazy Curve Generation
+                .addPath(new Path(new BezierLine(follower::getPose, new Pose(96, 95))))
+                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(45), 0.8))
+                .build();
+        }
+
+
+
         telemetry.addLine("Ready!");
         telemetry.update();
     }
@@ -88,18 +113,23 @@ public class v1Teleop extends OpMode {
     @Override
     public void loop() {
 
+        //gamepad logic
         player1.readButtons();
         leftTriggerReader.readValue();
-        pinpoint.update();
-        Pose2D currentPose = pinpoint.getPosition();
-        updateCoordinates();
-        //follower.update();
-
-
         boolean leftBumperJustPressed = player1.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER);
         boolean leftTriggerJustPressed = leftTriggerReader.wasJustPressed();
 
+        //localization + pedropathing logic
+        pinpoint.update();
+        Pose2D currentPose = pinpoint.getPosition();
+        follower.update();
 
+        if (player1.wasJustPressed(GamepadKeys.Button.TOUCHPAD_FINGER_1)){
+            updateCoordinates();
+        }
+
+
+        //state machine control
         if (leftBumperJustPressed) {
                 stateMachine = (stateMachine + 1) % 2;
         }
@@ -109,36 +139,22 @@ public class v1Teleop extends OpMode {
 
         }
 
+        //drive logic
         double forward = player1.getLeftY();
         double strafe = player1.getLeftX();
         double rotate = player1.getRightX();
 
-
-        // Toggle the heading lock with dpad up/down
-        if (player1.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
-            isHeadingLocked = true;
-            telemetry.addLine("Heading Lock Enabled.");
-        }
-        if (player1.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
-            isHeadingLocked = false;
-            telemetry.addLine("Heading Lock Disabled.");
-        }
-
-
-        //drive logic
         double robotHeading = Math.toRadians(currentPose.getHeading(AngleUnit.DEGREES));
         double finalRotation;
 
         if (isHeadingLocked) {
             finalRotation = limelight.autoAlign();
-
             telemetry.addData("Using Limelight Data for Heading Lock.", "");
-            telemetry.addData("PID Error", limelight.error);
+            telemetry.addData("Error from tag center", limelight.error);
             telemetry.addData("PID Rotation", limelight.autoAlign());
 
         }
         else {
-
             finalRotation = rotate;
             telemetry.addData("Using Pinpoint IMU Heading.", "");
         }
@@ -171,12 +187,22 @@ public class v1Teleop extends OpMode {
                 currentPose.getHeading(AngleUnit.DEGREES)
         );
 
+        //main state machine loop where all of the actions actually happen
         switch (stateMachine){
             case 0:
-
+               //intake stuff
 
                 break;
             case 1:
+            //score stuff
+                if (player1.wasJustPressed(GamepadKeys.Button.CIRCLE)) {
+                    follower.followPath(pathChain.get());
+
+                }
+                while (!follower.isBusy()){
+                    isHeadingLocked = true;
+                }
+                isHeadingLocked = false;
 
 
                 break;
@@ -187,6 +213,11 @@ public class v1Teleop extends OpMode {
         telemetry.addData("Position", data);
         telemetry.addData("Heading Lock", isHeadingLocked ? "ON" : "OFF");
         telemetry.update();
+
+        //boolean control to check if pedro is in use
+        while (follower.isBusy()){
+            automatedDrive = true;
+        }
     }
 
     @Override
@@ -194,20 +225,26 @@ public class v1Teleop extends OpMode {
         limelight.limelightCamera.stop();
     }
 
+    //takes position from april tag and updates pinpoint
     public void updateCoordinates() {
+        //updates the orientation of robot for limelight camera's usage
+        limelight.limelightCamera.updateRobotOrientation(pinpoint.getPosition().getHeading(AngleUnit.RADIANS));
+
         LLResult result = limelight.getresult();
+
+        //ensures result exsists and is from an acceptable apriltag
         if (result != null && result.isValid()) {
             for (LLResultTypes.FiducialResult fr : result.getFiducialResults()) {
                 if (fr.getFiducialId() == 20 || fr.getFiducialId() == 24) {
                     Pose3D mt2Pose = result.getBotpose_MT2();
                     if (mt2Pose != null) {
-
+                        //gets raw position from limelight in m
                         double llX_m = mt2Pose.getPosition().x;
                         double llY_m = mt2Pose.getPosition().y;
-
+                        //converts position to inches
                         double llX_in = llX_m * METERS_TO_INCH;
                         double llY_in = llY_m * METERS_TO_INCH;
-
+                        //shifts position to bottom left corner field origin for pedro pathing use
                         double llX_in_shifted = llX_in + 72.0;
                         double llY_in_shifted = llY_in + 72.0;
 
@@ -216,7 +253,7 @@ public class v1Teleop extends OpMode {
                                 llX_in_shifted, llY_in_shifted,
                                 AngleUnit.RADIANS, currentHeadingRad);
                         pinpoint.setPosition(newPose);
-                        telemetry.addData("Pinpoint Pose", "X: %.2f in, Y: %.2f in, H: %.1f°", llX_in_shifted, llY_in_shifted, Math.toDegrees(currentHeadingRad));
+                        telemetry.addData("New Pose From Apriltag:", "X: %.2f in, Y: %.2f in, H: %.1f°", llX_in_shifted, llY_in_shifted, Math.toDegrees(currentHeadingRad));
                     }
                     break;
                 }
@@ -226,6 +263,7 @@ public class v1Teleop extends OpMode {
 
     }
 
+    //define pinpoint offsets and constants
     private void configurePinpoint() {
         pinpoint.setOffsets(2.3 * 25.4, 1 * 25.4, DistanceUnit.MM);
         pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);

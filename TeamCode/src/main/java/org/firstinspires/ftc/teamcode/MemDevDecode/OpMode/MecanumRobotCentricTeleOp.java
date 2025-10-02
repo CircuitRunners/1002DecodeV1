@@ -1,11 +1,12 @@
 package org.firstinspires.ftc.teamcode.MemDevDecode.OpMode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 
 import org.firstinspires.ftc.teamcode.MemDevDecode.Config.MecanumDrive;
-
+@Disabled
 @TeleOp(name = "Mecanum -Robot Centric")
 public class MecanumRobotCentricTeleOp extends OpMode {
     private MecanumDrive drive;
