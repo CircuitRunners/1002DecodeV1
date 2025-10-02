@@ -26,6 +26,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.teamcode.V1.Config.subsystems.LimelightCamera;
 import org.firstinspires.ftc.teamcode.V1.Config.subsystems.MecanumDrive;
+import org.firstinspires.ftc.teamcode.V1.Config.util.Poses;
 
 import java.util.List;
 import java.util.Locale;
@@ -54,6 +55,7 @@ public class v1Teleop extends OpMode {
 
     boolean isRedAlliance;
     boolean automatedDrive = false;
+    boolean preselectFromAuto = false;
 
 
 
@@ -104,6 +106,17 @@ public class v1Teleop extends OpMode {
                 .build();
         }
 
+        if(Poses.getAlliance() !=null){
+            if(Poses.getAlliance() == Poses.Alliance.RED){
+                isRedAlliance = true;
+                preselectFromAuto = true;
+            }
+            else {
+                isRedAlliance = false;
+                preselectFromAuto = true;
+            }
+        }
+
 
 
         telemetry.addLine("Ready!");
@@ -128,6 +141,14 @@ public class v1Teleop extends OpMode {
             updateCoordinates();
         }
 
+        //selector logic for alliance
+        if (!preselectFromAuto) {
+            if (player1.wasJustPressed(GamepadKeys.Button.START)) {
+                isRedAlliance = true;
+            } else if (player1.wasJustPressed(GamepadKeys.Button.BACK)) {
+                isRedAlliance = false;
+            }
+        }
 
         //state machine control
         if (leftBumperJustPressed) {

@@ -32,14 +32,23 @@ public class Poses {
     // =======================
     // Alliance selection
     // =======================
-    public static Alliance currentAlliance = Alliance.RED;
+    private static Alliance currentAlliance = Alliance.RED;
     private static Gamepad previousGamepad = new Gamepad();
 
-    public static Pose get(AlliancePose p) { return p.get(currentAlliance); }
+    public static Alliance getAlliance() {
+        return currentAlliance;
+    }
+    private static void setAlliance(Alliance alliance) {
+        currentAlliance = alliance;
+    }
+
+    public static Pose get(AlliancePose p) {
+        return p.get(currentAlliance);
+    }
 
     public static void updateAlliance(Gamepad g, Telemetry telemetry) {
-        if (g.dpad_up && !previousGamepad.dpad_up) currentAlliance = Alliance.RED;
-        else if (g.dpad_down && !previousGamepad.dpad_down) currentAlliance = Alliance.BLUE;
+        if (g.dpad_up && !previousGamepad.dpad_up) setAlliance(Alliance.RED);
+        else if (g.dpad_down && !previousGamepad.dpad_down) setAlliance(Alliance.BLUE);
         previousGamepad.copy(g);
 
         telemetry.addLine("--- Alliance Selector ---");
@@ -47,6 +56,7 @@ public class Poses {
         telemetry.addLine("D-pad UP → RED | D-pad DOWN → BLUE");
         telemetry.update();
     }
+
 
     // =======================
     // Example poses
