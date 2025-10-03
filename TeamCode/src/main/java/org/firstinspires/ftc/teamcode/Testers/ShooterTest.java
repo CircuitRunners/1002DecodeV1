@@ -4,22 +4,29 @@ import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 @Configurable
 @TeleOp
 public class ShooterTest extends OpMode {
-    public DcMotorEx shooter;
+    public DcMotorEx shooter1;
+    public DcMotorEx shooter2;
     public GamepadEx player1;
     public static double LAUNCHER_TARGET_VELOCITY = 1633; //velocity in ticks per second; 28 ticks per revolution
     final double STOP_SPEED = 0.0;
 
     @Override
     public void init() {
-        shooter = hardwareMap.get(DcMotorEx.class, "shooter");
+        shooter1 = hardwareMap.get(DcMotorEx.class, "motor1");
+        shooter1.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
-        shooter.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        shooter2 = hardwareMap.get(DcMotorEx.class, "motor2");
+        shooter2.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+
+        shooter2.setDirection(DcMotorSimple.Direction.REVERSE);
+
         player1 = new GamepadEx(gamepad1);
     }
 
@@ -28,10 +35,12 @@ public class ShooterTest extends OpMode {
         player1.readButtons();
 
         if (player1.wasJustPressed(GamepadKeys.Button.CIRCLE)) {
-            shooter.setVelocity(LAUNCHER_TARGET_VELOCITY);
+            shooter1.setVelocity(LAUNCHER_TARGET_VELOCITY);
+            shooter2.setVelocity(LAUNCHER_TARGET_VELOCITY);
         }
         if (player1.wasJustPressed(GamepadKeys.Button.SQUARE)) {
-            shooter.setVelocity((STOP_SPEED));
+            shooter1.setVelocity((STOP_SPEED));
+            shooter2.setVelocity((STOP_SPEED));
         }
         if (player1.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
             LAUNCHER_TARGET_VELOCITY += 100;
@@ -47,7 +56,9 @@ public class ShooterTest extends OpMode {
         }
 
         telemetry.addData("Target Speed", LAUNCHER_TARGET_VELOCITY);
-        telemetry.addData("Motor Speed", shooter.getVelocity());
+        telemetry.addData("Shooter1 Speed", shooter1.getVelocity());
+        telemetry.addData("Shooter2 Speed", shooter2.getVelocity());
+
         telemetry.update();
     }
 }
