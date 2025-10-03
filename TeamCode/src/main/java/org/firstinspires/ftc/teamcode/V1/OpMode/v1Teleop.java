@@ -37,25 +37,24 @@ import java.util.function.Supplier;
 public class v1Teleop extends OpMode {
 
     private MecanumDrive drive;
-    TriggerReader leftTriggerReader;
-    private Follower follower;
-
-    private LimelightCamera limelight;
-    private GamepadEx player1;
     private GoBildaPinpointDriver pinpoint;
+    private Follower follower;
+    private LimelightCamera limelight;
+
+    private GamepadEx player1;
+    TriggerReader leftTriggerReader;
+    private Supplier<PathChain> pathChain;
+
     private final ElapsedTime timer = new ElapsedTime();
+
+    private int stateMachine = -1;
+    private static final double METERS_TO_INCH = 39.37;
 
     // State variable to manage the heading lock.
     private boolean isHeadingLocked = false;
-
-    private int stateMachine = -1;
-
-    private static final double METERS_TO_INCH = 39.37;
-    private Supplier<PathChain> pathChain;
-
-    boolean isRedAlliance;
-    boolean automatedDrive = false;
-    boolean preselectFromAuto = false;
+    private boolean isRedAlliance;
+    private boolean automatedDrive = false;
+    private boolean preselectFromAuto = false;
 
 
 
@@ -94,13 +93,13 @@ public class v1Teleop extends OpMode {
         }
 
         if (isRedAlliance){
-            pathChain = () -> follower.pathBuilder() //Lazy Curve Generation
+            pathChain = () -> follower.pathBuilder() //Lazy Curve Generation for red shoot pos
                 .addPath(new Path(new BezierLine(follower::getPose, new Pose(48, 95))))
                 .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(135), 0.8))
                 .build();
         }
         else {
-            pathChain = () -> follower.pathBuilder() //Lazy Curve Generation
+            pathChain = () -> follower.pathBuilder() //Lazy Curve Generation for blue shoot pos
                 .addPath(new Path(new BezierLine(follower::getPose, new Pose(96, 95))))
                 .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(45), 0.8))
                 .build();
@@ -115,6 +114,9 @@ public class v1Teleop extends OpMode {
                 isRedAlliance = false;
                 preselectFromAuto = true;
             }
+        }
+        else{
+            preselectFromAuto = false;
         }
 
 
