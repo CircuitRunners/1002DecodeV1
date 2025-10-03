@@ -27,6 +27,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.teamcode.V1.Config.subsystems.LimelightCamera;
 import org.firstinspires.ftc.teamcode.V1.Config.subsystems.MecanumDrive;
 import org.firstinspires.ftc.teamcode.V1.Config.util.Poses;
+import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 import java.util.List;
 import java.util.Locale;
@@ -63,13 +64,13 @@ public class v1Teleop extends OpMode {
         telemetry.addLine("Initializing...");
         telemetry.update();
 
-//        follower = Constants.createFollower(hardwareMap);
-//        follower.setStartingPose(Poses.getStartingPose());
-//        follower.update();
+        follower = Constants.createFollower(hardwareMap);
+        follower.setStartingPose(Poses.getStartingPose());
+        follower.update();
 
 
-      //  Pose2D newPose = new Pose2D(DistanceUnit.MM, Poses.getStartingPose().getX(), Poses.getStartingPose().getY(), AngleUnit.RADIANS, Math.toRadians(Poses.getStartingPose().getHeading()));
-      //  pinpoint.setPosition(newPose);
+        Pose2D newPose = new Pose2D(DistanceUnit.INCH, Poses.getStartingPose().getX(), Poses.getStartingPose().getY(), AngleUnit.RADIANS, Math.toRadians(Poses.getStartingPose().getHeading()));
+        pinpoint.setPosition(newPose);
         player1 = new GamepadEx(gamepad1);
 
         leftTriggerReader = new TriggerReader(
