@@ -234,7 +234,11 @@ public class v1Teleop extends OpMode {
                 isHeadingLocked = false;
                 break;
         }
+        if (stateMachine > 1){
+            stateMachine = -1;
+        }
         telemetry.addData("Position", data);
+        telemetry.addData("State", stateMachine);
         telemetry.addData("Heading Lock", isHeadingLocked ? "ON" : "OFF");
         telemetry.update();
 
