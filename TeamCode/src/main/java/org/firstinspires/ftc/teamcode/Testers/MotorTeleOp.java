@@ -50,6 +50,7 @@ public class MotorTeleOp extends OpMode {
         telemetry.addData("Target RPM", target);
         telemetry.addData("Shooter1 RPM", shooter1.getVelocity() * 60.0 / TICKS_PER_REV);
         telemetry.addData("Shooter2 RPM", shooter2.getVelocity() * 60.0 / TICKS_PER_REV);
+
         telemetry.addData("Target TPS", ticksPerSecond);
         telemetry.addData("Shooter1 TPS", shooter1.getVelocity());
         telemetry.addData("Shooter2 TPS", shooter2.getVelocity());
