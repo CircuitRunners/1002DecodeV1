@@ -27,6 +27,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.teamcode.V1.Config.subsystems.LimelightCamera;
 import org.firstinspires.ftc.teamcode.V1.Config.subsystems.MecanumDrive;
 import org.firstinspires.ftc.teamcode.V1.Config.util.Poses;
+import org.firstinspires.ftc.teamcode.V1.Config.util.ValidShootingZoneChecker;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 import java.util.List;
@@ -41,6 +42,7 @@ public class v1Teleop extends OpMode {
     private GoBildaPinpointDriver pinpoint;
     private Follower follower;
     private LimelightCamera limelight;
+    private ValidShootingZoneChecker zoneChecker;
 
     private GamepadEx player1;
     TriggerReader leftTriggerReader;
@@ -86,6 +88,8 @@ public class v1Teleop extends OpMode {
         limelight = new LimelightCamera(hardwareMap);
         limelight.limelightCamera.pipelineSwitch(3);
         limelight.limelightCamera.start();
+
+        zoneChecker = new ValidShootingZoneChecker();
 
         // Set up bulk caching
         List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
@@ -227,7 +231,9 @@ public class v1Teleop extends OpMode {
                     isHeadingLocked = true;
                 }
                 isHeadingLocked = false;
-
+                if (zoneChecker.isInsideShootingZone(currentPose.getX(DistanceUnit.INCH), currentPose.getY(DistanceUnit.INCH))){
+                    //shooting logic
+                }
 
                 break;
             default:

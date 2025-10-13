@@ -64,11 +64,11 @@ public class Poses {
 
     // ️Mirrored point (Red auto-computed)
     public static final AlliancePose startPose = AlliancePose.mirror(
-            new Pose(7.3285, 65.83, 0)
+            new Pose(64, 135.5, 0)
     );
 
     //  Non-mirrored point (explicit different coords)
-    public static final AlliancePose preloadPose = new AlliancePose(
+  /*EXAMPLE*/  public static final AlliancePose preloadPose = new AlliancePose(
             new Pose(42, 65.83, 0),     // Red
             new Pose(-40, 60, Math.toRadians(10))  // Blue custom
     );
@@ -76,9 +76,7 @@ public class Poses {
     // ===============
     // Goal Side Poses (Blue given, red auto-computed
     //================
-    public static final AlliancePose startPoint = AlliancePose.mirror(
-            new Pose(64, 136, 0)
-    );
+
 
     //Used multiple times cause shoot from same spot
     public static final AlliancePose shootPosition = AlliancePose.mirror(
