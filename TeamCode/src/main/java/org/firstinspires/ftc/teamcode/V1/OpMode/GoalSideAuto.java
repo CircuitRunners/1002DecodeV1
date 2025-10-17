@@ -193,6 +193,7 @@ public class GoalSideAuto extends OpMode {
 
         @Override
         public void stop() {
+            Poses.savePose(follower.getPose());
             //shooterIntake.stopAll();
         }
 

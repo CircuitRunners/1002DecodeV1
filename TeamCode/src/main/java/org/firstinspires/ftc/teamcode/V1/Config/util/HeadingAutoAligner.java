@@ -9,13 +9,13 @@ import com.pedropathing.math.MathFunctions;
  * ------------------
  * Computes rotation power to face a fixed field coordinate using a PID controller.
  *
- * - Tunable live in FTC Dashboard.
+ * - Tunable live in panels
  * - Optionally adjustable during TeleOp via button input.
  *
  * Math:
- *   1️⃣ worldAngleToTarget = atan2(targetY - robotY, targetX - robotX)
- *   2️⃣ headingError = normalizeAngle(worldAngleToTarget - robotHeading)
- *   3️⃣ rotationPower = kP * error + kI * sum(error) + kD * (error - lastError)
+ *   1. worldAngleToTarget = atan2(targetY - robotY, targetX - robotX)
+ *   2. headingError = normalizeAngle(worldAngleToTarget - robotHeading)
+ *   3. rotationPower = kP * error + kI * sum(error) + kD * (error - lastError)
  *
  * Tuning tips:
  *   - Start with only kP (0.3–1.0)
