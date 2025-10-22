@@ -150,7 +150,10 @@ public class v1Teleop extends OpMode {
 
     @Override
     public void loop() {
-
+        //boolean control to check if pedro is in use
+        if (follower.isBusy()){
+            automatedDrive = true;
+        }
         //gamepad logic
         player1.readButtons();
         leftTriggerReader.readValue();
@@ -318,10 +321,7 @@ public class v1Teleop extends OpMode {
         telemetry.addData("Alliance: ", isRedAlliance? "Red" : "Blue");
         telemetry.update();
 
-        //boolean control to check if pedro is in use
-        if (follower.isBusy()){
-            automatedDrive = true;
-        }
+
     }
 
     @Override
