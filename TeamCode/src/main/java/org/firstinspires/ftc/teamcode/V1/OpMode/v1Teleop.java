@@ -305,6 +305,7 @@ public class v1Teleop extends OpMode {
                     }
                 }
                 else {
+                        shooter.stopShooter();
                         isIntakeInUse = false;
                 }
                 break;
