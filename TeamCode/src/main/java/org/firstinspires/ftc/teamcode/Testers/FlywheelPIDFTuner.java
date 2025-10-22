@@ -58,10 +58,10 @@ import java.util.List;
 public class FlywheelPIDFTuner extends OpMode {
 
     // ===== Dashboard Tunables =====
-    public static double kP = 0.002;       // proportional gain
-    public static double kI = 0.0001;      // integral gain
-    public static double kD = 0.0004;      // derivative gain
-    public static double kF = 0.0002;      // feedforward ≈ 1 / maxTicksPerSec
+    public static double kP = 0.01;       // proportional gain
+    public static double kI = 0.000;      // integral gain
+    public static double kD = 0.000;      // derivative gain
+    public static double kF = 0.00025;      // feedforward ≈ 1 / maxTicksPerSec
     public static double targetVelocity = 1633; // desired speed (ticks/sec)
     public static double maxPower = 1.0;          // safety clamp
 
@@ -87,7 +87,7 @@ public class FlywheelPIDFTuner extends OpMode {
         shooter1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         shooter2.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
-        shooter2.setDirection(DcMotorSimple.Direction.REVERSE);
+        shooter1.setDirection(DcMotorSimple.Direction.REVERSE);
 
         shooter1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         shooter2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);

@@ -80,9 +80,7 @@ public class v1Teleop extends OpMode {
         follower.update();
 
 
-        Pose2D newPose = new Pose2D(DistanceUnit.INCH, Poses.getStartingPose().getX(), Poses.getStartingPose().getY(), AngleUnit.RADIANS, Math.toRadians(Poses.getStartingPose().getHeading()));
-        pinpoint.setPosition(newPose);
-        player1 = new GamepadEx(gamepad1);
+
 
         leftTriggerReader = new TriggerReader(
                 player1, GamepadKeys.Trigger.LEFT_TRIGGER
@@ -99,6 +97,10 @@ public class v1Teleop extends OpMode {
 
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "odo");
         configurePinpoint();
+
+        Pose2D newPose = new Pose2D(DistanceUnit.INCH, Poses.getStartingPose().getX(), Poses.getStartingPose().getY(), AngleUnit.RADIANS, Math.toRadians(Poses.getStartingPose().getHeading()));
+        pinpoint.setPosition(newPose);
+        player1 = new GamepadEx(gamepad1);
 
         limelight = new LimelightCamera(hardwareMap);
         limelight.limelightCamera.pipelineSwitch(3);
@@ -232,6 +234,7 @@ public class v1Teleop extends OpMode {
 //            telemetry.addLine("Pinpoint IMU Recalibrated!");
 //        }
         if (player1.wasJustPressed(GamepadKeys.Button.SQUARE)) {
+            pinpoint.recalibrateIMU();
             Pose2D newPose = new Pose2D(DistanceUnit.INCH,
                     72,72,
                     AngleUnit.RADIANS, 0);
@@ -254,9 +257,11 @@ public class v1Teleop extends OpMode {
                  isIntakeInUse= true;
                 if(rightTriggerJustPressed){
                     intake.intakeIn();
+                    intake.setServoPower(0.45);
                 }
                 else if (leftTriggerJustPressed){
                     intake.intakeOut();
+                    intake.setServoPower(-0.45);
                 }
                 else{
                     intake.intakeIdle();
