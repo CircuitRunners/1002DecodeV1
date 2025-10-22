@@ -63,9 +63,7 @@ public class Poses {
     // =======================
 
     // ️Mirrored point (Red auto-computed)
-    public static final AlliancePose startPose = AlliancePose.mirror(
-            new Pose(64, 135.5, 0)
-    );
+
 
     //  Non-mirrored point (explicit different coords)
   /*EXAMPLE*/  public static final AlliancePose preloadPose = new AlliancePose(
@@ -76,10 +74,12 @@ public class Poses {
     // ===============
     // Goal Side Poses (Blue given, red auto-computed
     //================
-
+    public static final AlliancePose startPoseGoalSide = AlliancePose.mirror(
+            new Pose(63.8, 135.8, 0)
+    );
 
     //Used multiple times cause shoot from same spot
-    public static final AlliancePose shootPosition = AlliancePose.mirror(
+    public static final AlliancePose shootPositionGoalSide = AlliancePose.mirror(
             new Pose(44, 99, Math.toRadians(135))
             //new Pose(48, 95.4, Math.toRadians(135))
     );
@@ -106,6 +106,39 @@ public class Poses {
     public static final AlliancePose lineupAtGate = AlliancePose.mirror(
             new Pose(19, 70, 0)
     );
+
+
+    // ===============
+    // Goal Side Poses (Blue given, red auto-computed
+    //================
+    public static final AlliancePose startPoseFarSide = AlliancePose.mirror(
+            new Pose(63.8, 8.3, 0)
+    );
+    public static final AlliancePose pathToShootFirstTimeControlPoint1 = AlliancePose.mirror(
+            new Pose(59.4, 48.5, 0)
+    );
+    public static final AlliancePose pathToShootFirstTimeControlPoint2 = AlliancePose.mirror(
+            new Pose(71.8, 98.7, 0)
+    );
+    public static final AlliancePose shootPositionFar = AlliancePose.mirror(
+            new Pose(58, 113, 140)
+    );
+    public static final AlliancePose toHumanPlayerControlPoint1 = AlliancePose.mirror(
+            new Pose(69.7, 97.9, 0)
+    );
+    public static final AlliancePose toHumanPlayerControlPoint2 = AlliancePose.mirror(
+            new Pose(74, 16, 0)
+    );
+    public static final AlliancePose humanPlayerPosition = AlliancePose.mirror(
+            new Pose(18, 16, 180)
+    );
+    public static final AlliancePose backToShootControlPoint1 = AlliancePose.mirror(
+            new Pose(74, 16, 0)
+    );
+    public static final AlliancePose backToShootControlPoint2 = AlliancePose.mirror(
+            new Pose(69.7, 97.9, 0)
+    );
+
 
     //TELEOP STUFF
     public static final AlliancePose teleopDefaultPose = AlliancePose.mirror(

@@ -287,7 +287,7 @@ public class v1Teleop extends OpMode {
                 }
 
 
-                if (zoneChecker.isInsideShootingZone(currentPose.getX(DistanceUnit.INCH), currentPose.getY(DistanceUnit.INCH))) {
+               // if (zoneChecker.isInsideShootingZone(currentPose.getX(DistanceUnit.INCH), currentPose.getY(DistanceUnit.INCH))) {
                     shooter.shoot();
                     //shooting logic
                     if ((shooter.getCurrentVelo() >= MINIMUM_SHOOTER_VELO) && (shooter.getCurrentVelo() <= MAXIMUM_SHOOTER_VELO)) {
@@ -303,11 +303,11 @@ public class v1Teleop extends OpMode {
                     else {
                         isIntakeInUse = false;
                     }
-                }
-                else {
-                        shooter.stopShooter();
-                        isIntakeInUse = false;
-                }
+               // }
+//                else {
+//                        shooter.stopShooter();
+//                        isIntakeInUse = false;
+//                }
                 break;
             default:
                 isHeadingLocked = false;

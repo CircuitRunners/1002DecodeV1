@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.V1.OpMode;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierLine;
-import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -43,14 +42,14 @@ public class GoalSideAuto extends OpMode {
 
             // Path 1: Travel from Start to a Shooting Position
             travelToShoot = follower.pathBuilder()
-                    .addPath(new BezierLine(Poses.get(Poses.startPose), Poses.get(Poses.shootPosition)))
-                    .setLinearHeadingInterpolation(Poses.get(Poses.startPose).getHeading(), Poses.get(Poses.shootPosition).getHeading())
+                    .addPath(new BezierLine(Poses.get(Poses.startPoseGoalSide), Poses.get(Poses.shootPositionGoalSide)))
+                    .setLinearHeadingInterpolation(Poses.get(Poses.startPoseGoalSide).getHeading(), Poses.get(Poses.shootPositionGoalSide).getHeading())
                     .build();
 
             // Path 2: Travel from Shooting Position to Intake Position
             travelToIntake1 = follower.pathBuilder()
-                    .addPath(new BezierLine(Poses.get(Poses.shootPosition), Poses.get(Poses.lineupLine1)))
-                    .setLinearHeadingInterpolation(Poses.get(Poses.startPose).getHeading(), Poses.get(Poses.shootPosition).getHeading())
+                    .addPath(new BezierLine(Poses.get(Poses.shootPositionGoalSide), Poses.get(Poses.lineupLine1)))
+                    .setLinearHeadingInterpolation(Poses.get(Poses.startPoseGoalSide).getHeading(), Poses.get(Poses.shootPositionGoalSide).getHeading())
                     .build();
             intake1 = follower.pathBuilder()
                     .addPath(new BezierLine(Poses.get(Poses.lineupLine1), Poses.get(Poses.pickupLine1)))
@@ -58,8 +57,8 @@ public class GoalSideAuto extends OpMode {
                     .build();
 
             travelBackToShoot = follower.pathBuilder()
-                    .addPath(new BezierLine(Poses.get(Poses.pickupLine1), Poses.get(Poses.shootPosition)))
-                    .setLinearHeadingInterpolation(Poses.get(Poses.pickupLine1).getHeading(), Poses.get(Poses.shootPosition).getHeading())
+                    .addPath(new BezierLine(Poses.get(Poses.pickupLine1), Poses.get(Poses.shootPositionGoalSide)))
+                    .setLinearHeadingInterpolation(Poses.get(Poses.pickupLine1).getHeading(), Poses.get(Poses.shootPositionGoalSide).getHeading())
                     .build();
 
             // Initialize aligner to point at a generic goal target (e.g., X=0, Y=144 for blue goal)
@@ -224,12 +223,12 @@ public class GoalSideAuto extends OpMode {
 
 
                 // Set the alliance-specific starting pose before building paths
-                follower.setStartingPose(Poses.get(Poses.startPose));
+                follower.setStartingPose(Poses.get(Poses.startPoseGoalSide));
                 buildPaths();
 
 
             telemetry.addData("Alliance Set", Poses.getAlliance());
-            telemetry.addData("Start Pose", Poses.get(Poses.startPose));
+            telemetry.addData("Start Pose", Poses.get(Poses.startPoseGoalSide));
             telemetry.update();
         }
 
