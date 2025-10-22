@@ -79,7 +79,7 @@ public class v1Teleop extends OpMode {
         follower.setStartingPose(Poses.getStartingPose());
         follower.update();
 
-
+        player1 = new GamepadEx(gamepad1);
 
 
         leftTriggerReader = new TriggerReader(
@@ -100,7 +100,7 @@ public class v1Teleop extends OpMode {
 
         Pose2D newPose = new Pose2D(DistanceUnit.INCH, Poses.getStartingPose().getX(), Poses.getStartingPose().getY(), AngleUnit.RADIANS, Math.toRadians(Poses.getStartingPose().getHeading()));
         pinpoint.setPosition(newPose);
-        player1 = new GamepadEx(gamepad1);
+
 
         limelight = new LimelightCamera(hardwareMap);
         limelight.limelightCamera.pipelineSwitch(3);
