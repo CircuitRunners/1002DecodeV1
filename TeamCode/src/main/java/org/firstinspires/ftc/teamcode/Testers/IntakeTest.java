@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Testers;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -9,7 +10,7 @@ import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
 
-
+@Disabled
 @TeleOp(name = "IntakeTest")
 public class IntakeTest extends OpMode {
 

@@ -1,63 +1,21 @@
-package org.firstinspires.ftc.teamcode.Testers;
+package org.firstinspires.ftc.teamcode.V1.Config.subsystems;
 
 import com.bylazar.configurables.annotations.Configurable;
-import com.qualcomm.hardware.lynx.LynxModule;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 import com.seattlesolvers.solverslib.controller.PIDFController;
+import com.seattlesolvers.solverslib.hardware.motors.CRServo;
 
-import java.util.List;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-
-/**
- * ============================================================
- *                Flywheel PIDF Tuning Instructions
- * ============================================================
- * This OpMode helps you tune your flywheel velocity PIDF loop.
- * Use FTC Dashboard to view and adjust parameters live.
- *
- * STEP 1: Connect Pannels
- *    - Run this OpMode.
- *    - Open the Dashboard.
- *    - Watch telemetry for velocity, target, and power.
- *
- * STEP 2: Tune Feedforward (kF)
- *    - Set kP, kI, kD = 0.
- *    - Increase kF until the flywheel speed roughly reaches your target velocity
- *      (targetVelocity) without oscillation or overshooting.
- *    - The idea: power ≈ kF * targetVelocity → stable near target speed.
- *
- * STEP 3: Tune Proportional (kP)
- *    - Slowly increase kP until the flywheel reacts quickly but starts to oscillate slightly.
- *    - If it overshoots or oscillates too much, reduce kP a bit.
- *
- * STEP 4: Tune Derivative (kD)
- *    - Add a small amount of kD to reduce oscillations and overshoot.
- *    - This smooths out the response.
- *
- * STEP 5: Tune Integral (kI)
- *    - Add a little kI if there’s a consistent steady-state error (flywheel settles below target).
- *    - Be careful: too much kI will cause oscillation or lag.
- *
- * STEP 6: Verify Response
- *    - Try different targetVelocity values.
- *    - Ensure response is smooth, fast, and consistent under load.
- *
- * STEP 7: Save Constants
- *    - Once tuned, record your PIDF constants and hardcode them in your shooter control code.
- *
- *    NOTE - if its good enough with just Kf and Kp then just leave it - no need for Kd and Ki unless absoulutely neccesary
- *    **/
 @Configurable
-@TeleOp
-public class FlywheelPIDFTuner extends OpMode {
+public class Shooter {
 
-    // ===== Dashboard Tunables =====
+    private Telemetry telemetry;
     public static double kP = 0.002;       // proportional gain
     public static double kI = 0.0001;      // integral gain
     public static double kD = 0.0004;      // derivative gain
@@ -65,19 +23,17 @@ public class FlywheelPIDFTuner extends OpMode {
     public static double targetVelocity = 1633; // desired speed (ticks/sec)
     public static double maxPower = 1.0;          // safety clamp
 
+    public static final int TICKS_PER_REV = 537; // goBILDA 312 RPM Yellow Jacket
+
     // ===== Hardware =====
     public DcMotorEx shooter1;
     public DcMotorEx shooter2;
     private PIDFController pidf;
     private ElapsedTime loopTimer = new ElapsedTime();
-    // Removed lastTicks and lastTime since they're no longer needed for manual calculation
 
-    @Override
-    public void init() {
-        // Enable bulk reads for faster loops
-//        List<LynxModule> hubs = hardwareMap.getAll(LynxModule.class);
-//        for (LynxModule hub : hubs) hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
 
+    public Shooter(HardwareMap hardwareMap, Telemetry telemetry) {
+        this.telemetry= telemetry;
 
         shooter1 = hardwareMap.get(DcMotorEx.class, "motor1");
         shooter1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -94,10 +50,13 @@ public class FlywheelPIDFTuner extends OpMode {
 
         pidf = new PIDFController(kP, kI, kD, kF);
         pidf.setSetPoint(targetVelocity);
+
+
     }
 
-    @Override
-    public void loop() {
+
+    public void shoot(){
+        loopTimer.reset();
 
         double rPM = shooter1.getVelocity();
         double rPM2 = shooter2.getVelocity();
@@ -116,8 +75,11 @@ public class FlywheelPIDFTuner extends OpMode {
         shooter2.setPower(output);
 
         // --- Telemetry ---
-        telemetry.addData("Target Vel (rotations/minute)", targetVelocity);
-        telemetry.addData("Measured Vel motor 1 (rotations/minute)", rPM);
+        telemetry.addData("Target Vel (ticks/sec)", targetVelocity);
+        telemetry.addData("Measured Vel motor 1 (tick/sec)", rPM);
+        telemetry.addData("Measured Vel motor 1 (tick/sec)", rPM2);
+        telemetry.addData("Measured Avg Vel (tick/sec)", averageRPM);
+        telemetry.addData("RPM?", getCurrentRPM());
         telemetry.addData("Motor Power", output);
         telemetry.addData("Loop Time (ms)", loopTimer.milliseconds());
         telemetry.update();
@@ -125,4 +87,39 @@ public class FlywheelPIDFTuner extends OpMode {
         // Reset the timer for the next loop iteration (optional, for loop time tracking)
         loopTimer.reset();
     }
-}
+
+        // --- Basic control methods ---
+
+
+        public void setPower(double power){
+            shooter1.setPower(power);
+            shooter2.setPower(power);
+        }
+        public void setTargetRPM(double rpm) {
+            targetVelocity = rpm;
+        }
+
+        public void stopShooter() {
+            setPower(0);
+        }
+
+        public void incrementRPM(double increment) {
+            setTargetRPM(targetVelocity+ increment);
+        }
+
+        public void decrementRPM(double increment) {
+            setTargetRPM(targetVelocity - increment);
+        }
+
+
+        public double getCurrentRPM() {
+            return shooter1.getVelocity() * 60.0 / TICKS_PER_REV;
+        }
+        public double getCurrentVelo(){
+            return ((shooter1.getVelocity()) + (shooter2.getVelocity()))/2;
+        }
+
+
+
+
+    }

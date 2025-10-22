@@ -57,7 +57,7 @@ public class HeadingAutoAligner {
      */
     public double getRotationPower(double robotX, double robotY, double robotHeading) {
         double worldAngleToTarget = Math.atan2(targetY - robotY, targetX - robotX);
-        double headingError = MathFunctions.normalizeAngle(worldAngleToTarget - robotHeading);
+        double headingError = normalizeAngle(worldAngleToTarget - robotHeading);
 
         // PID terms
         integral += headingError;
@@ -79,4 +79,12 @@ public class HeadingAutoAligner {
 
     public double getTargetX() { return targetX; }
     public double getTargetY() { return targetY; }
+
+    private double normalizeAngle(double angleRadians) {
+        double angle = angleRadians % (2*Math.PI);
+        if (angle < 0) {
+            return angle + 2*Math.PI;
+        }
+        return angle;
+    }
 }

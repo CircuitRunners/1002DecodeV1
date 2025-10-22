@@ -65,6 +65,21 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
             setTargetRPM(targetRPM - increment);
         }
 
+        public void intakeIn(){
+            intake.setPower(1);
+        }
+
+        public void intakeOut(){
+            intake.setPower(-1);
+        }
+        public void intakeRetainBalls(){
+            intake.setPower(0.35);
+        }
+
+        public void intakeIdle(){
+            intake.setPower(0);
+        }
+
         // --- Periodic update (optional) ---
         public void update() {
             telemetry.addData("Target RPM", targetRPM);

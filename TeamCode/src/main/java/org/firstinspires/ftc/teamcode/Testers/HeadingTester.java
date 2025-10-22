@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Testers;
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.lynx.LynxModule;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
@@ -15,7 +16,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.V1.Config.subsystems.LimelightCamera;
 import org.firstinspires.ftc.teamcode.V1.Config.subsystems.MecanumDrive;
 import org.firstinspires.ftc.teamcode.V1.Config.util.HeadingAutoAligner;
-
+//@Disabled
 @TeleOp(name = "Heading Auto Aligner (Dashboard Tunable PID)", group = "Testers")
 @Configurable
 public class HeadingTester extends OpMode {

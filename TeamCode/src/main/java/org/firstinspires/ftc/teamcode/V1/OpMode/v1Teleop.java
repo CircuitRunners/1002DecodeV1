@@ -24,8 +24,10 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
+import org.firstinspires.ftc.teamcode.V1.Config.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.V1.Config.subsystems.LimelightCamera;
 import org.firstinspires.ftc.teamcode.V1.Config.subsystems.MecanumDrive;
+import org.firstinspires.ftc.teamcode.V1.Config.subsystems.Shooter;
 import org.firstinspires.ftc.teamcode.V1.Config.util.Poses;
 import org.firstinspires.ftc.teamcode.V1.Config.util.ValidShootingZoneChecker;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
@@ -43,10 +45,14 @@ public class v1Teleop extends OpMode {
     private Follower follower;
     private LimelightCamera limelight;
     private ValidShootingZoneChecker zoneChecker;
+    private Intake intake;
+    private Shooter shooter;
+    private Supplier<PathChain> pathChainBlue;
+    private Supplier<PathChain> pathChainRed;
 
     private GamepadEx player1;
     TriggerReader leftTriggerReader;
-    private Supplier<PathChain> pathChain;
+    TriggerReader rightTriggerReader;
 
     private final ElapsedTime timer = new ElapsedTime();
 
@@ -58,6 +64,9 @@ public class v1Teleop extends OpMode {
     private boolean isRedAlliance;
     private boolean automatedDrive = false;
     private boolean preselectFromAuto = false;
+    private boolean isIntakeInUse = false;
+    private final double MINIMUM_SHOOTER_VELO = 1600; //   tick/sec
+    private final double MAXIMUM_SHOOTER_VELO = 1650; //   tick/sec
 
 
 
@@ -78,9 +87,15 @@ public class v1Teleop extends OpMode {
         leftTriggerReader = new TriggerReader(
                 player1, GamepadKeys.Trigger.LEFT_TRIGGER
         );
+        rightTriggerReader = new TriggerReader(
+                player1, GamepadKeys.Trigger.RIGHT_TRIGGER
+        );
 
         drive = new MecanumDrive();
         drive.init(hardwareMap);
+
+        intake = new Intake(hardwareMap, telemetry);
+        shooter = new Shooter(hardwareMap, telemetry);
 
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "odo");
         configurePinpoint();
@@ -97,19 +112,6 @@ public class v1Teleop extends OpMode {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
         }
 
-        if (isRedAlliance){
-            pathChain = () -> follower.pathBuilder() //Lazy Curve Generation for red shoot pos
-                .addPath(new Path(new BezierLine(follower::getPose, new Pose(48, 95))))
-                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(135), 0.8))
-                .build();
-        }
-        else {
-            pathChain = () -> follower.pathBuilder() //Lazy Curve Generation for blue shoot pos
-                .addPath(new Path(new BezierLine(follower::getPose, new Pose(96, 95))))
-                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(45), 0.8))
-                .build();
-        }
-
         if(Poses.getAlliance() !=null){
             if(Poses.getAlliance() == Poses.Alliance.RED){
                 isRedAlliance = true;
@@ -121,8 +123,24 @@ public class v1Teleop extends OpMode {
             }
         }
         else{
+            isRedAlliance = false;
             preselectFromAuto = false;
         }
+
+
+            pathChainBlue = () -> follower.pathBuilder() //Lazy Curve Generation for blue shoot pos
+                .addPath(new Path(new BezierLine(follower::getPose, new Pose(44, 99))))
+                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(135), 0.8))
+                .build();
+
+
+            pathChainRed = () -> follower.pathBuilder() //Lazy Curve Generation for red shoot pos
+                .addPath(new Path(new BezierLine(follower::getPose, new Pose(100, 99))))
+                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(45), 0.8))
+                .build();
+
+
+
 
 
 
@@ -138,6 +156,8 @@ public class v1Teleop extends OpMode {
         leftTriggerReader.readValue();
         boolean leftBumperJustPressed = player1.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER);
         boolean leftTriggerJustPressed = leftTriggerReader.wasJustPressed();
+        boolean rightBumperJustPressed = player1.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER);
+        boolean rightTriggerJustPressed = rightTriggerReader.wasJustPressed();
 
         //localization + pedropathing logic
         pinpoint.update();
@@ -158,11 +178,11 @@ public class v1Teleop extends OpMode {
         }
 
         //state machine control
-        if (leftBumperJustPressed) {
+        if (rightBumperJustPressed) {
                 stateMachine = (stateMachine + 1) % 2;
         }
 
-        if (leftTriggerJustPressed) {
+        if (leftBumperJustPressed) {
             stateMachine = (stateMachine - 1) % 2;
 
         }
@@ -194,18 +214,26 @@ public class v1Teleop extends OpMode {
         double newForward = r * Math.sin(theta);
         double newStrafe  = r * Math.cos(theta);
 
-        drive.drive(newForward, newStrafe, finalRotation);
-
+        if(!follower.isBusy()) {
+            drive.drive(newForward, newStrafe, finalRotation);
+        }
 
 
         // recalibrate pinpoint
+//        if (player1.wasJustPressed(GamepadKeys.Button.SQUARE)) {
+//            pinpoint.resetPosAndIMU();
+//            telemetry.addLine("Pinpoint IMU Reset!");
+//        }
+//        if (player1.wasJustPressed(GamepadKeys.Button.TRIANGLE)) {
+//            pinpoint.recalibrateIMU();
+//            telemetry.addLine("Pinpoint IMU Recalibrated!");
+//        }
         if (player1.wasJustPressed(GamepadKeys.Button.SQUARE)) {
-            pinpoint.resetPosAndIMU();
-            telemetry.addLine("Pinpoint IMU Reset!");
-        }
-        if (player1.wasJustPressed(GamepadKeys.Button.TRIANGLE)) {
-            pinpoint.recalibrateIMU();
-            telemetry.addLine("Pinpoint IMU Recalibrated!");
+            Pose2D newPose = new Pose2D(DistanceUnit.INCH,
+                    72,72,
+                    AngleUnit.RADIANS, 0);
+            pinpoint.setPosition(newPose);
+            telemetry.addLine("Pinpoint Reset - Position now 72,72 (Middle)!");
         }
 
         String data = String.format(Locale.US,
@@ -218,23 +246,64 @@ public class v1Teleop extends OpMode {
         //main state machine loop where all of the actions actually happen
         switch (stateMachine){
             case 0:
+                shooter.stopShooter();
                //intake stuff
+                 isIntakeInUse= true;
+                if(rightTriggerJustPressed){
+                    intake.intakeIn();
+                }
+                else if (leftTriggerJustPressed){
+                    intake.intakeOut();
+                }
+                else{
+                    intake.intakeIdle();
+                }
 
                 break;
             case 1:
             //score stuff
+
+                if (!isIntakeInUse){
+                    intake.intakeRetainBalls();
+                }
                 if (player1.wasJustPressed(GamepadKeys.Button.CIRCLE)) {
-                    follower.followPath(pathChain.get());
+                    if (isRedAlliance){
+                        follower.followPath(pathChainRed.get());
+                    }
+                    else {
+                        follower.followPath(pathChainBlue.get());
+                    }
+
 
                 }
-                while (!follower.isBusy()){
-                    isHeadingLocked = true;
+                if (!automatedDrive){
+                    //isHeadingLocked = true;
                 }
-                isHeadingLocked = false;
-                if (zoneChecker.isInsideShootingZone(currentPose.getX(DistanceUnit.INCH), currentPose.getY(DistanceUnit.INCH))){
+                else {
+                    isHeadingLocked = false;
+                }
+
+
+                if (zoneChecker.isInsideShootingZone(currentPose.getX(DistanceUnit.INCH), currentPose.getY(DistanceUnit.INCH))) {
+                    shooter.shoot();
                     //shooting logic
+                    if ((shooter.getCurrentVelo() >= MINIMUM_SHOOTER_VELO) && (shooter.getCurrentVelo() <= MAXIMUM_SHOOTER_VELO)) {
+                        isIntakeInUse = true;
+                        intake.intakeIn();
+                        if (player1.isDown(GamepadKeys.Button.CROSS)) {
+                            intake.setServoPower(1);
+                        }
+                        else{
+                            intake.setServoPower(0);
+                        }
+                    }
+                    else {
+                        isIntakeInUse = false;
+                    }
                 }
-
+                else {
+                        isIntakeInUse = false;
+                }
                 break;
             default:
                 isHeadingLocked = false;
@@ -246,10 +315,11 @@ public class v1Teleop extends OpMode {
         telemetry.addData("Position", data);
         telemetry.addData("State", stateMachine);
         telemetry.addData("Heading Lock", isHeadingLocked ? "ON" : "OFF");
+        telemetry.addData("Alliance: ", isRedAlliance? "Red" : "Blue");
         telemetry.update();
 
         //boolean control to check if pedro is in use
-        while (follower.isBusy()){
+        if (follower.isBusy()){
             automatedDrive = true;
         }
     }
