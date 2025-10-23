@@ -98,8 +98,9 @@ public class v1Teleop extends OpMode {
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "odo");
         configurePinpoint();
 
-        Pose2D newPose = new Pose2D(DistanceUnit.INCH, Poses.getStartingPose().getX(), Poses.getStartingPose().getY(), AngleUnit.RADIANS, Math.toRadians(Poses.getStartingPose().getHeading())); //causing errors when initializing
-        pinpoint.setPosition(newPose); //causing errors when initializing
+//        Pose2D newPose = new Pose2D(DistanceUnit.INCH, Poses.getStartingPose().getX(), Poses.getStartingPose().getY(), AngleUnit.RADIANS, Math.toRadians(Poses.getStartingPose().getHeading())); //causing errors when initializing
+
+      //  pinpoint.setPosition(newPose); //causing errors when initializing
 
 
         limelight = new LimelightCamera(hardwareMap);
@@ -148,6 +149,12 @@ public class v1Teleop extends OpMode {
 
         telemetry.addLine("Ready!");
         telemetry.update();
+    }
+
+    @Override
+    public void start(){
+        Pose2D newPose = new Pose2D(DistanceUnit.INCH, Poses.getStartingPose().getX(), Poses.getStartingPose().getY(), AngleUnit.RADIANS, Math.toRadians(Poses.getStartingPose().getHeading()));
+        pinpoint.setPosition(newPose);
     }
 
     @Override
