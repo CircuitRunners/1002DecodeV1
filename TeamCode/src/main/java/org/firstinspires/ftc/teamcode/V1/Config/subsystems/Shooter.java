@@ -8,7 +8,6 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 import com.seattlesolvers.solverslib.controller.PIDFController;
-import com.seattlesolvers.solverslib.hardware.motors.CRServo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
@@ -20,8 +19,8 @@ public class Shooter {
     public static double kI = 0.000;      // integral gain
     public static double kD = 0.000;      // derivative gain
     public static double kF = 0.00025;      // feedforward ≈ 1 / maxTicksPerSec
-    public static double targetVelocity = 1110; // desired speed (ticks/sec) // 1633
-    public static double maxPower = 1.0;          // safety clamp
+    public static double targetVelocity = 0; // desired speed (ticks/sec) // 1633og, 1110 new for close/auto spot
+    private static double maxPower = 1.0;          // safety clamp
 
     public static final int TICKS_PER_REV = 537; // goBILDA 312 RPM Yellow Jacket
 
@@ -30,6 +29,7 @@ public class Shooter {
     public DcMotorEx shooter2;
     private PIDFController pidf;
     private ElapsedTime loopTimer = new ElapsedTime();
+
 
 
     public Shooter(HardwareMap hardwareMap, Telemetry telemetry) {
@@ -55,33 +55,34 @@ public class Shooter {
     }
 
 
-    public void shoot(){
+    public void shoot(double desiredVelo){
         loopTimer.reset();
 
-        double rPM = shooter1.getVelocity();
-        double rPM2 = shooter2.getVelocity();
+        targetVelocity = desiredVelo;
 
-        double averageRPM = (rPM + rPM2) / 2;
+
+        double shooter1Velocity = shooter1.getVelocity();
+        double shooter2Velocity = shooter2.getVelocity();
+
+        double averageVelo = (shooter1Velocity + shooter2Velocity) / 2;
 
         // --- Update gains and setpoint ---
         pidf.setPIDF(kP, kI, kD, kF);
         pidf.setSetPoint(targetVelocity);
 
         // --- Compute output and send to motor ---
-        // 'rPM' (the measured velocity) is passed to the custom PIDF controller.
-        double output = pidf.calculate(averageRPM, targetVelocity);
+        // 'shooter1Velocity' (the measured velocity) is passed to the custom PIDF controller.
+        double output = pidf.calculate(averageVelo, desiredVelo);
         output = Range.clip(output, 0, maxPower);
         shooter1.setPower(output);
         shooter2.setPower(output);
 
         // --- Telemetry ---
-        telemetry.addData("Target Vel (ticks/sec)", targetVelocity);
-        telemetry.addData("Measured Vel motor 1 (tick/sec)", rPM);
-        telemetry.addData("Measured Vel motor 1 (tick/sec)", rPM2);
-        telemetry.addData("Measured Avg Vel (tick/sec)", averageRPM);
-        telemetry.addData("RPM?", getCurrentRPM());
-        telemetry.addData("Motor Power", output);
-        telemetry.addData("Loop Time (ms)", loopTimer.milliseconds());
+//        telemetry.addData("Target Vel (ticks/sec)", targetVelocity);
+//        telemetry.addData("Measured Vel motor 1 (tick/sec)", shooter1Velocity);
+//        telemetry.addData("Measured Vel motor 1 (tick/sec)", shooter2Velocity);
+//        telemetry.addData("Measured Avg Vel (tick/sec)", averageVelo);
+        telemetry.addData("Shooter Motor Power Set Point: ", output);
         telemetry.update();
 
         // Reset the timer for the next loop iteration (optional, for loop time tracking)
@@ -118,6 +119,10 @@ public class Shooter {
     public double getCurrentVelo(){
         return ((shooter1.getVelocity()) + (shooter2.getVelocity()))/2;
     }
+    public double getTargetVelocity(){
+        return targetVelocity;
+    }
+
 
 
 

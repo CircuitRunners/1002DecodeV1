@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode.V1.OpMode;
 import com.bylazar.configurables.annotations.Configurable;
 //import com.pedropathing.follower.Follower;
 //import com.pedropathing.geometry.Pose;
+import com.bylazar.telemetry.PanelsTelemetry;
+import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
@@ -32,6 +34,7 @@ import org.firstinspires.ftc.teamcode.V1.Config.util.Poses;
 import org.firstinspires.ftc.teamcode.V1.Config.util.ValidShootingZoneChecker;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
+
 import java.util.List;
 import java.util.Locale;
 import java.util.function.Supplier;
@@ -49,6 +52,7 @@ public class v1Teleop extends OpMode {
     private Shooter shooter;
     private Supplier<PathChain> pathChainBlue;
     private Supplier<PathChain> pathChainRed;
+    private TelemetryManager panelsTelemetry;
 
     private GamepadEx player1;
     TriggerReader leftTriggerReader;
@@ -75,11 +79,14 @@ public class v1Teleop extends OpMode {
         telemetry.addLine("Initializing...");
         telemetry.update();
 
+        panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(Poses.getStartingPose());
         follower.update();
 
         player1 = new GamepadEx(gamepad1);
+
+
 
 
         leftTriggerReader = new TriggerReader(
@@ -301,7 +308,7 @@ public class v1Teleop extends OpMode {
 
 
                 // if (zoneChecker.isInsideShootingZone(currentPose.getX(DistanceUnit.INCH), currentPose.getY(DistanceUnit.INCH))) {
-                shooter.shoot();
+                shooter.shoot(1110);
                 //shooting logic
                 if ((shooter.getCurrentVelo() >= MINIMUM_SHOOTER_VELO) && (shooter.getCurrentVelo() <= MAXIMUM_SHOOTER_VELO)) {
                     isIntakeInUse = true;
@@ -333,8 +340,21 @@ public class v1Teleop extends OpMode {
         telemetry.addData("State", stateMachine);
         telemetry.addData("Heading Lock", isHeadingLocked ? "ON" : "OFF");
         telemetry.addData("Alliance: ", isRedAlliance? "Red" : "Blue");
-        telemetry.update();
+        telemetry.addData("Shooter Velo", shooter.getCurrentVelo());
+        telemetry.addData("Intake in use: ", isIntakeInUse? "Yes" : "No");
 
+
+        panelsTelemetry.debug("Position", data);
+        panelsTelemetry.debug("State", stateMachine);
+        panelsTelemetry.debug("Heading Lock", isHeadingLocked ? "ON" : "OFF");
+        panelsTelemetry.debug("Alliance: ", isRedAlliance? "Red" : "Blue");
+        panelsTelemetry.debug("Shooter Velo", shooter.getCurrentVelo());
+        panelsTelemetry.debug("Intake in use: ", isIntakeInUse? "Yes" : "No");
+
+
+
+        panelsTelemetry.update(telemetry);
+        telemetry.update();
 
     }
 
