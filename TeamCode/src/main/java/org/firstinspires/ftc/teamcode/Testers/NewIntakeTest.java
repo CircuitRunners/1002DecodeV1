@@ -47,9 +47,9 @@ public class NewIntakeTest extends OpMode{
                intake.setTargetRPM(startingTargetRPM);
             }
 
-            if (player1.wasJustPressed(GamepadKeys.Button.TRIANGLE)) {
-                intake.toggleServoDirection();
-            }
+//            if (player1.wasJustPressed(GamepadKeys.Button.TRIANGLE)) {
+//                intake.toggleServoDirection();
+//            }
 
             while (player1.isDown(GamepadKeys.Button.X)) {
                 intake.setServoPower(0.5);

@@ -271,6 +271,7 @@ public class v1Teleop extends OpMode {
                     intake.setServoPower(-0.45);
                 }
                 else{
+                    intake.setServoPower(0);
                     intake.intakeIdle();
                 }
 
