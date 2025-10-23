@@ -88,38 +88,38 @@ public class Shooter {
         loopTimer.reset();
     }
 
-        // --- Basic control methods ---
+    // --- Basic control methods ---
 
 
-        public void setPower(double power){
-            shooter1.setPower(power);
-            shooter2.setPower(power);
-        }
-        public void setTargetRPM(double rpm) {
-            targetVelocity = rpm;
-        }
-
-        public void stopShooter() {
-            setPower(0);
-        }
-
-        public void incrementRPM(double increment) {
-            setTargetRPM(targetVelocity+ increment);
-        }
-
-        public void decrementRPM(double increment) {
-            setTargetRPM(targetVelocity - increment);
-        }
-
-
-        public double getCurrentRPM() {
-            return shooter1.getVelocity() * 60.0 / TICKS_PER_REV;
-        }
-        public double getCurrentVelo(){
-            return ((shooter1.getVelocity()) + (shooter2.getVelocity()))/2;
-        }
-
-
-
-
+    public void setPower(double power){
+        shooter1.setPower(power);
+        shooter2.setPower(power);
     }
+    public void setTargetRPM(double rpm) {
+        targetVelocity = rpm;
+    }
+
+    public void stopShooter() {
+        setPower(0);
+    }
+
+    public void incrementRPM(double increment) {
+        setTargetRPM(targetVelocity+ increment);
+    }
+
+    public void decrementRPM(double increment) {
+        setTargetRPM(targetVelocity - increment);
+    }
+
+
+    public double getCurrentRPM() {
+        return shooter1.getVelocity() * 60.0 / TICKS_PER_REV;
+    }
+    public double getCurrentVelo(){
+        return ((shooter1.getVelocity()) + (shooter2.getVelocity()))/2;
+    }
+
+
+
+
+}
