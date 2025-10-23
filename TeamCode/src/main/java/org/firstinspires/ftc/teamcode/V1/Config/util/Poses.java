@@ -75,12 +75,12 @@ public class Poses {
     // Goal Side Poses (Blue given, red auto-computed
     //================
     public static final AlliancePose startPoseGoalSide = AlliancePose.mirror(
-            new Pose(63.8, 135.8, 0)
+            new Pose(31, 135.8, 0)
     );
 
     //Used multiple times cause shoot from same spot
     public static final AlliancePose shootPositionGoalSide = AlliancePose.mirror(
-            new Pose(44, 99, Math.toRadians(135))
+            new Pose(38, 106.5, Math.toRadians(132.5))
             //new Pose(48, 95.4, Math.toRadians(135))
     );
 

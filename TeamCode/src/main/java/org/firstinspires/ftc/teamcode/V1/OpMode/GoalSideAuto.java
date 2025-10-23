@@ -28,8 +28,10 @@ public class GoalSideAuto extends OpMode {
     private int pathState;
     private int shotCounter = 0;
 
-    private double MINIMUM_SHOOTER_VELO = 1050;
-    private double MAXIMUM_SHOOTER_VELO = 1150;
+    private final double MINIMUM_SHOOTER_VELO = 1050;
+    private final double MAXIMUM_SHOOTER_VELO = 1150;
+
+    private final double shooterDesiredVelo = 1110;
 
 
     // Tolerance for alignment in radians (approx. 2 degrees)
@@ -106,13 +108,14 @@ public class GoalSideAuto extends OpMode {
     public void autonomousPathUpdate() {
         switch (pathState) {
             case 0: // Initial Travel to Shoot Position
+                intake.intakeRetainBalls();
                 if (!follower.isBusy()) {
                     follower.followPath(travelToShoot, true);
                     setPathState();
                 }
                 break;
             case 1: // Shooter Shoot
-                shooter.shoot(1110);
+                shooter.shoot(shooterDesiredVelo);
                 //aligner.getRotationPower(follower.getPose().getX(), follower.getPose().getY(), follower.getHeading());
                 if ((shooter.getCurrentVelo() >= MINIMUM_SHOOTER_VELO) && (shooter.getCurrentVelo() <= MAXIMUM_SHOOTER_VELO)) {
                     intake.intakeIn();
@@ -130,6 +133,7 @@ public class GoalSideAuto extends OpMode {
                 break;
             case 2: //go to intake
                 shooter.stopShooter();
+                intake.intakeIdle();
                 if (!follower.isBusy()) {
                     follower.followPath(travelToIntake1, true);
                     setPathState();
@@ -152,7 +156,7 @@ public class GoalSideAuto extends OpMode {
                 }
                 break;
             case 5: //shoot
-                shooter.shoot(1110);
+                shooter.shoot(shooterDesiredVelo);
                 //aligner.getRotationPower(follower.getPose().getX(), follower.getPose().getY(), follower.getHeading());
                 if ((shooter.getCurrentVelo() >= MINIMUM_SHOOTER_VELO) && (shooter.getCurrentVelo() <= MAXIMUM_SHOOTER_VELO)) {
                     intake.intakeIn();
@@ -177,6 +181,7 @@ public class GoalSideAuto extends OpMode {
 
             case 6: //go to intake
                 shooter.stopShooter();
+                intake.intakeIdle();
                 if (!follower.isBusy()) {
                     follower.followPath(travelToIntake2, true);
                     setPathState();
@@ -199,7 +204,7 @@ public class GoalSideAuto extends OpMode {
                 }
                 break;
             case 9: //shoot
-                shooter.shoot(1110);
+                shooter.shoot(shooterDesiredVelo);
                 //aligner.getRotationPower(follower.getPose().getX(), follower.getPose().getY(), follower.getHeading());
                 if ((shooter.getCurrentVelo() >= MINIMUM_SHOOTER_VELO) && (shooter.getCurrentVelo() <= MAXIMUM_SHOOTER_VELO)) {
                     intake.intakeIn();
@@ -217,6 +222,7 @@ public class GoalSideAuto extends OpMode {
                 break;
             case 10: //go to intake
                 shooter.stopShooter();
+                intake.intakeIdle();
                 if (!follower.isBusy()) {
                     follower.followPath(travelToIntake3, true);
                     setPathState();
@@ -239,7 +245,7 @@ public class GoalSideAuto extends OpMode {
                 }
                 break;
             case 13: //shoot
-                shooter.shoot(1110);
+                shooter.shoot(shooterDesiredVelo);
                 //aligner.getRotationPower(follower.getPose().getX(), follower.getPose().getY(), follower.getHeading());
                 if ((shooter.getCurrentVelo() >= MINIMUM_SHOOTER_VELO) && (shooter.getCurrentVelo() <= MAXIMUM_SHOOTER_VELO)) {
                     intake.intakeIn();
@@ -256,6 +262,7 @@ public class GoalSideAuto extends OpMode {
                 }
                 break;
             case 14:
+                intake.intakeIdle();
                 if (!follower.isBusy()){
                     follower.followPath(travelToGate, true);
                     setPathState(-1);
