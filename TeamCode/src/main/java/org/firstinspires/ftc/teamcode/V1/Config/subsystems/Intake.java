@@ -2,10 +2,10 @@ package org.firstinspires.ftc.teamcode.V1.Config.subsystems;
 
 
 import com.bylazar.configurables.annotations.Configurable;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.seattlesolvers.solverslib.hardware.motors.CRServo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
@@ -48,13 +48,13 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
         public void setServoPower(double power) {
             servoPower = power;
-            servoIntake.set(servoPower);
+            servoIntake.setPower(servoPower);
 
         }
 
         public void toggleServoDirection() {
             reverseServo = !reverseServo;
-            servoIntake.setInverted(reverseServo);
+            servoIntake.setDirection(DcMotorSimple.Direction.REVERSE);
         }
 
         public void incrementRPM(double increment) {

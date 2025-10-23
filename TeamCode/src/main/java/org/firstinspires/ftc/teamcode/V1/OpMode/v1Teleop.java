@@ -98,8 +98,8 @@ public class v1Teleop extends OpMode {
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "odo");
         configurePinpoint();
 
-        Pose2D newPose = new Pose2D(DistanceUnit.INCH, Poses.getStartingPose().getX(), Poses.getStartingPose().getY(), AngleUnit.RADIANS, Math.toRadians(Poses.getStartingPose().getHeading()));
-        pinpoint.setPosition(newPose);
+        Pose2D newPose = new Pose2D(DistanceUnit.INCH, Poses.getStartingPose().getX(), Poses.getStartingPose().getY(), AngleUnit.RADIANS, Math.toRadians(Poses.getStartingPose().getHeading())); //causing errors when initializing
+        pinpoint.setPosition(newPose); //causing errors when initializing
 
 
         limelight = new LimelightCamera(hardwareMap);
@@ -130,13 +130,13 @@ public class v1Teleop extends OpMode {
         }
 
 
-            pathChainBlue = () -> follower.pathBuilder() //Lazy Curve Generation for blue shoot pos
+        pathChainBlue = () -> follower.pathBuilder() //Lazy Curve Generation for blue shoot pos
                 .addPath(new Path(new BezierLine(follower::getPose, new Pose(44, 99))))
                 .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(135), 0.8))
                 .build();
 
 
-            pathChainRed = () -> follower.pathBuilder() //Lazy Curve Generation for red shoot pos
+        pathChainRed = () -> follower.pathBuilder() //Lazy Curve Generation for red shoot pos
                 .addPath(new Path(new BezierLine(follower::getPose, new Pose(100, 99))))
                 .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(45), 0.8))
                 .build();
@@ -184,7 +184,7 @@ public class v1Teleop extends OpMode {
 
         //state machine control
         if (rightBumperJustPressed) {
-                stateMachine = (stateMachine + 1) % 2;
+            stateMachine = (stateMachine + 1) % 2;
         }
 
         if (leftBumperJustPressed) {
@@ -253,8 +253,8 @@ public class v1Teleop extends OpMode {
         switch (stateMachine){
             case 0:
                 shooter.stopShooter();
-               //intake stuff
-                 isIntakeInUse= true;
+                //intake stuff
+                isIntakeInUse= true;
                 if(rightTriggerJustPressed){
                     intake.intakeIn();
                     intake.setServoPower(0.45);
@@ -269,7 +269,7 @@ public class v1Teleop extends OpMode {
 
                 break;
             case 1:
-            //score stuff
+                //score stuff
 
                 if (!isIntakeInUse){
                     intake.intakeRetainBalls();
@@ -292,23 +292,23 @@ public class v1Teleop extends OpMode {
                 }
 
 
-               // if (zoneChecker.isInsideShootingZone(currentPose.getX(DistanceUnit.INCH), currentPose.getY(DistanceUnit.INCH))) {
-                    shooter.shoot();
-                    //shooting logic
-                    if ((shooter.getCurrentVelo() >= MINIMUM_SHOOTER_VELO) && (shooter.getCurrentVelo() <= MAXIMUM_SHOOTER_VELO)) {
-                        isIntakeInUse = true;
-                        intake.intakeIn();
-                        if (player1.isDown(GamepadKeys.Button.CROSS)) {
-                            intake.setServoPower(1);
-                        }
-                        else{
-                            intake.setServoPower(0);
-                        }
+                // if (zoneChecker.isInsideShootingZone(currentPose.getX(DistanceUnit.INCH), currentPose.getY(DistanceUnit.INCH))) {
+                shooter.shoot();
+                //shooting logic
+                if ((shooter.getCurrentVelo() >= MINIMUM_SHOOTER_VELO) && (shooter.getCurrentVelo() <= MAXIMUM_SHOOTER_VELO)) {
+                    isIntakeInUse = true;
+                    intake.intakeIn();
+                    if (player1.isDown(GamepadKeys.Button.CROSS)) {
+                        intake.setServoPower(1);
                     }
-                    else {
-                        isIntakeInUse = false;
+                    else{
+                        intake.setServoPower(0);
                     }
-               // }
+                }
+                else {
+                    isIntakeInUse = false;
+                }
+                // }
 //                else {
 //                        shooter.stopShooter();
 //                        isIntakeInUse = false;
