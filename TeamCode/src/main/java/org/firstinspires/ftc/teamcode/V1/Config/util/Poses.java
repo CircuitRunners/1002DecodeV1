@@ -75,7 +75,7 @@ public class Poses {
     // Goal Side Poses (Blue given, red auto-computed
     //================
     public static final AlliancePose startPoseGoalSide = AlliancePose.mirror(
-            new Pose(31, 135.8, 0)
+            new Pose(32.3, 135.6, Math.toRadians(0))
     );
 
     //Used multiple times cause shoot from same spot
@@ -112,7 +112,7 @@ public class Poses {
     // Goal Side Poses (Blue given, red auto-computed
     //================
     public static final AlliancePose startPoseFarSide = AlliancePose.mirror(
-            new Pose(63.8, 8.3, 0)
+            new Pose(54.6, 8.3, 90)
     );
     public static final AlliancePose pathToShootFirstTimeControlPoint1 = AlliancePose.mirror(
             new Pose(59.4, 48.5, 0)
@@ -121,7 +121,7 @@ public class Poses {
             new Pose(71.8, 98.7, 0)
     );
     public static final AlliancePose shootPositionFar = AlliancePose.mirror(
-            new Pose(58, 113, 140)
+            new Pose(59, 85, 135)
     );
     public static final AlliancePose toHumanPlayerControlPoint1 = AlliancePose.mirror(
             new Pose(69.7, 97.9, 0)

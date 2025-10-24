@@ -111,7 +111,6 @@ public class v1Teleop extends OpMode {
 
 
         limelight = new LimelightCamera(hardwareMap);
-        limelight.limelightCamera.pipelineSwitch(3);
         limelight.limelightCamera.start();
 
         zoneChecker = new ValidShootingZoneChecker();
@@ -368,7 +367,7 @@ public class v1Teleop extends OpMode {
         //updates the orientation of robot for limelight camera's usage
         limelight.limelightCamera.updateRobotOrientation(pinpoint.getPosition().getHeading(AngleUnit.RADIANS));
 
-        LLResult result = limelight.getresult();
+       LLResult result = limelight.getResult();
 
         //ensures result exsists and is from an acceptable apriltag
         if (result != null && result.isValid()) {

@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.V1.OpMode;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierLine;
+import com.pedropathing.paths.HeadingInterpolator;
 import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -34,6 +35,7 @@ public class GoalSideAuto extends OpMode {
     private final double shooterDesiredVelo = 1110;
 
 
+
     // Tolerance for alignment in radians (approx. 2 degrees)
    // private static final double ALIGN_THRESHOLD = Math.toRadians(2);
 
@@ -45,10 +47,25 @@ public class GoalSideAuto extends OpMode {
         // Poses.get(POSE_NAME) ensures the correct RED or BLUE coordinates are used.
 
         // Path 1: Travel from Start to a Shooting Position
+//        travelToShoot = follower.pathBuilder()
+//                .addPath(new BezierLine(Poses.get(Poses.startPoseGoalSide), Poses.get(Poses.shootPositionGoalSide)))
+//                .setLinearHeadingInterpolation(Poses.get(Poses.startPoseGoalSide).getHeading(), Poses.get(Poses.shootPositionGoalSide).getHeading(), 0.8) // endtime is between 0.0 and 1.0
+//                .build();
+
         travelToShoot = follower.pathBuilder()
                 .addPath(new BezierLine(Poses.get(Poses.startPoseGoalSide), Poses.get(Poses.shootPositionGoalSide)))
-                .setLinearHeadingInterpolation(Poses.get(Poses.startPoseGoalSide).getHeading(), Poses.get(Poses.shootPositionGoalSide).getHeading())
-                .build();
+                .setHeadingInterpolation(
+                        HeadingInterpolator.piecewise(
+                                new HeadingInterpolator.PiecewiseNode(
+                                        0,0.4,HeadingInterpolator.linear(Math.toRadians(0), Math.toRadians(45))
+                                ),
+                                new HeadingInterpolator.PiecewiseNode(
+                                        0.4,0.65,HeadingInterpolator.constant(Math.toRadians(45))
+                                ),
+                                new HeadingInterpolator.PiecewiseNode(
+                                        0.65,1,HeadingInterpolator.linear(Math.toRadians(45), Poses.get(Poses.shootPositionGoalSide).getHeading())
+                                ))) // splits up different timed portions of the path (from 0.0-1.0) into different movment types
+                        .build();
 
         // Path 2: Travel from Shooting Position to Intake Position
         travelToIntake1 = follower.pathBuilder()
@@ -109,6 +126,10 @@ public class GoalSideAuto extends OpMode {
         switch (pathState) {
             case 0: // Initial Travel to Shoot Position
                 intake.intakeRetainBalls();
+                if(follower.getCurrentTValue() >=0.4){
+                    //limelight.getTagId();
+
+                }
                 if (!follower.isBusy()) {
                     follower.followPath(travelToShoot, true);
                     setPathState();
