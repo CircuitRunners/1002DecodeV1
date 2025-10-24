@@ -40,7 +40,7 @@ public class Shooter {
         shooter1.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
         shooter2 = hardwareMap.get(DcMotorEx.class, "motor2");
-        shooter1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        shooter2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         shooter2.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
         shooter1.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -86,7 +86,7 @@ public class Shooter {
         telemetry.update();
 
         // Reset the timer for the next loop iteration (optional, for loop time tracking)
-        loopTimer.reset();
+
     }
 
     // --- Basic control methods ---
