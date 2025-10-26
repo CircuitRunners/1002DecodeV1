@@ -28,8 +28,11 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
             intake = hardwareMap.get(DcMotorEx.class, "intake");
             servoIntake = hardwareMap.get(CRServo.class, "feederWheel");
 
-            intake.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-            intake.setDirection(DcMotorSimple.Direction.REVERSE);
+
+            servoIntake.setDirection(DcMotorSimple.Direction.REVERSE);
+
+            //intake.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+           // intake.setDirection(DcMotorSimple.Direction.REVERSE);
 
         }
 
@@ -73,7 +76,10 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
         public void intakeIdle(){
             intake.setPower(0);
+            servoIntake.setPower(0);
         }
+
+
 
         // --- Periodic update (optional) ---
         public void update() {

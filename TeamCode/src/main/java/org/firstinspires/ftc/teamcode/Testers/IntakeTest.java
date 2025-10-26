@@ -10,7 +10,7 @@ import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
 
-@Disabled
+//@Disabled
 @TeleOp(name = "IntakeTest")
 public class IntakeTest extends OpMode {
 
@@ -34,7 +34,7 @@ public class IntakeTest extends OpMode {
         intake.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         intake.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        servoIntake = hardwareMap.get(CRServo.class, "servo");
+        servoIntake = hardwareMap.get(CRServo.class, "feederWheel");
 
         telemetry.addLine("Ready!");
         telemetry.update();

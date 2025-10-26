@@ -142,7 +142,7 @@ public class Poses {
 
     //TELEOP STUFF
     public static final AlliancePose teleopDefaultPose = AlliancePose.mirror(
-            new Pose(72, 72, 0) // change to your preferred TeleOp "spawn" location
+            new Pose(72, 72, 90) // change to your preferred TeleOp "spawn" location
     );
 
     // =======================

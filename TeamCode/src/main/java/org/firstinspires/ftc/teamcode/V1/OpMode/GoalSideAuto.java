@@ -29,8 +29,11 @@ public class GoalSideAuto extends OpMode {
     private int pathState;
     private int shotCounter = 0;
 
-    private final double MINIMUM_SHOOTER_VELO = 1050;
-    private final double MAXIMUM_SHOOTER_VELO = 1150;
+    private double lastShooterVelo = 0;
+    private boolean shotDetected = false;
+    private final double DROP_THRESHOLD = 35;      // RPM drop to count as a shot (tune this)
+    private final double RECOVER_THRESHOLD = 20;   // How close to target before re-arming detection
+    private final double SHOOTER_READY_THRESHOLD = 0.8; // 80% of target before enabling detection
 
     private final double shooterDesiredVelo = 1110;
 
@@ -136,61 +139,39 @@ public class GoalSideAuto extends OpMode {
                 }
                 break;
             case 1: // Shooter Shoot
-                shooter.shoot(shooterDesiredVelo);
-                //aligner.getRotationPower(follower.getPose().getX(), follower.getPose().getY(), follower.getHeading());
-                if ((shooter.getCurrentVelo() >= MINIMUM_SHOOTER_VELO) && (shooter.getCurrentVelo() <= MAXIMUM_SHOOTER_VELO)) {
-                    intake.intakeIn();
-                    intake.setServoPower(1);
-                    shotCounter++;
-                }
-                else{
-                    intake.setServoPower(0);
-                }
-
-                if(shotCounter >= 3){
-                    shotCounter = 0;
-                    setPathState();
+                if (!follower.isBusy()) {
+                    shootBalls();
                 }
                 break;
             case 2: //go to intake
                 shooter.stopShooter();
                 intake.intakeIdle();
                 if (!follower.isBusy()) {
+
                     follower.followPath(travelToIntake1, true);
                     setPathState();
                 }
                 break;
             case 3: //intake
-                intake.intakeIn();
+
                 if (!follower.isBusy()) {
+                    intake.intakeIn();
                     follower.followPath(intake1, true);
 
                     setPathState();
                 }
                 break;
             case 4: //go to shoot
-                intake.intakeRetainBalls();
                 if (!follower.isBusy()) {
+                    intake.intakeRetainBalls();
                     follower.followPath(travelBackToShoot1, true);
 
                     setPathState();
                 }
                 break;
             case 5: //shoot
-                shooter.shoot(shooterDesiredVelo);
-                //aligner.getRotationPower(follower.getPose().getX(), follower.getPose().getY(), follower.getHeading());
-                if ((shooter.getCurrentVelo() >= MINIMUM_SHOOTER_VELO) && (shooter.getCurrentVelo() <= MAXIMUM_SHOOTER_VELO)) {
-                    intake.intakeIn();
-                    intake.setServoPower(1);
-                    shotCounter++;
-                }
-                else{
-                    intake.setServoPower(0);
-                }
-
-                if(shotCounter >= 3){
-                    shotCounter = 0;
-                    setPathState(-1);
+                if (!follower.isBusy()) {
+                    shootBalls();
                 }
                 break;
 
@@ -209,36 +190,26 @@ public class GoalSideAuto extends OpMode {
                 }
                 break;
             case 7: //intake
-                intake.intakeIn();
+
                 if (!follower.isBusy()) {
+                    intake.intakeIn();
                     follower.followPath(intake2, true);
 
                     setPathState();
                 }
                 break;
             case 8: //go to shoot
-                intake.intakeRetainBalls();
+
                 if (!follower.isBusy()) {
+                    intake.intakeRetainBalls();
                     follower.followPath(travelBackToShoot2, true);
 
                     setPathState();
                 }
                 break;
             case 9: //shoot
-                shooter.shoot(shooterDesiredVelo);
-                //aligner.getRotationPower(follower.getPose().getX(), follower.getPose().getY(), follower.getHeading());
-                if ((shooter.getCurrentVelo() >= MINIMUM_SHOOTER_VELO) && (shooter.getCurrentVelo() <= MAXIMUM_SHOOTER_VELO)) {
-                    intake.intakeIn();
-                    intake.setServoPower(1);
-                    shotCounter++;
-                }
-                else{
-                    intake.setServoPower(0);
-                }
-
-                if(shotCounter >= 3){
-                    shotCounter = 0;
-                    setPathState();
+                if (!follower.isBusy()) {
+                    shootBalls();
                 }
                 break;
             case 10: //go to intake
@@ -250,40 +221,32 @@ public class GoalSideAuto extends OpMode {
                 }
                 break;
             case 11: //intake
-                intake.intakeIn();
+
                 if (!follower.isBusy()) {
+                    intake.intakeIn();
                     follower.followPath(intake3, true);
 
                     setPathState();
                 }
                 break;
             case 12: //go to shoot
-                intake.intakeRetainBalls();
+
                 if (!follower.isBusy()) {
+                    intake.intakeRetainBalls();
                     follower.followPath(travelBackToShoot3, true);
 
                     setPathState();
                 }
                 break;
             case 13: //shoot
-                shooter.shoot(shooterDesiredVelo);
-                //aligner.getRotationPower(follower.getPose().getX(), follower.getPose().getY(), follower.getHeading());
-                if ((shooter.getCurrentVelo() >= MINIMUM_SHOOTER_VELO) && (shooter.getCurrentVelo() <= MAXIMUM_SHOOTER_VELO)) {
-                    intake.intakeIn();
-                    intake.setServoPower(1);
-                    shotCounter++;
-                }
-                else{
-                    intake.setServoPower(0);
-                }
-
-                if(shotCounter >= 3){
-                    shotCounter = 0;
-                    setPathState();
+                if (follower.isBusy()) {
+                    shootBalls();
                 }
                 break;
             case 14:
                 intake.intakeIdle();
+                shooter.stopShooter();
+                intake.setServoPower(0);
                 if (!follower.isBusy()){
                     follower.followPath(travelToGate, true);
                     setPathState(-1);
@@ -321,13 +284,13 @@ public class GoalSideAuto extends OpMode {
         telemetry.addData("Heading", follower.getPose().getHeading());
         telemetry.addData("Path State", pathState);
         telemetry.addData("Shots Fired", shotCounter);
-        // telemetry.addData("Shooter Ready", shooterIntake.isShooterUpToSpeed());
+       // telemetry.addData("Shooter Velo: ", shooter.getCurrentVelo());
 
         telemetry.update();
 
 
-        //shooterIntake.update(); // Generic subsystem update
-        follower.update();
+
+
         autonomousPathUpdate();
 
     }
@@ -382,6 +345,51 @@ public class GoalSideAuto extends OpMode {
         buildPaths();
         pathTimer.resetTimer();
         setPathState(0);
+    }
+
+    public void shootBalls(){
+
+        shooter.shoot(shooterDesiredVelo);
+        double currentVelo = shooter.getCurrentVelo();
+
+        // --- Skip detection until shooter is near speed ---
+        if (currentVelo < shooterDesiredVelo * SHOOTER_READY_THRESHOLD) {
+            lastShooterVelo = currentVelo;
+            intake.intakeRetainBalls();
+            intake.setServoPower(0);
+        }
+
+        // --- Feed balls only when shooter is up to speed ---
+        if (currentVelo >= shooterDesiredVelo - 25 && currentVelo <= shooterDesiredVelo + 55) {
+            intake.intakeIn();
+            intake.setServoPower(1);
+        } else {
+            intake.intakeRetainBalls();
+            intake.setServoPower(0);
+        }
+
+        // --- Detect velocity drop (shot fired) ---
+        double delta = lastShooterVelo - currentVelo;
+
+        // If speed dropped sharply, count one shot
+        if (!shotDetected && delta > DROP_THRESHOLD) {
+            shotDetected = true;
+            shotCounter++;
+            telemetry.addData("Shot Detected", shotCounter);
+        }
+
+        // When shooter recovers, re-arm detection for next ball
+        if (shotDetected && currentVelo >= shooterDesiredVelo - RECOVER_THRESHOLD) {
+            shotDetected = false;
+        }
+
+        // --- Move to next path after 3 confirmed shots ---
+        if (shotCounter >= 3 || pathTimer.getElapsedTimeSeconds() >= 7.5) {
+            shotCounter = 0;
+            setPathState();
+        }
+
+        lastShooterVelo = currentVelo;
     }
 
 }

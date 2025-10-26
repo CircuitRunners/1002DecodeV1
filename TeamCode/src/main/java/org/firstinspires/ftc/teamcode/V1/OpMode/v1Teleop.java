@@ -60,7 +60,7 @@ public class v1Teleop extends OpMode {
 
     private final ElapsedTime timer = new ElapsedTime();
 
-    private int stateMachine = -1;
+    private int stateMachine = 0;
     private static final double METERS_TO_INCH = 39.37;
 
     // State variable to manage the heading lock.
@@ -105,9 +105,9 @@ public class v1Teleop extends OpMode {
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "odo");
         configurePinpoint();
 
-//        Pose2D newPose = new Pose2D(DistanceUnit.INCH, Poses.getStartingPose().getX(), Poses.getStartingPose().getY(), AngleUnit.RADIANS, Math.toRadians(Poses.getStartingPose().getHeading())); //causing errors when initializing
+        Pose2D newPose = new Pose2D(DistanceUnit.INCH, Poses.getStartingPose().getX(), Poses.getStartingPose().getY(), AngleUnit.RADIANS, Math.toRadians(Poses.getStartingPose().getHeading())); //causing errors when initializing
 
-      //  pinpoint.setPosition(newPose); //causing errors when initializing
+        pinpoint.setPosition(newPose); //causing errors when initializing
 
 
         limelight = new LimelightCamera(hardwareMap);
@@ -138,13 +138,13 @@ public class v1Teleop extends OpMode {
 
 
         pathChainBlue = () -> follower.pathBuilder() //Lazy Curve Generation for blue shoot pos
-                .addPath(new Path(new BezierLine(follower::getPose, new Pose(44, 99))))
+                .addPath(new Path(new BezierLine(follower::getPose, new Pose(55, 88))))
                 .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(135), 0.8))
                 .build();
 
 
         pathChainRed = () -> follower.pathBuilder() //Lazy Curve Generation for red shoot pos
-                .addPath(new Path(new BezierLine(follower::getPose, new Pose(100, 99))))
+                .addPath(new Path(new BezierLine(follower::getPose, new Pose(88, 88))))
                 .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(45), 0.8))
                 .build();
 
@@ -159,8 +159,8 @@ public class v1Teleop extends OpMode {
 
     @Override
     public void start(){
-        Pose2D newPose = new Pose2D(DistanceUnit.INCH, Poses.getStartingPose().getX(), Poses.getStartingPose().getY(), AngleUnit.RADIANS, Math.toRadians(Poses.getStartingPose().getHeading()));
-        pinpoint.setPosition(newPose);
+//        Pose2D newPose = new Pose2D(DistanceUnit.INCH, Poses.getStartingPose().getX(), Poses.getStartingPose().getY(), AngleUnit.RADIANS, Math.toRadians(Poses.getStartingPose().getHeading()));
+//        pinpoint.setPosition(newPose);
     }
 
     @Override
@@ -169,6 +169,12 @@ public class v1Teleop extends OpMode {
         if (follower.isBusy()){
             automatedDrive = true;
         }
+
+        pinpoint.update();
+        Pose2D currentPose = pinpoint.getPosition();
+        follower.update();
+
+
         //gamepad logic
         player1.readButtons();
         leftTriggerReader.readValue();
@@ -177,10 +183,12 @@ public class v1Teleop extends OpMode {
         boolean rightBumperJustPressed = player1.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER);
         boolean rightTriggerJustPressed = rightTriggerReader.wasJustPressed();
 
+        boolean leftTriggerIsPressed = leftTriggerReader.isDown();
+        boolean rightTriggerIsPressed = rightTriggerReader.isDown();
+
+
         //localization + pedropathing logic
-        pinpoint.update();
-        Pose2D currentPose = pinpoint.getPosition();
-        follower.update();
+
 
         if (player1.wasJustPressed(GamepadKeys.Button.TOUCHPAD_FINGER_1)){
             updateCoordinates();
@@ -233,7 +241,7 @@ public class v1Teleop extends OpMode {
         double newStrafe  = r * Math.cos(theta);
 
         if(!follower.isBusy()) {
-            drive.drive(newForward, newStrafe, finalRotation);
+            drive.drive(newForward, -newStrafe, finalRotation);
         }
 
 
@@ -250,7 +258,7 @@ public class v1Teleop extends OpMode {
             pinpoint.recalibrateIMU();
             Pose2D newPose = new Pose2D(DistanceUnit.INCH,
                     72,72,
-                    AngleUnit.RADIANS, 0);
+                    AngleUnit.RADIANS, Math.toRadians(90));
             pinpoint.setPosition(newPose);
             telemetry.addLine("Pinpoint Reset - Position now 72,72 (Middle)!");
         }
@@ -268,13 +276,14 @@ public class v1Teleop extends OpMode {
                 shooter.stopShooter();
                 //intake stuff
                 isIntakeInUse= true;
-                if(rightTriggerJustPressed){
+                if(gamepad1.right_trigger > 0.25){
                     intake.intakeIn();
-                    intake.setServoPower(0.45);
+                    intake.setServoPower(0);
+
                 }
-                else if (leftTriggerJustPressed){
+                else if (gamepad1.left_trigger > 0.25){
                     intake.intakeOut();
-                    intake.setServoPower(-0.45);
+                    intake.setServoPower(0);
                 }
                 else{
                     intake.setServoPower(0);
@@ -304,36 +313,41 @@ public class v1Teleop extends OpMode {
                 else {
                     isHeadingLocked = false;
                 }
+                int desiredVelo = 1250;
 
+                if (gamepad1.dpad_up){
+                    desiredVelo += 250;
+                } else if (gamepad1.dpad_down) {
+                    desiredVelo -=250;
+                }
 
-                // if (zoneChecker.isInsideShootingZone(currentPose.getX(DistanceUnit.INCH), currentPose.getY(DistanceUnit.INCH))) {
-                shooter.shoot(1110);
+              //  if (zoneChecker.isInsideShootingZone(currentPose.getX(DistanceUnit.INCH), currentPose.getY(DistanceUnit.INCH))) {
+                    shooter.shoot(desiredVelo);
+
                 //shooting logic
-                if ((shooter.getCurrentVelo() >= MINIMUM_SHOOTER_VELO) && (shooter.getCurrentVelo() <= MAXIMUM_SHOOTER_VELO)) {
+                if ((shooter.getCurrentVelo() >= desiredVelo - 40) && (shooter.getCurrentVelo() <= desiredVelo + 55)) {
                     isIntakeInUse = true;
                     intake.intakeIn();
-                    if (player1.isDown(GamepadKeys.Button.CROSS)) {
+                    if (gamepad1.right_trigger > 0.2) {
                         intake.setServoPower(1);
                     }
-                    else{
+                    else if (gamepad1.right_trigger < 0.2){
                         intake.setServoPower(0);
                     }
-                }
+
+                 }
+
                 else {
-                    isIntakeInUse = false;
+                        shooter.stopShooter();
+                        isIntakeInUse = false;
                 }
-                // }
-//                else {
-//                        shooter.stopShooter();
-//                        isIntakeInUse = false;
-//                }
                 break;
             default:
                 isHeadingLocked = false;
                 break;
         }
         if (stateMachine > 1){
-            stateMachine = -1;
+            stateMachine = 0;
         }
         telemetry.addData("Position", data);
         telemetry.addData("State", stateMachine);
@@ -343,12 +357,13 @@ public class v1Teleop extends OpMode {
         telemetry.addData("Intake in use: ", isIntakeInUse? "Yes" : "No");
 
 
-        panelsTelemetry.debug("Position", data);
-        panelsTelemetry.debug("State", stateMachine);
-        panelsTelemetry.debug("Heading Lock", isHeadingLocked ? "ON" : "OFF");
-        panelsTelemetry.debug("Alliance: ", isRedAlliance? "Red" : "Blue");
-        panelsTelemetry.debug("Shooter Velo", shooter.getCurrentVelo());
-        panelsTelemetry.debug("Intake in use: ", isIntakeInUse? "Yes" : "No");
+//        panelsTelemetry.debug("Position", data);
+//        panelsTelemetry.debug("State", stateMachine);
+//        panelsTelemetry.debug("Heading Lock", isHeadingLocked ? "ON" : "OFF");
+//        panelsTelemetry.debug("Alliance: ", isRedAlliance? "Red" : "Blue");
+//        panelsTelemetry.debug("Shooter Velo", shooter.getCurrentVelo());
+//        panelsTelemetry.debug("Intake in use: ", isIntakeInUse? "Yes" : "No");
+
 
 
 
@@ -390,6 +405,7 @@ public class v1Teleop extends OpMode {
                                 llX_in_shifted, llY_in_shifted,
                                 AngleUnit.RADIANS, currentHeadingRad);
                         pinpoint.setPosition(newPose);
+                        gamepad1.rumble(500);
                         telemetry.addData("New Pose From Apriltag:", "X: %.2f in, Y: %.2f in, H: %.1f°", llX_in_shifted, llY_in_shifted, Math.toDegrees(currentHeadingRad));
                     }
                     break;
@@ -402,13 +418,13 @@ public class v1Teleop extends OpMode {
 
     //define pinpoint offsets and constants
     private void configurePinpoint() {
-        pinpoint.setOffsets(2.3 * 25.4, 1 * 25.4, DistanceUnit.MM);
+        pinpoint.setOffsets(1.5, 2.5, DistanceUnit.INCH);
         pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
         pinpoint.setEncoderDirections(
                 GoBildaPinpointDriver.EncoderDirection.FORWARD,
                 GoBildaPinpointDriver.EncoderDirection.REVERSED
         );
-        pinpoint.resetPosAndIMU();
+        pinpoint.recalibrateIMU();
     }
 
 
