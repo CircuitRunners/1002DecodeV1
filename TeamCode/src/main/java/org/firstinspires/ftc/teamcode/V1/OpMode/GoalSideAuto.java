@@ -12,6 +12,8 @@ import com.qualcomm.hardware.lynx.LynxModule;
 import java.util.List;
 
 import org.firstinspires.ftc.teamcode.V1.Config.subsystems.Intake;
+import org.firstinspires.ftc.teamcode.V1.Config.subsystems.LimelightCamera;
+import org.firstinspires.ftc.teamcode.V1.Config.subsystems.LimelightCamera.BallOrder;
 import org.firstinspires.ftc.teamcode.V1.Config.subsystems.Shooter;
 import org.firstinspires.ftc.teamcode.V1.Config.util.HeadingAutoAligner;
 import org.firstinspires.ftc.teamcode.V1.Config.util.Poses;
@@ -26,6 +28,7 @@ public class GoalSideAuto extends OpMode {
     private HeadingAutoAligner aligner;
     private Shooter shooter;
     private Intake intake;
+    private LimelightCamera limelight;
     private int pathState;
     private int shotCounter = 0;
 
@@ -36,6 +39,7 @@ public class GoalSideAuto extends OpMode {
     private final double SHOOTER_READY_THRESHOLD = 0.8; // 80% of target before enabling detection
 
     private final double shooterDesiredVelo = 1110;
+
 
 
 
@@ -301,6 +305,7 @@ public class GoalSideAuto extends OpMode {
         intake.intakeIdle();
         intake.setServoPower(0);
         Poses.savePose(follower.getPose());
+        limelight.limelightCamera.pause();
         //shooterIntake.stopAll();
     }
 
@@ -321,6 +326,13 @@ public class GoalSideAuto extends OpMode {
 
         intake = new Intake(hardwareMap, telemetry);
         shooter = new Shooter(hardwareMap, telemetry);
+//        limelight = new LimelightCamera(hardwareMap);
+//        limelight.limelightCamera.start();
+//
+//        BallOrder detected = limelight.detectBallOrder();
+//
+//        telemetry.addData("Ball Order", detected);
+        telemetry.update();
     }
 
     @Override

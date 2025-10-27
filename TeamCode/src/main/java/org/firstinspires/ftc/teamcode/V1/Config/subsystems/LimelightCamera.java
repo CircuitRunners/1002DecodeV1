@@ -47,8 +47,9 @@ public class LimelightCamera {
         limelightCamera.pipelineSwitch(3);
 
         LLResult result = getResult();
+
         if (result != null && result.isValid()) {
-            error = result.getTxNC();
+            error = updateError();
             finalRotation = error * HEADING_KP_TX;
 
             // enforce minimum rotation power
