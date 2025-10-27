@@ -75,7 +75,7 @@ public class Poses {
     // Goal Side Poses (Blue given, red auto-computed
     //================
     public static final AlliancePose startPoseGoalSide = AlliancePose.mirror(
-            new Pose(32.3, 135.6, Math.toRadians(0))
+            new Pose(33, 137, Math.toRadians(0))
     );
 
     //Used multiple times cause shoot from same spot
@@ -85,20 +85,20 @@ public class Poses {
     );
 
     public static final AlliancePose lineupLine1 = AlliancePose.mirror(
-            new Pose(41, 84, Math.toRadians(180))
+            new Pose(43, 84, Math.toRadians(180))
     );
     public static final AlliancePose pickupLine1 = AlliancePose.mirror(
             new Pose(15, 84, Math.toRadians(180))
     );
     public static final AlliancePose lineupLine2 = AlliancePose.mirror(
-            new Pose(41, 60, Math.toRadians(180))
+            new Pose(43, 60, Math.toRadians(180))
     );
     public static final AlliancePose pickupLine2 = AlliancePose.mirror(
             new Pose(9, 60, Math.toRadians(180))
     );
 
     public static final AlliancePose lineupLine3 = AlliancePose.mirror(
-            new Pose(41, 35.5, Math.toRadians(180))
+            new Pose(43, 35.5, Math.toRadians(180))
     );
     public static final AlliancePose pickupLine3 = AlliancePose.mirror(
             new Pose(9, 60, Math.toRadians(180))
