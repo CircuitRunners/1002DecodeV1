@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.V1.Config.util;
 
+import android.text.InputFilter;
+
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
@@ -104,8 +106,22 @@ public class Poses {
             new Pose(9, 60, Math.toRadians(180))
     );
     public static final AlliancePose lineupAtGate = AlliancePose.mirror(
-            new Pose(19, 70, 0)
+            new Pose(19, 70, Math.toRadians(0))
     );
+    public static final AlliancePose openGate = AlliancePose.mirror(
+            new Pose(15.2,70,Math.toRadians(0))
+    );
+    public static final AlliancePose openGateFromStartControlPoint = AlliancePose.mirror(
+            new Pose(79,74,Math.toRadians(0))   //NEED to have tv based pose change to not hit first row of balls
+    );
+    public static final AlliancePose lineupLine2FromGate = AlliancePose.mirror(
+            new Pose(44,60,Math.toRadians(180))
+    );
+    public static final AlliancePose lineupLine2FromGateControlPoint = AlliancePose.mirror(
+            new Pose(37,85,Math.toRadians(0))
+    );
+
+
 
 
     // ===============
