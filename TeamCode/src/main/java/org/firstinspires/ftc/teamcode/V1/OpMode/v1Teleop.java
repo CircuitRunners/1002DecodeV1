@@ -241,7 +241,7 @@ public class v1Teleop extends OpMode {
         double newStrafe  = r * Math.cos(theta);
 
         if(!follower.isBusy()) {
-            drive.drive(newForward, -newStrafe, finalRotation);
+            drive.drive(newForward, newStrafe, finalRotation);
         }
 
 
