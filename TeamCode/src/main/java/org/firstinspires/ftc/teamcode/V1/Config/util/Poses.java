@@ -80,20 +80,26 @@ public class Poses {
             new Pose(33, 137, Math.toRadians(0))
     );
 
-    //Used multiple times cause shoot from same spot
+    //Used for first shoot
     public static final AlliancePose shootPositionGoalSide = AlliancePose.mirror(
             new Pose(45, 116, Math.toRadians(128))
             //new Pose(48, 95.4, Math.toRadians(135))
     );
 
+    // Used for 2nd and third shoots
+    public static final AlliancePose shootPositionGoalSide2 = AlliancePose.mirror(
+            new Pose(45, 116, Math.toRadians(120))
+            //new Pose(48, 95.4, Math.toRadians(135))
+    );
+
     public static final AlliancePose lineupLine1 = AlliancePose.mirror(
-            new Pose(53, 92, Math.toRadians(180))
+            new Pose(55, 92, Math.toRadians(180))
     );
     public static final AlliancePose pickupLine1 = AlliancePose.mirror(
-            new Pose(24, 92, Math.toRadians(180))
+            new Pose(27, 92, Math.toRadians(180))
     );
     public static final AlliancePose lineupLine2 = AlliancePose.mirror(
-            new Pose(53, 65, Math.toRadians(180))
+            new Pose(55, 65, Math.toRadians(180))
     );
     public static final AlliancePose pickupLine2 = AlliancePose.mirror(
             new Pose(21, 65, Math.toRadians(180))
@@ -110,7 +116,7 @@ public class Poses {
             new Pose(21, 38, Math.toRadians(180))
     );
     public static final AlliancePose lineupAtGate = AlliancePose.mirror(
-            new Pose(28, 78.5, Math.toRadians(0))
+            new Pose(28, 78.5, Math.toRadians(90))
     );
     public static final AlliancePose openGate = AlliancePose.mirror(
             new Pose(15.2,70,Math.toRadians(0))
