@@ -304,10 +304,12 @@ public class v1Teleop extends OpMode {
                 }
                 if (player1.wasJustPressed(GamepadKeys.Button.CIRCLE)) {
                     if (isRedAlliance){
-                        follower.followPath(pathChainRed.get());
+                        limelight.autoAlign();
+//                        follower.followPath(pathChainRed.get());
                     }
                     else {
-                        follower.followPath(pathChainBlue.get());
+                        limelight.autoAlign();
+//                        follower.followPath(pathChainBlue.get());
                     }
                 }
 
