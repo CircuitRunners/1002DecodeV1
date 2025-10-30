@@ -901,6 +901,13 @@ class DriveTuner extends OpMode {
                 .build();
 
         follower.followPath(forwards);
+
+        telemetryM.debug("x:" + follower.getPose().getX());
+        telemetryM.debug("y:" + follower.getPose().getY());
+        telemetryM.debug("heading:" + follower.getPose().getHeading());
+        telemetryM.debug("total heading:" + follower.getTotalHeading());
+        telemetryM.update(telemetry);
+
     }
 
     /**
@@ -923,6 +930,11 @@ class DriveTuner extends OpMode {
         }
 
         telemetryM.debug("Driving forward?: " + forward);
+        telemetryM.debug("x:" + follower.getPose().getX());
+        telemetryM.debug("y:" + follower.getPose().getY());
+        telemetryM.debug("heading:" + follower.getPose().getHeading());
+        telemetryM.debug("total heading:" + follower.getTotalHeading());
+
         telemetryM.update(telemetry);
     }
 }

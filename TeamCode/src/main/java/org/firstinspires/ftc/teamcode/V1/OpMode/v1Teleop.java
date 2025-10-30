@@ -196,9 +196,9 @@ public class v1Teleop extends OpMode {
 
         //selector logic for alliance
         if (!preselectFromAuto) {
-            if (player1.wasJustPressed(GamepadKeys.Button.START)) {
+            if (player1.wasJustPressed(GamepadKeys.Button.RIGHT_STICK_BUTTON)) {
                 isRedAlliance = true;
-            } else if (player1.wasJustPressed(GamepadKeys.Button.BACK)) {
+            } else if (player1.wasJustPressed(GamepadKeys.Button.LEFT_STICK_BUTTON)) {
                 isRedAlliance = false;
             }
         }
@@ -241,7 +241,12 @@ public class v1Teleop extends OpMode {
         double newStrafe  = r * Math.cos(theta);
 
         if(!follower.isBusy()) {
-            drive.drive(newForward, newStrafe, finalRotation);
+            if (isRedAlliance) {
+                drive.drive(newForward, newStrafe, finalRotation);
+            }
+            else{
+                drive.drive(-newForward, -newStrafe, finalRotation);
+            }
         }
 
 
@@ -255,7 +260,7 @@ public class v1Teleop extends OpMode {
 //            telemetry.addLine("Pinpoint IMU Recalibrated!");
 //        }
         if (player1.wasJustPressed(GamepadKeys.Button.SQUARE)) {
-            pinpoint.recalibrateIMU();
+            //pinpoint.recalibrateIMU();
             Pose2D newPose = new Pose2D(DistanceUnit.INCH,
                     72,72,
                     AngleUnit.RADIANS, Math.toRadians(90));
@@ -281,11 +286,11 @@ public class v1Teleop extends OpMode {
                     intake.setServoPower(0);
 
                 }
-                else if (gamepad1.left_trigger > 0.25){
+                else if (gamepad1.left_trigger > 0.25 && gamepad1.left_trigger < 0.7){
                     intake.intakeOut();
                     intake.setServoPower(0);
                 }
-                else{
+                else if (gamepad1.left_trigger > 0.8) {
                     intake.setServoPower(0);
                     intake.intakeIdle();
                 }
@@ -304,9 +309,8 @@ public class v1Teleop extends OpMode {
                     else {
                         follower.followPath(pathChainBlue.get());
                     }
-
-
                 }
+
                 if (!automatedDrive){
                     //isHeadingLocked = true;
                 }
@@ -338,7 +342,9 @@ public class v1Teleop extends OpMode {
                  }
 
                 else {
-                        shooter.stopShooter();
+                        intake.setServoPower(0);
+                        intake.intakeIdle();
+
                         isIntakeInUse = false;
                 }
                 break;
@@ -421,8 +427,8 @@ public class v1Teleop extends OpMode {
         pinpoint.setOffsets(1.5, 2.5, DistanceUnit.INCH);
         pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
         pinpoint.setEncoderDirections(
-                GoBildaPinpointDriver.EncoderDirection.FORWARD,
-                GoBildaPinpointDriver.EncoderDirection.REVERSED
+                GoBildaPinpointDriver.EncoderDirection.REVERSED,
+                GoBildaPinpointDriver.EncoderDirection.FORWARD
         );
         pinpoint.recalibrateIMU();
     }

@@ -71,7 +71,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
             intake.setPower(-1);
         }
         public void intakeRetainBalls(){
-            intake.setPower(0.35);
+            intake.setPower(0.5);
         }
 
         public void intakeIdle(){
