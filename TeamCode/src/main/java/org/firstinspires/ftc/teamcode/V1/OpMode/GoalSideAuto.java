@@ -175,15 +175,15 @@ public class GoalSideAuto extends OpMode {
                 break;
             case 3: //intake
                 intake.intakeIn();
-                setPathState(1000);
+                setPathState();
                 break;
-            case 1000:
+            case 4:
                 if (!follower.isBusy()) {
                     follower.followPath(intake1, true);
-                    setPathState(4);
+                    setPathState();
                 }
                 break;
-            case 4: //go to shoot
+            case 5: //go to shoot
 //                intake.intakeRetainBalls();
                 intake.setServoPower(0);
                 if (!follower.isBusy()) {
@@ -193,19 +193,12 @@ public class GoalSideAuto extends OpMode {
                     setPathState();
                 }
                 break;
-            case 5: //shoot
+            case 6: //shoot
                 if (!follower.isBusy()) {
                     shootBalls();
                 }
                 break;
-
-
-                //-----------
-            //not using this stuff yet
-                //-----------
-
-
-            case 6: //go to intake
+            case 7: //go to intake
 //                shooter.stopShooter();    // breaks intake
                 intake.intakeOut();
                 if (!follower.isBusy()) {
@@ -213,11 +206,11 @@ public class GoalSideAuto extends OpMode {
                     setPathState();
                 }
                 break;
-            case 7: //intake
+            case 8: //intake
                 intake.intakeIn();
-                setPathState(1001);
+                setPathState();
                 break;
-            case 1001:
+            case 9:
                 if (!follower.isBusy()) {
 
                     follower.followPath(intake2, true);
@@ -225,7 +218,7 @@ public class GoalSideAuto extends OpMode {
                     setPathState(67);
                 }
                 break;
-            case 67:
+            case 10:
 //                intake.intakeRetainBalls();
                 intake.setServoPower(0);
                 if (!follower.isBusy()){
@@ -233,7 +226,7 @@ public class GoalSideAuto extends OpMode {
                     setPathState(8);
                 }
                 break;
-            case 8: //go to shoot
+            case 11: //go to shoot
 //                intake.intakeRetainBalls();
 //                intake.setServoPower(0);
                 if (!follower.isBusy()) {
@@ -243,12 +236,12 @@ public class GoalSideAuto extends OpMode {
                     setPathState();
                 }
                 break;
-            case 9: //shoot
+            case 12: //shoot
                 if (!follower.isBusy()) {
                     shootBalls();
                 }
                 break;
-            case 10:
+            case 13:
                 setPathState(14);
                 break;
 //            case 10: //go to intake
