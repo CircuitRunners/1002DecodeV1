@@ -99,6 +99,10 @@ public class Poses {
             new Pose(21, 65, Math.toRadians(180))
     );
 
+    public static final AlliancePose backToShoot2ControlPoint = AlliancePose.mirror(
+            new Pose(68, 53, Math.toRadians(180))
+    );
+
     public static final AlliancePose lineupLine3 = AlliancePose.mirror(
             new Pose(53, 38, Math.toRadians(180))
     );

@@ -83,6 +83,7 @@ public class Shooter {
 //        telemetry.addData("Measured Vel motor 1 (tick/sec)", shooter2Velocity);
         telemetry.addData("Measured Avg Vel (tick/sec)", averageVelo);
         telemetry.addData("Shooter Motor Power Set Point: ", output);
+        telemetry.addData("At Set Point?", pidf.atSetPoint() ? "Yes" : "Nah gang");
         telemetry.update();
 
         // Reset the timer for the next loop iteration (optional, for loop time tracking)

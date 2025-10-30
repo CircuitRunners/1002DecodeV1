@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.V1.OpMode;
 import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.paths.HeadingInterpolator;
 import com.pedropathing.paths.PathChain;
@@ -102,14 +103,18 @@ public class GoalSideAuto extends OpMode {
                 .addPath(new BezierLine(Poses.get(Poses.lineupLine2), Poses.get(Poses.pickupLine2)))
                 .setConstantHeadingInterpolation(Poses.get(Poses.pickupLine2).getHeading())
                 .build();
-        travelBackToLineup2 = follower.pathBuilder()
-                .addPath(new BezierLine(Poses.get(Poses.pickupLine2), Poses.get(Poses.lineupLine2)))
-                .setConstantHeadingInterpolation(Poses.get(Poses.pickupLine2).getHeading())
-                .build();
-
+//        travelBackToLineup2 = follower.pathBuilder()
+//                .addPath(new BezierLine(Poses.get(Poses.pickupLine2), Poses.get(Poses.lineupLine2)))
+//                .setConstantHeadingInterpolation(Poses.get(Poses.pickupLine2).getHeading())
+//                .build();
+//
+//        travelBackToShoot2 = follower.pathBuilder()
+//                .addPath(new BezierLine(Poses.get(Poses.lineupLine2), Poses.get(Poses.shootPositionGoalSide)))
+//                .setLinearHeadingInterpolation(Poses.get(Poses.lineupLine2).getHeading(), Poses.get(Poses.shootPositionGoalSide).getHeading())
+//                .build();
         travelBackToShoot2 = follower.pathBuilder()
-                .addPath(new BezierLine(Poses.get(Poses.lineupLine2), Poses.get(Poses.shootPositionGoalSide)))
-                .setLinearHeadingInterpolation(Poses.get(Poses.lineupLine2).getHeading(), Poses.get(Poses.shootPositionGoalSide).getHeading())
+                .addPath(new BezierCurve(Poses.get(Poses.pickupLine2), Poses.get(Poses.backToShoot2ControlPoint), Poses.get(Poses.shootPositionGoalSide)))
+                .setLinearHeadingInterpolation(Poses.get(Poses.pickupLine2).getHeading(), Poses.get(Poses.shootPositionGoalSide).getHeading())
                 .build();
         travelToIntake3 = follower.pathBuilder()
                 .addPath(new BezierLine(Poses.get(Poses.shootPositionGoalSide), Poses.get(Poses.lineupLine3)))
@@ -210,7 +215,7 @@ public class GoalSideAuto extends OpMode {
 
                     follower.followPath(intake2, true);
 
-                    setPathState(67);
+                    setPathState();
                 }
                 break;
             case 67:
