@@ -39,6 +39,7 @@ public class GoalSideAuto extends OpMode {
     private final double SHOOTER_READY_THRESHOLD = 0.8; // 80% of target before enabling detection
 
     private final double shooterDesiredVelo = 1000;
+    private Poses.Alliance lastKnownAlliance = null;
 
 
 
@@ -359,9 +360,17 @@ public class GoalSideAuto extends OpMode {
 
     @Override
     public void init_loop() {
-        // ESSENTIAL: Call this to read gamepad input (dpad_up/down) and set the alliance
+
+
         Poses.updateAlliance(gamepad1, telemetry);
 
+        //  CHECK: Has the alliance changed since the last loop iteration?
+        if (Poses.getAlliance() != lastKnownAlliance) {
+            follower.setStartingPose(Poses.get(Poses.startPoseGoalSide));
+
+            buildPaths();
+            lastKnownAlliance = Poses.getAlliance();
+        }
 
 
         // Set the alliance-specific starting pose before building paths
