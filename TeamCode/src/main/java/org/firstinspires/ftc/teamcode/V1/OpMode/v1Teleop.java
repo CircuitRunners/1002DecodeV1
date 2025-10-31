@@ -389,7 +389,7 @@ public class v1Teleop extends OpMode {
     public void updateCoordinates() {
         //updates the orientation of robot for limelight camera's usage
         limelight.limelightCamera.updateRobotOrientation(pinpoint.getPosition().getHeading(AngleUnit.RADIANS));
-
+        limelight.limelightCamera.pipelineSwitch(3);
        LLResult result = limelight.getResult();
 
         //ensures result exsists and is from an acceptable apriltag
@@ -413,6 +413,7 @@ public class v1Teleop extends OpMode {
                                 llX_in_shifted, llY_in_shifted,
                                 AngleUnit.RADIANS, currentHeadingRad);
                         pinpoint.setPosition(newPose);
+                        follower.setPose(new Pose(llX_in_shifted,llY_in_shifted,currentHeadingRad));
                         gamepad1.rumble(500);
                         telemetry.addData("New Pose From Apriltag:", "X: %.2f in, Y: %.2f in, H: %.1f°", llX_in_shifted, llY_in_shifted, Math.toDegrees(currentHeadingRad));
                     }
@@ -429,7 +430,7 @@ public class v1Teleop extends OpMode {
         pinpoint.setOffsets(1.5, 2.5, DistanceUnit.INCH);
         pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
         pinpoint.setEncoderDirections(
-                GoBildaPinpointDriver.EncoderDirection.REVERSED,
+                GoBildaPinpointDriver.EncoderDirection.FORWARD,
                 GoBildaPinpointDriver.EncoderDirection.FORWARD
         );
         pinpoint.recalibrateIMU();

@@ -33,19 +33,19 @@ public class NewIntakeTest extends OpMode{
         public void loop() {
             player1.readButtons();
 
-            if (player1.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
-                intake.incrementRPM(increment);
-            }
-            else if (player1.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
-                intake.decrementRPM(increment);
-            }
-
-            if (player1.wasJustPressed((GamepadKeys.Button.SQUARE))) {
-                intake.stopIntake();
-
-            } else if (player1.wasJustPressed((GamepadKeys.Button.CIRCLE))) {
-               intake.setTargetRPM(startingTargetRPM);
-            }
+//            if (player1.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
+//                intake.incrementRPM(increment);
+//            }
+//            else if (player1.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
+//                intake.decrementRPM(increment);
+//            }
+//
+//            if (player1.wasJustPressed((GamepadKeys.Button.SQUARE))) {
+//                intake.stopIntake();
+//
+//            } else if (player1.wasJustPressed((GamepadKeys.Button.CIRCLE))) {
+//               intake.setTargetRPM(startingTargetRPM);
+//            }
 
 //            if (player1.wasJustPressed(GamepadKeys.Button.TRIANGLE)) {
 //                intake.toggleServoDirection();

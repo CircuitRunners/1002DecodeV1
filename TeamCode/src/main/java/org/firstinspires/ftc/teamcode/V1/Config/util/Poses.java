@@ -76,99 +76,112 @@ public class Poses {
     // ===============
     // Goal Side Poses (Blue given, red auto-computed
     //================
-    public static final AlliancePose startPoseGoalSide = AlliancePose.mirror(
+    public static final AlliancePose startPoseGoalSide = new AlliancePose(
+            new Pose(111, 137, Math.toRadians(180)),
             new Pose(33, 137, Math.toRadians(0))
     );
 
-    //Used for first shoot
-    public static final AlliancePose shootPositionGoalSide = AlliancePose.mirror(
+    public static final AlliancePose shootPositionGoalSide = new AlliancePose(
+            new Pose(99, 116, Math.toRadians(52)),
             new Pose(45, 116, Math.toRadians(128))
-            //new Pose(48, 95.4, Math.toRadians(135))
     );
 
-    // Used for 2nd and third shoots
-    public static final AlliancePose shootPositionGoalSide2 = AlliancePose.mirror(
+    public static final AlliancePose shootPositionGoalSide2 = new AlliancePose(
+            new Pose(99, 116, Math.toRadians(60)),
             new Pose(45, 116, Math.toRadians(120))
-            //new Pose(48, 95.4, Math.toRadians(135))
     );
 
-    public static final AlliancePose lineupLine1 = AlliancePose.mirror(
+    public static final AlliancePose lineupLine1 = new AlliancePose(
+            new Pose(89, 92, Math.toRadians(0)),
             new Pose(55, 92, Math.toRadians(180))
     );
-    public static final AlliancePose pickupLine1 = AlliancePose.mirror(
+    public static final AlliancePose pickupLine1 = new AlliancePose(
+            new Pose(117, 92, Math.toRadians(0)),
             new Pose(27, 92, Math.toRadians(180))
     );
-    public static final AlliancePose lineupLine2 = AlliancePose.mirror(
+    public static final AlliancePose lineupLine2 = new AlliancePose(
+            new Pose(89, 65, Math.toRadians(0)),
             new Pose(55, 65, Math.toRadians(180))
     );
-    public static final AlliancePose pickupLine2 = AlliancePose.mirror(
+    public static final AlliancePose pickupLine2 = new AlliancePose(
+            new Pose(123, 65, Math.toRadians(0)),
             new Pose(21, 65, Math.toRadians(180))
     );
-
-    public static final AlliancePose backToShoot2ControlPoint = AlliancePose.mirror(
+    public static final AlliancePose backToShoot2ControlPoint = new AlliancePose(
+            new Pose(76, 53, Math.toRadians(0)),
             new Pose(68, 53, Math.toRadians(180))
     );
-
-    public static final AlliancePose lineupLine3 = AlliancePose.mirror(
+    public static final AlliancePose lineupLine3 = new AlliancePose(
+            new Pose(91, 38, Math.toRadians(0)),
             new Pose(53, 38, Math.toRadians(180))
     );
-    public static final AlliancePose pickupLine3 = AlliancePose.mirror(
+    public static final AlliancePose pickupLine3 = new AlliancePose(
+            new Pose(123, 38, Math.toRadians(0)),
             new Pose(21, 38, Math.toRadians(180))
     );
-    public static final AlliancePose lineupAtGate = AlliancePose.mirror(
+    public static final AlliancePose lineupAtGate = new AlliancePose(
+            new Pose(116, 78.5, Math.toRadians(270)),
             new Pose(28, 78.5, Math.toRadians(90))
     );
-    public static final AlliancePose openGate = AlliancePose.mirror(
-            new Pose(15.2,70,Math.toRadians(0))
+    public static final AlliancePose openGate = new AlliancePose(
+            new Pose(128.8, 70, Math.toRadians(180)),
+            new Pose(15.2, 70, Math.toRadians(0))
     );
-    public static final AlliancePose openGateFromStartControlPoint = AlliancePose.mirror(
-            new Pose(79,74,Math.toRadians(0))   //NEED to have tv based pose change to not hit first row of balls
+    public static final AlliancePose openGateFromStartControlPoint = new AlliancePose(
+            new Pose(65, 74, Math.toRadians(180)),
+            new Pose(79, 74, Math.toRadians(0))
     );
-    public static final AlliancePose lineupLine2FromGate = AlliancePose.mirror(
-            new Pose(44,60,Math.toRadians(180))
+    public static final AlliancePose lineupLine2FromGate = new AlliancePose(
+            new Pose(100, 60, Math.toRadians(0)),
+            new Pose(44, 60, Math.toRadians(180))
     );
-    public static final AlliancePose lineupLine2FromGateControlPoint = AlliancePose.mirror(
-            new Pose(37,85,Math.toRadians(0))
-    );
-
-
-
-
-    // ===============
-    // Goal Side Poses (Blue given, red auto-computed
-    //================
-    public static final AlliancePose startPoseFarSide = AlliancePose.mirror(
-            new Pose(54.6, 8.3, 90)
-    );
-    public static final AlliancePose pathToShootFirstTimeControlPoint1 = AlliancePose.mirror(
-            new Pose(59.4, 48.5, 0)
-    );
-    public static final AlliancePose pathToShootFirstTimeControlPoint2 = AlliancePose.mirror(
-            new Pose(71.8, 98.7, 0)
-    );
-    public static final AlliancePose shootPositionFar = AlliancePose.mirror(
-            new Pose(59, 85, 135)
-    );
-    public static final AlliancePose toHumanPlayerControlPoint1 = AlliancePose.mirror(
-            new Pose(69.7, 97.9, 0)
-    );
-    public static final AlliancePose toHumanPlayerControlPoint2 = AlliancePose.mirror(
-            new Pose(74, 16, 0)
-    );
-    public static final AlliancePose humanPlayerPosition = AlliancePose.mirror(
-            new Pose(18, 16, 180)
-    );
-    public static final AlliancePose backToShootControlPoint1 = AlliancePose.mirror(
-            new Pose(74, 16, 0)
-    );
-    public static final AlliancePose backToShootControlPoint2 = AlliancePose.mirror(
-            new Pose(69.7, 97.9, 0)
+    public static final AlliancePose lineupLine2FromGateControlPoint = new AlliancePose(
+            new Pose(107, 85, Math.toRadians(180)),
+            new Pose(37, 85, Math.toRadians(0))
     );
 
+    // =============== Far Side Poses (explicit red/blue) ===============
+    public static final AlliancePose startPoseFarSide = new AlliancePose(
+            new Pose(89.4, 8.3, Math.toRadians(270)),
+            new Pose(54.6, 8.3, Math.toRadians(90))
+    );
+    public static final AlliancePose pathToShootFirstTimeControlPoint1 = new AlliancePose(
+            new Pose(84.6, 48.5, Math.toRadians(180)),
+            new Pose(59.4, 48.5, Math.toRadians(0))
+    );
+    public static final AlliancePose pathToShootFirstTimeControlPoint2 = new AlliancePose(
+            new Pose(72.2, 98.7, Math.toRadians(180)),
+            new Pose(71.8, 98.7, Math.toRadians(0))
+    );
+    public static final AlliancePose shootPositionFar = new AlliancePose(
+            new Pose(85, 85, Math.toRadians(45)),
+            new Pose(59, 85, Math.toRadians(135))
+    );
+    public static final AlliancePose toHumanPlayerControlPoint1 = new AlliancePose(
+            new Pose(74.3, 97.9, Math.toRadians(180)),
+            new Pose(69.7, 97.9, Math.toRadians(0))
+    );
+    public static final AlliancePose toHumanPlayerControlPoint2 = new AlliancePose(
+            new Pose(70, 16, Math.toRadians(180)),
+            new Pose(74, 16, Math.toRadians(0))
+    );
+    public static final AlliancePose humanPlayerPosition = new AlliancePose(
+            new Pose(126, 16, Math.toRadians(0)),
+            new Pose(18, 16, Math.toRadians(180))
+    );
+    public static final AlliancePose backToShootControlPoint1 = new AlliancePose(
+            new Pose(70, 16, Math.toRadians(180)),
+            new Pose(74, 16, Math.toRadians(0))
+    );
+    public static final AlliancePose backToShootControlPoint2 = new AlliancePose(
+            new Pose(74.3, 97.9, Math.toRadians(180)),
+            new Pose(69.7, 97.9, Math.toRadians(0))
+    );
 
-    //TELEOP STUFF
-    public static final AlliancePose teleopDefaultPose = AlliancePose.mirror(
-            new Pose(72, 72, 90) // change to your preferred TeleOp "spawn" location
+    // TELEOP
+    public static final AlliancePose teleopDefaultPose = new AlliancePose(
+            new Pose(72, 72, Math.toRadians(270)),
+            new Pose(72, 72, Math.toRadians(90))
     );
 
     // =======================

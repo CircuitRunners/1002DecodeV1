@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.V1.Config.subsystems;
 
 
 import com.bylazar.configurables.annotations.Configurable;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -33,6 +34,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
             servoIntake.setDirection(DcMotorSimple.Direction.REVERSE);
 
+            intake.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
             //intake.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
            // intake.setDirection(DcMotorSimple.Direction.REVERSE);
 
@@ -40,16 +42,16 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
         // --- Basic control methods ---
 
-        public void setTargetRPM(double rpm) {
-            targetRPM = rpm;
-            double ticksPerSecond = rpmToTicksPerSecond(rpm);
-            intake.setVelocity(ticksPerSecond);
-        }
+//        public void setTargetRPM(double rpm) {
+//            targetRPM = rpm;
+//            double ticksPerSecond = rpmToTicksPerSecond(rpm);
+//            intake.setVelocity(ticksPerSecond);
+//        }
 
-        public void stopIntake() {
-            targetRPM = 0;
-            intake.setVelocity(0);
-        }
+//        public void stopIntake() {
+//            targetRPM = 0;
+//            intake.setVelocity(0);
+//        }
 
         public void setServoPower(double power) {
             servoPower = power;
@@ -57,13 +59,13 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
         }
 
-        public void incrementRPM(double increment) {
-            setTargetRPM(targetRPM + increment);
-        }
-
-        public void decrementRPM(double increment) {
-            setTargetRPM(targetRPM - increment);
-        }
+//        public void incrementRPM(double increment) {
+//            setTargetRPM(targetRPM + increment);
+//        }
+//
+//        public void decrementRPM(double increment) {
+//            setTargetRPM(targetRPM - increment);
+//        }
 
         public void intakeIn(){
             intake.setPower(1);

@@ -372,18 +372,17 @@ public class GoalSideAuto extends OpMode {
 
         Poses.updateAlliance(gamepad1, telemetry);
 
-        //  CHECK: Has the alliance changed since the last loop iteration?
+
         if (Poses.getAlliance() != lastKnownAlliance) {
+
             follower.setStartingPose(Poses.get(Poses.startPoseGoalSide));
 
+
             buildPaths();
+
             lastKnownAlliance = Poses.getAlliance();
+            telemetry.addData("STATUS", "Paths Rebuilt for " + lastKnownAlliance);
         }
-
-
-        // Set the alliance-specific starting pose before building paths
-        follower.setStartingPose(Poses.get(Poses.startPoseGoalSide));
-
 
 
         telemetry.addData("Alliance Set", Poses.getAlliance());
@@ -393,7 +392,7 @@ public class GoalSideAuto extends OpMode {
 
     @Override
     public void start() {
-        buildPaths();
+        //buildPaths();
         pathTimer.resetTimer();
         setPathState(0);
     }

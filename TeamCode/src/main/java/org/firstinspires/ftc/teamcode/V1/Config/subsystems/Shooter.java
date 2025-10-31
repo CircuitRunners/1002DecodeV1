@@ -49,14 +49,15 @@ public class Shooter {
         shooter2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         pidf = new PIDFController(kP, kI, kD, kF);
-        pidf.setSetPoint(targetVelocity);
+        //pidf.setPIDF(kP, kI, kD, kF);
+        //pidf.setSetPoint(targetVelocity);
 
 
     }
 
 
     public void shoot(double desiredVelo){
-        loopTimer.reset();
+
 
         targetVelocity = desiredVelo;
 
@@ -67,8 +68,7 @@ public class Shooter {
         double averageVelo = (shooter1Velocity + shooter2Velocity) / 2;
 
         // --- Update gains and setpoint ---
-        pidf.setPIDF(kP, kI, kD, kF);
-        pidf.setSetPoint(targetVelocity);
+
 
         // --- Compute output and send to motor ---
         // 'shooter1Velocity' (the measured velocity) is passed to the custom PIDF controller.
