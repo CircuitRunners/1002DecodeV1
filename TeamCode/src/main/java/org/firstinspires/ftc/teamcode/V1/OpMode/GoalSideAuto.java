@@ -92,8 +92,8 @@ public class GoalSideAuto extends OpMode {
                 .build();
 
         travelBackToShoot1 = follower.pathBuilder()
-                .addPath(new BezierLine(Poses.get(Poses.pickupLine1), Poses.get(Poses.shootPositionGoalSide)))
-                .setLinearHeadingInterpolation(Poses.get(Poses.pickupLine1).getHeading(), Poses.get(Poses.shootPositionGoalSide).getHeading())
+                .addPath(new BezierLine(Poses.get(Poses.pickupLine1), Poses.get(Poses.shootPositionGoalSide2)))
+                .setLinearHeadingInterpolation(Poses.get(Poses.pickupLine1).getHeading(), Poses.get(Poses.shootPositionGoalSide2).getHeading())
                 .build();
         travelToIntake2 = follower.pathBuilder()
                 .addPath(new BezierLine(Poses.get(Poses.shootPositionGoalSide), Poses.get(Poses.lineupLine2)))
@@ -103,18 +103,18 @@ public class GoalSideAuto extends OpMode {
                 .addPath(new BezierLine(Poses.get(Poses.lineupLine2), Poses.get(Poses.pickupLine2)))
                 .setConstantHeadingInterpolation(Poses.get(Poses.pickupLine2).getHeading())
                 .build();
-//        travelBackToLineup2 = follower.pathBuilder()
-//                .addPath(new BezierLine(Poses.get(Poses.pickupLine2), Poses.get(Poses.lineupLine2)))
-//                .setConstantHeadingInterpolation(Poses.get(Poses.pickupLine2).getHeading())
-//                .build();
+        travelBackToLineup2 = follower.pathBuilder()
+                .addPath(new BezierLine(Poses.get(Poses.pickupLine2), Poses.get(Poses.lineupLine2)))
+                .setConstantHeadingInterpolation(Poses.get(Poses.pickupLine2).getHeading())
+                .build();
 //
 //        travelBackToShoot2 = follower.pathBuilder()
 //                .addPath(new BezierLine(Poses.get(Poses.lineupLine2), Poses.get(Poses.shootPositionGoalSide)))
 //                .setLinearHeadingInterpolation(Poses.get(Poses.lineupLine2).getHeading(), Poses.get(Poses.shootPositionGoalSide).getHeading())
 //                .build();
         travelBackToShoot2 = follower.pathBuilder()
-                .addPath(new BezierCurve(Poses.get(Poses.pickupLine2), Poses.get(Poses.backToShoot2ControlPoint), Poses.get(Poses.shootPositionGoalSide)))
-                .setLinearHeadingInterpolation(Poses.get(Poses.pickupLine2).getHeading(), Poses.get(Poses.shootPositionGoalSide).getHeading())
+                .addPath(new BezierCurve(Poses.get(Poses.pickupLine2), Poses.get(Poses.backToShoot2ControlPoint), Poses.get(Poses.shootPositionGoalSide2)))
+                .setLinearHeadingInterpolation(Poses.get(Poses.pickupLine2).getHeading(), Poses.get(Poses.shootPositionGoalSide2).getHeading())
                 .build();
         travelToIntake3 = follower.pathBuilder()
                 .addPath(new BezierLine(Poses.get(Poses.shootPositionGoalSide), Poses.get(Poses.lineupLine3)))
@@ -147,7 +147,8 @@ public class GoalSideAuto extends OpMode {
     public void autonomousPathUpdate() {
         switch (pathState) {
             case 0: // Initial Travel to Shoot Position
-                intake.intakeRetainBalls();
+//                intake.intakeRetainBalls();
+//                intake.intakeIn();
                 if(follower.getCurrentTValue() >=0.4){
                     //limelight.getTagId();
 
@@ -163,8 +164,9 @@ public class GoalSideAuto extends OpMode {
                 }
                 break;
             case 2: //go to intake
-                shooter.stopShooter();
+//                shooter.stopShooter();    // breaks intake
                 intake.intakeOut();
+//                intake.intakeIdle();
                 if (!follower.isBusy()) {
 
                     follower.followPath(travelToIntake1, true);
@@ -173,75 +175,73 @@ public class GoalSideAuto extends OpMode {
                 break;
             case 3: //intake
                 intake.intakeIn();
+                setPathState();
+                break;
+            case 4:
                 if (!follower.isBusy()) {
-
                     follower.followPath(intake1, true);
-
                     setPathState();
                 }
                 break;
-            case 4: //go to shoot
-                intake.intakeRetainBalls();
+            case 5: //go to shoot
+//                intake.intakeRetainBalls();
+                intake.setServoPower(0);
                 if (!follower.isBusy()) {
-
+//                    shootBalls();
                     follower.followPath(travelBackToShoot1, true);
 
                     setPathState();
                 }
                 break;
-            case 5: //shoot
+            case 6: //shoot
                 if (!follower.isBusy()) {
                     shootBalls();
                 }
                 break;
-
-
-                //-----------
-            //not using this stuff yet
-                //-----------
-
-
-            case 6: //go to intake
-                shooter.stopShooter();
+            case 7: //go to intake
+//                shooter.stopShooter();    // breaks intake
                 intake.intakeOut();
                 if (!follower.isBusy()) {
                     follower.followPath(travelToIntake2, true);
                     setPathState();
                 }
                 break;
-            case 7: //intake
+            case 8: //intake
                 intake.intakeIn();
+                setPathState();
+                break;
+            case 9:
                 if (!follower.isBusy()) {
 
                     follower.followPath(intake2, true);
 
-                    setPathState();
+                    setPathState(67);
                 }
                 break;
-            case 67:
-                intake.intakeRetainBalls();
+            case 10:
+//                intake.intakeRetainBalls();
                 intake.setServoPower(0);
-                if ((!follower.isBusy())){
+                if (!follower.isBusy()){
                     follower.followPath(travelBackToLineup2, true);
                     setPathState(8);
                 }
                 break;
-            case 8: //go to shoot
-                intake.intakeRetainBalls();
-                intake.setServoPower(0);
+            case 11: //go to shoot
+//                intake.intakeRetainBalls();
+//                intake.setServoPower(0);
                 if (!follower.isBusy()) {
-
+//                    shootBalls();
                     follower.followPath(travelBackToShoot2, true);
 
                     setPathState();
                 }
                 break;
-            case 9: //shoot
+            case 12: //shoot
                 if (!follower.isBusy()) {
                     shootBalls();
                 }
                 break;
-            case 10:
+            case 13:
                 setPathState(14);
                 break;
 //            case 10: //go to intake
@@ -316,6 +316,9 @@ public class GoalSideAuto extends OpMode {
         telemetry.addData("Heading", follower.getPose().getHeading());
         telemetry.addData("Path State", pathState);
         telemetry.addData("Shots Fired", shotCounter);
+        telemetry.addData("Shooter Velocity", shooter.getCurrentVelo());
+        telemetry.addData("Intake Power", intake.getPower());
+
        // telemetry.addData("Shooter Velo: ", shooter.getCurrentVelo());
 
         telemetry.update();

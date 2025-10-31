@@ -16,6 +16,8 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
         private DcMotorEx intake;
         private CRServo servoIntake;
 
+        public static double motorPower = 0;
+
         // Configurable constants
         public static final int TICKS_PER_REV = 537; // goBILDA 312 RPM Yellow Jacket
         public static double targetRPM = 0;  // default target speed
@@ -65,18 +67,22 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
         public void intakeIn(){
             intake.setPower(1);
+            motorPower = 1;
         }
 
         public void intakeOut(){
             intake.setPower(-1);
+            motorPower = -1;
         }
         public void intakeRetainBalls(){
             intake.setPower(0.5);
+            motorPower = 0.5;
         }
 
         public void intakeIdle(){
             intake.setPower(0);
             servoIntake.setPower(0);
+            motorPower = 0;
         }
 
 
@@ -108,9 +114,13 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
         public double getCurrentTargetVelocity(){
             return rpmToTicksPerSecond(targetRPM);
         }
-        public double getServoPower(){
-            return servoPower;
-        }
+    public double getServoPower(){
+        return servoPower;
+    }
+    public double getPower(){
+        return motorPower;
+    }
+
 
 
 
