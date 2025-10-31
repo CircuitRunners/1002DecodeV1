@@ -454,4 +454,59 @@ public class GoalSideAuto extends OpMode {
         lastShooterVelo = currentVelo;
     }
 
+
+    /*
+    LESS CHOPPED SHOOT BALLS HERE:
+    public void shootBalls(){
+        // Start the shooter flywheel immediately.
+        shooter.shoot(shooterDesiredVelo);
+        double currentVelo = shooter.getCurrentVelo();
+
+        // Assume shooting has NOT started until we meet the velocity target.
+        boolean isShooterReady = currentVelo >= shooterDesiredVelo - 25 && currentVelo <= shooterDesiredVelo + 55;
+
+        if (isShooterReady) {
+            // When ready, feed the ball using both the main intake motor and the servo.
+            // This is the only place we command intake/servo ON.
+            intake.intakeIn();
+            intake.setServoPower(1);
+        } else {
+            // When NOT ready, or if speed drops too far, stop feeding.
+            // This is the only place we command intake/servo OFF/retain.
+            // Use intakeIdle() or intakeRetainBalls() depending on what state you want
+            // the main intake motor to be in when waiting. We'll use intakeIdle()
+            // to ensure the motor isn't fighting itself.
+            intake.intakeIdle();
+            intake.setServoPower(0);
+        }
+
+        // --- Shot Detection Logic (Remains the same) ---
+        // ... your shot detection and path state transition logic here ...
+
+        // --- Detect velocity drop (shot fired) ---
+        double delta = lastShooterVelo - currentVelo;
+
+        // If speed dropped sharply, count one shot
+        if (!shotDetected && delta > DROP_THRESHOLD) {
+            shotDetected = true;
+            shotCounter++;
+            telemetry.addData("Shot Detected", shotCounter);
+        }
+
+        // When shooter recovers, re-arm detection for next ball
+        if (shotDetected && currentVelo >= shooterDesiredVelo - RECOVER_THRESHOLD) {
+            shotDetected = false;
+        }
+
+        // --- Move to next path after timeout ---
+        if (pathTimer.getElapsedTimeSeconds() >= 7) {
+            shotCounter = 0;
+            setPathState();
+        }
+
+        lastShooterVelo = currentVelo;
+    }
+
+     */
+
 }

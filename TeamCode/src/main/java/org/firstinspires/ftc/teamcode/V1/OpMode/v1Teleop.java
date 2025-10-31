@@ -107,7 +107,8 @@ public class v1Teleop extends OpMode {
 
         Pose2D newPose = new Pose2D(DistanceUnit.INCH, Poses.getStartingPose().getX(), Poses.getStartingPose().getY(), AngleUnit.RADIANS, Math.toRadians(Poses.getStartingPose().getHeading())); //causing errors when initializing
 
-        pinpoint.setPosition(newPose); //causing errors when initializing
+        //pinpoint.setPosition(newPose); //causing errors when initializing
+        // follower.setPose(new Pose(Poses.getStartingPose().getX(), Poses.getStartingPose().getY(), Poses.getStartingPose().getHeading()));
 
 
         limelight = new LimelightCamera(hardwareMap);
@@ -174,6 +175,16 @@ public class v1Teleop extends OpMode {
         Pose2D currentPose = pinpoint.getPosition();
         follower.update();
 
+        // --- CONSOLIDATED SENSOR AND INPUT READS (Added for single-pass data) ---
+        // Read Limelight/PID calculation once
+        double limelightRotation = limelight.autoAlign();
+        // Read Shooter Velocity once
+        double shooterVelo = shooter.getCurrentVelo();
+        // Read raw trigger values once
+        double leftTriggerValue = gamepad1.left_trigger;
+        double rightTriggerValue = gamepad1.right_trigger;
+        // ------------------------------------------------------------------------
+
 
         //gamepad logic
         player1.readButtons();
@@ -222,10 +233,10 @@ public class v1Teleop extends OpMode {
         double finalRotation;
 
         if (isHeadingLocked) {
-            finalRotation = limelight.autoAlign();
-            telemetry.addData("Using Limelight Data for Heading Lock.", "");
+            finalRotation = limelightRotation; // Replaced limelight.autoAlign()
+            telemetry.addLine("Using Limelight Data for Heading Lock.");
             telemetry.addData("Error from tag center", limelight.error);
-            telemetry.addData("PID Rotation", limelight.autoAlign());
+            telemetry.addData("PID Rotation", limelightRotation); // Replaced limelight.autoAlign()
 
         }
         else {
@@ -264,7 +275,7 @@ public class v1Teleop extends OpMode {
             Pose2D newPose = new Pose2D(DistanceUnit.INCH,
                     72,72,
                     AngleUnit.RADIANS, Math.toRadians(90));
-            pinpoint.setPosition(newPose);
+            //pinpoint.setPosition(newPose);
             follower.setPose(new Pose(72,72, Math.toRadians(90)));
             telemetry.addLine("Pinpoint Reset - Position now 72,72 (Middle)!");
         }
@@ -282,16 +293,16 @@ public class v1Teleop extends OpMode {
                 shooter.stopShooter();
                 //intake stuff
                 isIntakeInUse= true;
-                if(gamepad1.right_trigger > 0.25){
+                if(rightTriggerValue > 0.25){ // Replaced gamepad1.right_trigger
                     intake.intakeIn();
                     intake.setServoPower(0);
 
                 }
-                else if (gamepad1.left_trigger > 0.25 && gamepad1.left_trigger < 0.7){
+                else if (leftTriggerValue > 0.25 && leftTriggerValue < 0.7){ // Replaced gamepad1.left_trigger
                     intake.intakeOut();
                     intake.setServoPower(0);
                 }
-                else if (gamepad1.left_trigger > 0.8) {
+                else if (leftTriggerValue > 0.8) { // Replaced gamepad1.left_trigger
                     intake.setServoPower(0);
                     intake.intakeIdle();
                 }
@@ -305,11 +316,21 @@ public class v1Teleop extends OpMode {
                 }
                 if (player1.wasJustPressed(GamepadKeys.Button.CIRCLE)) {
                     if (isRedAlliance){
-                        limelight.autoAlign();
+                        if (isHeadingLocked){
+                            isHeadingLocked = false;
+                        }
+                        else if (!isHeadingLocked){
+                            isHeadingLocked = true;
+                        }
 //                        follower.followPath(pathChainRed.get());
                     }
                     else {
-                        limelight.autoAlign();
+                        if (isHeadingLocked){
+                            isHeadingLocked = false;
+                        }
+                        else if (!isHeadingLocked){
+                            isHeadingLocked = true;
+                        }
 //                        follower.followPath(pathChainBlue.get());
                     }
                 }
@@ -328,27 +349,27 @@ public class v1Teleop extends OpMode {
                     desiredVelo -=250;
                 }
 
-              //  if (zoneChecker.isInsideShootingZone(currentPose.getX(DistanceUnit.INCH), currentPose.getY(DistanceUnit.INCH))) {
-                    shooter.shoot(desiredVelo);
+                //  if (zoneChecker.isInsideShootingZone(currentPose.getX(DistanceUnit.INCH), currentPose.getY(DistanceUnit.INCH))) {
+                shooter.shoot(desiredVelo);
 
                 //shooting logic
-                if ((shooter.getCurrentVelo() >= desiredVelo - 40) && (shooter.getCurrentVelo() <= desiredVelo + 55)) {
+                if ((shooterVelo >= desiredVelo - 40) && (shooterVelo <= desiredVelo + 55)) { // Replaced shooter.getCurrentVelo()
                     isIntakeInUse = true;
                     intake.intakeIn();
-                    if (gamepad1.right_trigger > 0.2) {
+                    if (rightTriggerValue > 0.2) { // Replaced gamepad1.right_trigger
                         intake.setServoPower(1);
                     }
-                    else if (gamepad1.right_trigger < 0.2){
+                    else if (rightTriggerValue < 0.2){ // Replaced gamepad1.right_trigger
                         intake.setServoPower(0);
                     }
 
-                 }
+                }
 
                 else {
-                        intake.setServoPower(0);
-                        intake.intakeIdle();
+                    intake.setServoPower(0);
+                    intake.intakeIdle();
 
-                        isIntakeInUse = false;
+                    isIntakeInUse = false;
                 }
                 break;
             default:
@@ -362,7 +383,7 @@ public class v1Teleop extends OpMode {
         telemetry.addData("State", stateMachine);
         telemetry.addData("Heading Lock", isHeadingLocked ? "ON" : "OFF");
         telemetry.addData("Alliance: ", isRedAlliance? "Red" : "Blue");
-        telemetry.addData("Shooter Velo", shooter.getCurrentVelo());
+        telemetry.addData("Shooter Velo", shooterVelo); // Replaced shooter.getCurrentVelo()
         telemetry.addData("Intake in use: ", isIntakeInUse? "Yes" : "No");
 
 
@@ -370,7 +391,7 @@ public class v1Teleop extends OpMode {
 //        panelsTelemetry.debug("State", stateMachine);
 //        panelsTelemetry.debug("Heading Lock", isHeadingLocked ? "ON" : "OFF");
 //        panelsTelemetry.debug("Alliance: ", isRedAlliance? "Red" : "Blue");
-//        panelsTelemetry.debug("Shooter Velo", shooter.getCurrentVelo());
+//        panelsTelemetry.debug("Shooter Velo", shooterVelo); // Replaced shooter.getCurrentVelo()
 //        panelsTelemetry.debug("Intake in use: ", isIntakeInUse? "Yes" : "No");
 
 
@@ -391,7 +412,7 @@ public class v1Teleop extends OpMode {
         //updates the orientation of robot for limelight camera's usage
         limelight.limelightCamera.updateRobotOrientation(pinpoint.getPosition().getHeading(AngleUnit.RADIANS));
         limelight.limelightCamera.pipelineSwitch(3);
-       LLResult result = limelight.getResult();
+        LLResult result = limelight.getResult();
 
         //ensures result exsists and is from an acceptable apriltag
         if (result != null && result.isValid()) {
@@ -413,7 +434,7 @@ public class v1Teleop extends OpMode {
                         Pose2D newPose = new Pose2D(DistanceUnit.INCH,
                                 llX_in_shifted, llY_in_shifted,
                                 AngleUnit.RADIANS, currentHeadingRad);
-                        pinpoint.setPosition(newPose);
+                        //pinpoint.setPosition(newPose);
                         follower.setPose(new Pose(llX_in_shifted,llY_in_shifted,currentHeadingRad));
                         gamepad1.rumble(500);
                         telemetry.addData("New Pose From Apriltag:", "X: %.2f in, Y: %.2f in, H: %.1f°", llX_in_shifted, llY_in_shifted, Math.toDegrees(currentHeadingRad));
