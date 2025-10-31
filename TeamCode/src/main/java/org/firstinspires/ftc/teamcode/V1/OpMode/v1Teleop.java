@@ -265,6 +265,7 @@ public class v1Teleop extends OpMode {
                     72,72,
                     AngleUnit.RADIANS, Math.toRadians(90));
             pinpoint.setPosition(newPose);
+            follower.setPose(new Pose(72,72, Math.toRadians(90)));
             telemetry.addLine("Pinpoint Reset - Position now 72,72 (Middle)!");
         }
 
