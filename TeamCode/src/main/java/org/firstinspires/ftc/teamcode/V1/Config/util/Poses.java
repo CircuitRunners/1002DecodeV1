@@ -77,18 +77,18 @@ public class Poses {
     // Goal Side Poses (Blue given, red auto-computed
     //================
     public static final AlliancePose startPoseGoalSide = new AlliancePose(
-            new Pose(111, 137, Math.toRadians(180)),
+            new Pose(111-2, 137+10, Math.toRadians(180)),
             new Pose(33, 137, Math.toRadians(0))
     );
 
     public static final AlliancePose shootPositionGoalSide = new AlliancePose(
-            new Pose(99, 116, Math.toRadians(52)),
+            new Pose(99+4, 116-4, Math.toRadians(45)),
             new Pose(45, 116, Math.toRadians(128))
     );
 
     public static final AlliancePose shootPositionGoalSide2 = new AlliancePose(
-            new Pose(99, 116, Math.toRadians(60)),
-            new Pose(45, 116, Math.toRadians(120))
+            new Pose(99+4, 116-4, Math.toRadians(45)),
+            new Pose(45, 116, Math.toRadians(140))
     );
 
     public static final AlliancePose lineupLine1 = new AlliancePose(
@@ -120,7 +120,7 @@ public class Poses {
             new Pose(21, 38, Math.toRadians(180))
     );
     public static final AlliancePose lineupAtGate = new AlliancePose(
-            new Pose(116, 78.5, Math.toRadians(270)),
+            new Pose(108, 78.5+5, Math.toRadians(270)),
             new Pose(28, 78.5, Math.toRadians(90))
     );
     public static final AlliancePose openGate = new AlliancePose(
