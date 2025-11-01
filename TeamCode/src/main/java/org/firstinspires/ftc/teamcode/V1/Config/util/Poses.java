@@ -108,8 +108,8 @@ public class Poses {
             new Pose(21, 65, Math.toRadians(180))
     );
     public static final AlliancePose backToShoot2ControlPoint = new AlliancePose(
-            new Pose(76, 53, Math.toRadians(0)),
-            new Pose(68, 53, Math.toRadians(180))
+            new Pose(98, 67, Math.toRadians(0)),
+            new Pose(46, 67, Math.toRadians(180))
     );
     public static final AlliancePose lineupLine3 = new AlliancePose(
             new Pose(91, 38, Math.toRadians(0)),
