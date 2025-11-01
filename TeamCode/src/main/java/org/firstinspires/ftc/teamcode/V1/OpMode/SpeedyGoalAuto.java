@@ -121,7 +121,7 @@ public class SpeedyGoalAuto extends OpMode {
                 .addPath(new BezierLine(Poses.get(Poses.lineupLine2), Poses.get(Poses.pickupLine2)))
                 .setConstantHeadingInterpolation(Poses.get(Poses.pickupLine2).getHeading())
                 .addPath(new BezierCurve(Poses.get(Poses.pickupLine2), Poses.get(Poses.backToShootControlPoint2), Poses.get(Poses.shootPositionGoalSide2)))
-                .setConstantHeadingInterpolation(Poses.get(Poses.pickupLine2).getHeading())
+                .setConstantHeadingInterpolation(Poses.get(Poses.shootPositionGoalSide2).getHeading())
                 .build();
 //
 //        travelBackToShoot2 = follower.pathBuilder()
@@ -177,7 +177,7 @@ public class SpeedyGoalAuto extends OpMode {
                 break;
             case 1: // Shooter Shoot
                 if (!follower.isBusy()) {
-                    shootBalls();
+                    shootBalls(6);
                 }
                 break;
             case 2: //go to intake
@@ -192,7 +192,7 @@ public class SpeedyGoalAuto extends OpMode {
                 break;
             case 3: //shoot
                 if (!follower.isBusy()) {
-                    shootBalls();
+                    shootBalls(7);
                 }
                 break;
             case 4: //go to intake
@@ -206,7 +206,8 @@ public class SpeedyGoalAuto extends OpMode {
                 break;
             case 5: //shoot
                 if (!follower.isBusy()) {
-                    shootBalls();
+//                    pathTimer.resetTimer();
+                    shootBalls(11);
                 }
                 break;
 //            case 10: //go to intake
@@ -241,6 +242,12 @@ public class SpeedyGoalAuto extends OpMode {
 //                }
 //                break;
             case 6:
+                if (!follower.isBusy()) {
+                    if (pathTimer.getElapsedTimeSeconds() > 5) {
+                        setPathState();
+                    }
+                }
+            case 7:
                 intake.intakeIdle();
                 shooter.stopShooter();
                 intake.setServoPower(0);
@@ -283,6 +290,7 @@ public class SpeedyGoalAuto extends OpMode {
         telemetry.addData("Shots Fired", shotCounter);
         telemetry.addData("Shooter Velocity", shooter.getCurrentVelo());
         telemetry.addData("Intake Power", intake.getPower());
+        telemetry.addData("Path State", pathState);
 
         // telemetry.addData("Shooter Velo: ", shooter.getCurrentVelo());
 
@@ -422,7 +430,7 @@ public class SpeedyGoalAuto extends OpMode {
 
 
     //LESS CHOPPED SHOOT BALLS HERE:
-    public void shootBalls(){
+    public void shootBalls(int seconds){
         // Start the shooter flywheel immediately.
         shooter.shoot(shooterDesiredVelo);
         double currentVelo = shooter.getCurrentVelo();
@@ -465,7 +473,7 @@ public class SpeedyGoalAuto extends OpMode {
 //        }
 
         // --- Move to next path after timeout ---
-        if (pathTimer.getElapsedTimeSeconds() >= 7) {
+        if (pathTimer.getElapsedTimeSeconds() >= seconds) {
             shooter.stopShooter();
             intake.setServoPower(0);
 //            intake.intakeIdle();

@@ -20,8 +20,8 @@ import org.firstinspires.ftc.teamcode.V1.Config.util.HeadingAutoAligner;
 import org.firstinspires.ftc.teamcode.V1.Config.util.Poses;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
-@Autonomous(name = "Goal Side Auto", preselectTeleOp = "v1Teleop")
-public class GoalSideAuto extends OpMode {
+@Autonomous(name = "DelayAuto", preselectTeleOp = "v1Teleop")
+public class DelayAuto extends OpMode {
 
     private Follower follower;
     private Timer pathTimer;
@@ -46,10 +46,10 @@ public class GoalSideAuto extends OpMode {
 
 
     // Tolerance for alignment in radians (approx. 2 degrees)
-   // private static final double ALIGN_THRESHOLD = Math.toRadians(2);
+    // private static final double ALIGN_THRESHOLD = Math.toRadians(2);
 
 
-    private PathChain travelToShoot, travelToIntake1, intake1, travelBackToShoot1, travelToIntake2, intake2,travelBackToLineup2, travelBackToShoot2, travelToIntake3, intake3, travelBackToShoot3, travelToGate;
+    private PathChain travelToShoot,travelBack, travelToIntake1, intake1, travelBackToShoot1, travelToIntake2, intake2,travelBackToLineup2, travelBackToShoot2, travelToIntake3, intake3, travelBackToShoot3, travelToGate;
 
     public void buildPaths() {
         // --- Alliance-Aware Path Generation ---
@@ -78,6 +78,11 @@ public class GoalSideAuto extends OpMode {
         travelToShoot = follower.pathBuilder()
                 .addPath(new BezierLine(Poses.get(Poses.startPoseGoalSide), Poses.get(Poses.shootPositionGoalSide)))
                 .setLinearHeadingInterpolation(0, Poses.get(Poses.shootPositionGoalSide).getHeading())
+
+                .build();
+        travelBack = follower.pathBuilder()
+                .addPath(new BezierLine(Poses.get(Poses.shootPositionGoalSide), Poses.get(Poses.startPoseGoalSide)))
+                .setLinearHeadingInterpolation(0, Poses.get(Poses.startPoseGoalSide).getHeading())
 
                 .build();
 
@@ -146,7 +151,14 @@ public class GoalSideAuto extends OpMode {
 
     public void autonomousPathUpdate() {
         switch (pathState) {
-            case 0: // Initial Travel to Shoot Position
+            case 0:
+                if (!follower.isBusy()) {
+                    if (pathTimer.getElapsedTimeSeconds() > 8) {
+                        setPathState();
+                    }
+                }
+                break;
+            case 1: // Initial Travel to Shoot Position
 //                intake.intakeRetainBalls();
 //                intake.intakeIn();
                 if(follower.getCurrentTValue() >=0.4){
@@ -158,84 +170,84 @@ public class GoalSideAuto extends OpMode {
                     setPathState();
                 }
                 break;
-            case 1: // Shooter Shoot
+            case 2: // Shooter Shoot
                 if (!follower.isBusy()) {
                     shootBalls();
                 }
                 break;
-            case 2: //go to intake
+            case 3: //go to intake
 //                shooter.stopShooter();    // breaks intake
                 intake.intakeOut();
 //                intake.intakeIdle();
                 if (!follower.isBusy()) {
 
-                    follower.followPath(travelToIntake1, true);
-                    setPathState();
+                    follower.followPath(travelBack, true);
+                    setPathState(-1);
                 }
                 break;
-            case 3: //intake
-                intake.intakeIn();
-                setPathState();
-                break;
-            case 4:
-                if (!follower.isBusy()) {
-                    follower.followPath(intake1, true);
-                    setPathState();
-                }
-                break;
-            case 5: //go to shoot
-//                intake.intakeRetainBalls();
-                intake.setServoPower(0);
-                if (!follower.isBusy()) {
-//                    shootBalls();
-                    follower.followPath(travelBackToShoot1, true);
-
-                    setPathState();
-                }
-                break;
-            case 6: //shoot
-                if (!follower.isBusy()) {
-                    shootBalls();
-                }
-                break;
-            case 7: //go to intake
-//                shooter.stopShooter();    // breaks intake
-                intake.intakeOut();
-                if (!follower.isBusy()) {
-                    follower.followPath(travelToIntake2, true);
-                    setPathState();
-                }
-                break;
-            case 8: //intake
-                intake.intakeIn();
-                setPathState();
-                break;
-            case 9:
-                if (!follower.isBusy()) {
-
-                    follower.followPath(intake2, true);
-
-                    setPathState();
-                }
-                break;
-            case 10: //go to shoot
-//                intake.intakeRetainBalls();
+//            case 4: //intake
+//                intake.intakeIn();
+//                setPathState();
+//                break;
+//            case 5:
+//                if (!follower.isBusy()) {
+//                    follower.followPath(intake1, true);
+//                    setPathState();
+//                }
+//                break;
+//            case 6: //go to shoot
+////                intake.intakeRetainBalls();
 //                intake.setServoPower(0);
-                if (!follower.isBusy()) {
+//                if (!follower.isBusy()) {
+////                    shootBalls();
+//                    follower.followPath(travelBackToShoot1, true);
+//
+//                    setPathState();
+//                }
+//                break;
+//            case 6: //shoot
+//                if (!follower.isBusy()) {
 //                    shootBalls();
-                    follower.followPath(travelBackToShoot2, true);
-
-                    setPathState();
-                }
-                break;
-            case 11: //shoot
-                if (!follower.isBusy()) {
-                    shootBalls();
-                }
-                break;
-            case 12:
-                setPathState();
-                break;
+//                }
+//                break;
+//            case 7: //go to intake
+////                shooter.stopShooter();    // breaks intake
+//                intake.intakeOut();
+//                if (!follower.isBusy()) {
+//                    follower.followPath(travelToIntake2, true);
+//                    setPathState();
+//                }
+//                break;
+//            case 8: //intake
+//                intake.intakeIn();
+//                setPathState();
+//                break;
+//            case 9:
+//                if (!follower.isBusy()) {
+//
+//                    follower.followPath(intake2, true);
+//
+//                    setPathState();
+//                }
+//                break;
+//            case 10: //go to shoot
+////                intake.intakeRetainBalls();
+////                intake.setServoPower(0);
+//                if (!follower.isBusy()) {
+////                    shootBalls();
+//                    follower.followPath(travelBackToShoot2, true);
+//
+//                    setPathState();
+//                }
+//                break;
+//            case 11: //shoot
+//                if (!follower.isBusy()) {
+//                    shootBalls();
+//                }
+//                break;
+//            case 12:
+//                setPathState();
+//                break;
 //            case 10: //go to intake
 //                shooter.stopShooter();
 //                intake.intakeOut();
@@ -311,7 +323,7 @@ public class GoalSideAuto extends OpMode {
         telemetry.addData("Shooter Velocity", shooter.getCurrentVelo());
         telemetry.addData("Intake Power", intake.getPower());
 
-       // telemetry.addData("Shooter Velo: ", shooter.getCurrentVelo());
+        // telemetry.addData("Shooter Velo: ", shooter.getCurrentVelo());
 
         telemetry.update();
 
