@@ -55,8 +55,9 @@ public class Constants {
             ;
 
     public static PinpointConstants localizerConstants = new PinpointConstants()
-            .forwardPodY(1.5)  //x pod in terms of gobuilda
-            .strafePodX(2.5) // y pod in terms of gobuilda
+
+            .forwardPodY(1.91)  //x pod in terms of gobuilda og. 1.5
+            .strafePodX(-2.64) // y pod in terms of gobuilda - og. 2.5
             .distanceUnit(DistanceUnit.INCH)
             .hardwareMapName("odo")
             .encoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD)

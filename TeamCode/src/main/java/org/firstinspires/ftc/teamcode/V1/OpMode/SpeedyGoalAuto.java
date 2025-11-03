@@ -181,7 +181,6 @@ public class SpeedyGoalAuto extends OpMode {
                 }
                 break;
             case 2: //go to intake
-//                shooter.stopShooter();    // breaks intake
 //                intake.intakeOut();
 //                intake.intakeIdle();
                 if (!follower.isBusy()) {
@@ -196,7 +195,6 @@ public class SpeedyGoalAuto extends OpMode {
                 }
                 break;
             case 4: //go to intake
-//                shooter.stopShooter();    // breaks intake
 //                intake.intakeOut();
                 if (!follower.isBusy()) {
                     intake.intakeIn();
@@ -206,41 +204,10 @@ public class SpeedyGoalAuto extends OpMode {
                 break;
             case 5: //shoot
                 if (!follower.isBusy()) {
-//                    pathTimer.resetTimer();
+
                     shootBalls(11);
                 }
                 break;
-//            case 10: //go to intake
-//                shooter.stopShooter();
-//                intake.intakeOut();
-//                if (!follower.isBusy()) {
-//                    follower.followPath(travelToIntake3, true);
-//                    setPathState(-1);
-//                }
-//                break;
-//            case 11: //intake
-//                intake.intakeIn();
-//                if (!follower.isBusy()) {
-//
-//                    follower.followPath(intake3, true);
-//
-//                    setPathState();
-//                }
-//                break;
-//            case 12: //go to shoot
-//
-//                if (!follower.isBusy()) {
-//                    intake.intakeRetainBalls();
-//                    follower.followPath(travelBackToShoot3, true);
-//
-//                    setPathState();
-//                }
-//                break;
-//            case 13: //shoot
-//                if (follower.isBusy()) {
-//                    shootBalls();
-//                }
-//                break;
             case 6:
                 if (!follower.isBusy()) {
                     if (pathTimer.getElapsedTimeSeconds() > 5) {
@@ -370,65 +337,6 @@ public class SpeedyGoalAuto extends OpMode {
         setPathState(0);
     }
 
-//    public void shootBalls(){
-//    ////////////
-//        /*ONLY USING PATH TIMER STUFF - NOT CURRENTLY USING SHOOTING TIMER OR THE DELTA STUFF*/
-//    ////////////
-//        shooter.shoot(shooterDesiredVelo);
-//        double currentVelo = shooter.getCurrentVelo();
-//        boolean shootingStarted = false;
-//        Timer shootingTimer = new Timer();
-//
-//        // --- Skip detection until shooter is near speed ---
-//        if (currentVelo < shooterDesiredVelo * SHOOTER_READY_THRESHOLD) {
-//            lastShooterVelo = currentVelo;
-//            intake.intakeIn();
-//            intake.setServoPower(0);
-//        }
-//
-//        // --- Feed balls only when shooter is up to speed ---
-//        if (currentVelo >= shooterDesiredVelo - 25 && currentVelo <= shooterDesiredVelo + 55) {
-//            intake.intakeIn();
-//            intake.setServoPower(1);
-//            shootingStarted = true;
-//
-//        } else {
-//            intake.intakeRetainBalls();
-//            intake.setServoPower(0);
-//        }
-//
-//        if (shootingStarted){
-//            shootingTimer.resetTimer();
-//        }
-//
-//        // --- Detect velocity drop (shot fired) ---
-//        double delta = lastShooterVelo - currentVelo;
-//
-//
-//        // If speed dropped sharply, count one shot
-//        if (!shotDetected && delta > DROP_THRESHOLD) {
-//            shotDetected = true;
-//            shotCounter++;
-//            telemetry.addData("Shot Detected", shotCounter);
-//        }
-//
-//        // When shooter recovers, re-arm detection for next ball
-//        if (shotDetected && currentVelo >= shooterDesiredVelo - RECOVER_THRESHOLD) {
-//            shotDetected = false;
-//        }
-//
-//        // --- Move to next path after 3 confirmed shots ---
-//        //og was >= 7.7
-//        if (pathTimer.getElapsedTimeSeconds() >= 7) {
-//            shotCounter = 0;
-//            setPathState();
-//        }
-//
-//        lastShooterVelo = currentVelo;
-//    }
-
-
-
     //LESS CHOPPED SHOOT BALLS HERE:
     public void shootBalls(int seconds){
         // Start the shooter flywheel immediately.
@@ -439,39 +347,10 @@ public class SpeedyGoalAuto extends OpMode {
         boolean isShooterReady = currentVelo >= shooterDesiredVelo - 25 && currentVelo <= shooterDesiredVelo + 55;
 
         if (isShooterReady) {
-            // When ready, feed the ball using both the main intake motor and the servo.
-            // This is the only place we command intake/servo ON.
             intake.intakeIn();
             intake.setServoPower(1);
         }
-//        else {
-//            // When NOT ready, or if speed drops too far, stop feeding.
-//            // This is the only place we command intake/servo OFF/retain.
-//            // Use intakeIdle() or intakeRetainBalls() depending on what state you want
-//            // the main intake motor to be in when waiting. We'll use intakeIdle()
-//            // to ensure the motor isn't fighting itself.
-//            intake.intakeIdle();
-//            intake.setServoPower(0);
-//        }
-
-        // --- Shot Detection Logic (Remains the same) ---
-        // ... your shot detection and path state transition logic here ...
-
-        // --- Detect velocity drop (shot fired) ---
-//        double delta = lastShooterVelo - currentVelo;
 //
-//        // If speed dropped sharply, count one shot
-//        if (!shotDetected && delta > DROP_THRESHOLD) {
-//            shotDetected = true;
-//            shotCounter++;
-//            telemetry.addData("Shot Detected", shotCounter);
-//        }
-
-        // When shooter recovers, re-arm detection for next ball
-//        if (shotDetected && currentVelo >= shooterDesiredVelo - RECOVER_THRESHOLD) {
-//            shotDetected = false;
-//        }
-
         // --- Move to next path after timeout ---
         if (pathTimer.getElapsedTimeSeconds() >= seconds) {
             shooter.stopShooter();

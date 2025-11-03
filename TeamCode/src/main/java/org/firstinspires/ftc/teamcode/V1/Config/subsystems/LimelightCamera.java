@@ -9,13 +9,14 @@ public class LimelightCamera {
 
     public Limelight3A limelightCamera;
 
-    public static double HEADING_KP_TX = 0.02;
+    public static double HEADING_KP_TX = 0.2; //0.02
     public static double HEADING_KI_TX = 0.0;
     public static double HEADING_KD_TX = 0.0;
     public static double ROTATION_MIN_POWER = 0.0;
 
     public double finalRotation = 0;
     public double error = 0;
+
 
     public LimelightCamera(HardwareMap hardwareMap) {
         limelightCamera = hardwareMap.get(Limelight3A.class, "limelight");
@@ -91,6 +92,16 @@ public class LimelightCamera {
 
         return detectedOrder;
     }
+
+    public double calculateDistanceToGoal(double robotX, double robotY, double goalX, double goalY) {
+        // Change in X and Y
+        double deltaX = goalX - robotX;
+        double deltaY = goalY - robotY;
+
+        // Apply the distance formula: d = sqrt((x2 - x1)^2 + (y2 - y1)^2)
+        return Math.hypot(deltaX, deltaY);
+    }
+
 
     /** Enum for ball orders */
     public enum BallOrder {

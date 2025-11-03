@@ -78,50 +78,50 @@ public class Poses {
     //================
     public static final AlliancePose startPoseGoalSide = new AlliancePose(
             new Pose(111-2, 137+10, Math.toRadians(180)),
-            new Pose(33, 137, Math.toRadians(0))
+            new Pose(32, 137, Math.toRadians(0))
     );
 
     public static final AlliancePose shootPositionGoalSide = new AlliancePose(
             new Pose(99+4, 116-4, Math.toRadians(45)),
-            new Pose(45, 116, Math.toRadians(128))
+            new Pose(44, 116, Math.toRadians(128))
     );
 
     public static final AlliancePose shootPositionGoalSide2 = new AlliancePose(
             new Pose(99+4, 116-4, Math.toRadians(45)),
-            new Pose(45, 116, Math.toRadians(140))
+            new Pose(44, 116, Math.toRadians(140))
     );
 
     public static final AlliancePose lineupLine1 = new AlliancePose(
             new Pose(89, 92, Math.toRadians(0)),
-            new Pose(55, 92, Math.toRadians(180))
+            new Pose(54, 92, Math.toRadians(180))
     );
     public static final AlliancePose pickupLine1 = new AlliancePose(
             new Pose(117, 92, Math.toRadians(0)),
-            new Pose(27+2, 92, Math.toRadians(180))
+            new Pose(28, 92, Math.toRadians(180))
     );
     public static final AlliancePose lineupLine2 = new AlliancePose(
             new Pose(89, 65, Math.toRadians(0)),
-            new Pose(55, 65, Math.toRadians(180))
+            new Pose(54, 65, Math.toRadians(180))
     );
     public static final AlliancePose pickupLine2 = new AlliancePose(
             new Pose(123, 65, Math.toRadians(0)),
-            new Pose(21, 65, Math.toRadians(180))
+            new Pose(20, 65, Math.toRadians(180))
     );
     public static final AlliancePose backToShoot2ControlPoint = new AlliancePose(
             new Pose(96, 67, Math.toRadians(0)),
-            new Pose(48, 67, Math.toRadians(180))
+            new Pose(47, 67, Math.toRadians(180))
     );
     public static final AlliancePose lineupLine3 = new AlliancePose(
             new Pose(91, 38, Math.toRadians(0)),
-            new Pose(53, 38, Math.toRadians(180))
+            new Pose(52, 38, Math.toRadians(180))
     );
     public static final AlliancePose pickupLine3 = new AlliancePose(
             new Pose(123, 38, Math.toRadians(0)),
-            new Pose(21, 38, Math.toRadians(180))
+            new Pose(20, 38, Math.toRadians(180))
     );
     public static final AlliancePose lineupAtGate = new AlliancePose(
             new Pose(108, 78.5+5, Math.toRadians(270)),
-            new Pose(28, 78.5, Math.toRadians(90))
+            new Pose(27, 78.5, Math.toRadians(90))
     );
     public static final AlliancePose openGate = new AlliancePose(
             new Pose(128.8, 70, Math.toRadians(180)),

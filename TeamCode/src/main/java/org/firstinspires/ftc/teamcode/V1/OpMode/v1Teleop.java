@@ -7,6 +7,7 @@ import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierLine;
+import com.pedropathing.geometry.BezierPoint;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.HeadingInterpolator;
 import com.pedropathing.paths.Path;
@@ -140,14 +141,16 @@ public class v1Teleop extends OpMode {
 
         pathChainBlue = () -> follower.pathBuilder() //Lazy Curve Generation for blue shoot pos
                 .addPath(new Path(new BezierLine(follower::getPose, new Pose(55, 88))))
-                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(135), 0.8))
+                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(-135), 0.8))
                 .build();
 
 
         pathChainRed = () -> follower.pathBuilder() //Lazy Curve Generation for red shoot pos
                 .addPath(new Path(new BezierLine(follower::getPose, new Pose(88, 88))))
-                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(45), 0.8))
+                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(-45), 0.8))
                 .build();
+
+
 
 
 
@@ -201,18 +204,18 @@ public class v1Teleop extends OpMode {
         //localization + pedropathing logic
 
 
-        if (player1.wasJustPressed(GamepadKeys.Button.TOUCHPAD_FINGER_1)){
+        if (player1.wasJustPressed(GamepadKeys.Button.TRIANGLE)){
             updateCoordinates();
         }
 
         //selector logic for alliance
-        if (!preselectFromAuto) {
+
             if (player1.wasJustPressed(GamepadKeys.Button.RIGHT_STICK_BUTTON)) {
                 isRedAlliance = true;
             } else if (player1.wasJustPressed(GamepadKeys.Button.LEFT_STICK_BUTTON)) {
                 isRedAlliance = false;
             }
-        }
+
 
         //state machine control
         if (rightBumperJustPressed) {
@@ -253,10 +256,10 @@ public class v1Teleop extends OpMode {
 
         if(!follower.isBusy()) {
             if (isRedAlliance) {
-                drive.drive(newForward, newStrafe, finalRotation);
+                drive.drive(-newForward, -newStrafe, finalRotation);
             }
             else{
-                drive.drive(-newForward, -newStrafe, finalRotation);
+                drive.drive(newForward, newStrafe, finalRotation);
             }
         }
 
@@ -276,20 +279,29 @@ public class v1Teleop extends OpMode {
                     72,72,
                     AngleUnit.RADIANS, Math.toRadians(90));
             //pinpoint.setPosition(newPose);
-            follower.setPose(new Pose(72,72, Math.toRadians(90)));
+            follower.setPose(new Pose(72,72, Math.toRadians(-90)));
             telemetry.addLine("Pinpoint Reset - Position now 72,72 (Middle)!");
         }
 
-        String data = String.format(Locale.US,
+//        String data = String.format(Locale.US,
+//                "{X: %.3f, Y: %.3f, H: %.3f}",
+//                currentPose.getX(DistanceUnit.INCH),
+//                currentPose.getY(DistanceUnit.INCH),
+//                currentPose.getHeading(AngleUnit.DEGREES)
+//        );,
+
+        String followerData = String.format(Locale.US,
                 "{X: %.3f, Y: %.3f, H: %.3f}",
-                currentPose.getX(DistanceUnit.INCH),
-                currentPose.getY(DistanceUnit.INCH),
-                currentPose.getHeading(AngleUnit.DEGREES)
+                follower.getPose().getX(),
+                follower.getPose().getY(),
+                Math.toDegrees(follower.getPose().getHeading())
+
         );
 
         //main state machine loop where all of the actions actually happen
         switch (stateMachine){
             case 0:
+
                 shooter.stopShooter();
                 //intake stuff
                 isIntakeInUse= true;
@@ -318,30 +330,35 @@ public class v1Teleop extends OpMode {
                     if (isRedAlliance){
                         if (isHeadingLocked){
                             isHeadingLocked = false;
+                            follower.breakFollowing();
                         }
                         else if (!isHeadingLocked){
                             isHeadingLocked = true;
+                            follower.holdPoint(new BezierPoint(follower.getPose()), follower.getHeading());
                         }
-//                        follower.followPath(pathChainRed.get());
+
+                       // follower.holdPoint(new BezierPoint(follower.getPose()), follower.getHeading());
+                       // follower.followPath(pathChainRed.get(), true);
                     }
                     else {
+//
                         if (isHeadingLocked){
                             isHeadingLocked = false;
+                            follower.breakFollowing();
                         }
                         else if (!isHeadingLocked){
                             isHeadingLocked = true;
+                            follower.holdPoint(new BezierPoint(follower.getPose()), follower.getHeading());
                         }
-//                        follower.followPath(pathChainBlue.get());
+
+                        //follower.holdPoint(new BezierPoint(follower.getPose()), follower.getHeading());
+                        //follower.followPath(pathChainBlue.get(), true);
                     }
                 }
 
-                if (!automatedDrive){
-                    //isHeadingLocked = true;
-                }
-                else {
-                    isHeadingLocked = false;
-                }
+
                 int desiredVelo = 1250;
+                //int desiredVelo = shooter.calculateFlywheelVelocity(limelight.calculateDistanceToGoal(follower.getPose().getX(), follower.getPose().getY(), 132, 132));
 
                 if (gamepad1.dpad_up){
                     desiredVelo += 250;
@@ -379,7 +396,8 @@ public class v1Teleop extends OpMode {
         if (stateMachine > 1){
             stateMachine = 0;
         }
-        telemetry.addData("Position", data);
+        //telemetry.addData("Position", data);
+        telemetry.addData("FOLLOWER (Pedro) Position", followerData);
         telemetry.addData("State", stateMachine);
         telemetry.addData("Heading Lock", isHeadingLocked ? "ON" : "OFF");
         telemetry.addData("Alliance: ", isRedAlliance? "Red" : "Blue");
@@ -411,18 +429,48 @@ public class v1Teleop extends OpMode {
     public void updateCoordinates() {
         //updates the orientation of robot for limelight camera's usage
         limelight.limelightCamera.updateRobotOrientation(pinpoint.getPosition().getHeading(AngleUnit.RADIANS));
+        //limelight.limelightCamera.updateRobotOrientation(follower.getHeading());
         limelight.limelightCamera.pipelineSwitch(3);
         LLResult result = limelight.getResult();
 
         //ensures result exsists and is from an acceptable apriltag
+//        if (result != null && result.isValid()) {
+//            for (LLResultTypes.FiducialResult fr : result.getFiducialResults()) {
+//                if (fr.getFiducialId() == 20 || fr.getFiducialId() == 24) {
+//                    Pose3D mt2Pose = result.getBotpose_MT2();
+//                    if (mt2Pose != null) {
+//                        //gets raw position from limelight in m
+//                        double llX_m = mt2Pose.getPosition().x;
+//                        double llY_m = mt2Pose.getPosition().y;
+//                        //converts position to inches
+//                        double llX_in = llX_m * METERS_TO_INCH;
+//                        double llY_in = llY_m * METERS_TO_INCH;
+//                        //shifts position to bottom left corner field origin for pedro pathing use
+//                        double llX_in_shifted = llX_in + 72.0;
+//                        double llY_in_shifted = llY_in + 72.0;
+//
+//                        double currentHeadingRad = pinpoint.getPosition().getHeading(AngleUnit.RADIANS);  // keep heading from Pinpoint
+//                        Pose2D newPose = new Pose2D(DistanceUnit.INCH,
+//                                llX_in_shifted, llY_in_shifted,
+//                                AngleUnit.RADIANS, currentHeadingRad);
+//                        //pinpoint.setPosition(newPose);
+//                        follower.setPose(new Pose(llX_in_shifted,llY_in_shifted,currentHeadingRad));
+//                        gamepad1.rumble(500);
+//                        telemetry.addData("New Pose From Apriltag:", "X: %.2f in, Y: %.2f in, H: %.1f°", llX_in_shifted, llY_in_shifted, Math.toDegrees(currentHeadingRad));
+//                    }
+//                    break;
+//                }
+//            }
+//        }
+
         if (result != null && result.isValid()) {
             for (LLResultTypes.FiducialResult fr : result.getFiducialResults()) {
                 if (fr.getFiducialId() == 20 || fr.getFiducialId() == 24) {
-                    Pose3D mt2Pose = result.getBotpose_MT2();
-                    if (mt2Pose != null) {
+                    Pose3D mt1Pose = result.getBotpose();
+                    if (mt1Pose != null) {
                         //gets raw position from limelight in m
-                        double llX_m = mt2Pose.getPosition().x;
-                        double llY_m = mt2Pose.getPosition().y;
+                        double llX_m = mt1Pose.getPosition().x;
+                        double llY_m = mt1Pose.getPosition().y;
                         //converts position to inches
                         double llX_in = llX_m * METERS_TO_INCH;
                         double llY_in = llY_m * METERS_TO_INCH;
@@ -435,9 +483,42 @@ public class v1Teleop extends OpMode {
                                 llX_in_shifted, llY_in_shifted,
                                 AngleUnit.RADIANS, currentHeadingRad);
                         //pinpoint.setPosition(newPose);
-                        follower.setPose(new Pose(llX_in_shifted,llY_in_shifted,currentHeadingRad));
-                        gamepad1.rumble(500);
-                        telemetry.addData("New Pose From Apriltag:", "X: %.2f in, Y: %.2f in, H: %.1f°", llX_in_shifted, llY_in_shifted, Math.toDegrees(currentHeadingRad));
+                        if (llX_in_shifted > 72 && llX_in_shifted > 72){
+                            follower.setPose(new Pose(llX_in_shifted,144 - llY_in_shifted, currentHeadingRad));
+                            gamepad1.rumble(500);
+                            telemetry.addData("New Pose From Apriltag:", "X: %.2f in, Y: %.2f in, H: %.1f°", llX_in_shifted, llY_in_shifted, Math.toDegrees(currentHeadingRad));
+
+                        }
+                        if (llX_in_shifted > 72 && llY_in_shifted < 72){
+                            follower.setPose(new Pose(144 - llX_in_shifted, llY_in_shifted, currentHeadingRad));
+                            gamepad1.rumble(500);
+                            telemetry.addData("New Pose From Apriltag:", "X: %.2f in, Y: %.2f in, H: %.1f°", llX_in_shifted, llY_in_shifted, Math.toDegrees(currentHeadingRad));
+
+                        }
+                        if (llX_in_shifted < 72 && llY_in_shifted > 72){
+                            follower.setPose(new Pose(144 - llX_in_shifted, llY_in_shifted, currentHeadingRad));
+                            gamepad1.rumble(500);
+                            telemetry.addData("New Pose From Apriltag:", "X: %.2f in, Y: %.2f in, H: %.1f°", llX_in_shifted, llY_in_shifted, Math.toDegrees(currentHeadingRad));
+
+                        }
+                        if (llX_in_shifted < 72 && llY_in_shifted < 72){
+                            follower.setPose(new Pose(llX_in_shifted,144 - llY_in_shifted, currentHeadingRad));
+                            gamepad1.rumble(500);
+                            telemetry.addData("New Pose From Apriltag:", "X: %.2f in, Y: %.2f in, H: %.1f°", llX_in_shifted, llY_in_shifted, Math.toDegrees(currentHeadingRad));
+
+                        }
+
+//                               follower.setPose(new Pose(144-llX_in_shifted, llY_in_shifted, currentHeadingRad));
+//                               gamepad1.rumble(500);
+//                               telemetry.addData("New Pose From Apriltag:", "X: %.2f in, Y: %.2f in, H: %.1f°", llX_in_shifted, llY_in_shifted, Math.toDegrees(currentHeadingRad));
+//                           }
+//                           else if (fr.getFiducialId() == 20 && follower.getPose().getX() > 72){
+//                               follower.setPose(new Pose(llX_in_shifted, llY_in_shifted, currentHeadingRad));
+//                               gamepad1.rumble(500);
+//                               telemetry.addData("New Pose From Apriltag:", "X: %.2f in, Y: %.2f in, H: %.1f°", llX_in_shifted, llY_in_shifted, Math.toDegrees(currentHeadingRad));
+//                          // }
+
+                       // }
                     }
                     break;
                 }
@@ -449,11 +530,11 @@ public class v1Teleop extends OpMode {
 
     //define pinpoint offsets and constants
     private void configurePinpoint() {
-        pinpoint.setOffsets(1.5, 2.5, DistanceUnit.INCH);
+        pinpoint.setOffsets(1.91, -2.64, DistanceUnit.INCH);
         pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
         pinpoint.setEncoderDirections(
-                GoBildaPinpointDriver.EncoderDirection.FORWARD,
-                GoBildaPinpointDriver.EncoderDirection.FORWARD
+                GoBildaPinpointDriver.EncoderDirection.REVERSED,
+                GoBildaPinpointDriver.EncoderDirection.REVERSED
         );
         pinpoint.recalibrateIMU();
     }

@@ -24,6 +24,14 @@ public class Shooter {
 
     public static final int TICKS_PER_REV = 537; // goBILDA 312 RPM Yellow Jacket
 
+    // --- Pre-calculated Linear Model ---
+    // Slope (m) = (1250 - 1000) / (48 - 12) = 6.9444...
+    private static final double VELO_SLOPE = 6.9444444;
+    // Y-Intercept (b) = 1000 - (6.9444444 * 12) = 916.6666...
+    private static final double VELO_INTERCEPT = 916.66667;
+
+    private static final double MAXIMUM_VELO = 916.66667;
+
     // ===== Hardware =====
     public DcMotorEx shooter1;
     public DcMotorEx shooter2;
@@ -121,6 +129,16 @@ public class Shooter {
         return ((shooter1.getVelocity()) + (shooter2.getVelocity()))/2;
     }
     public double getTargetVelocity(){
+        return targetVelocity;
+    }
+
+    public double calculateFlywheelVelocity(double distanceInInches) {
+        // Use the simple linear equation: V = m*D + b
+        double targetVelocity = (VELO_SLOPE * distanceInInches) + VELO_INTERCEPT;
+
+        // Safety check: ensure velocity doesn't go below the lowest tuned bound
+        targetVelocity = Math.max(targetVelocity, MAXIMUM_VELO);
+
         return targetVelocity;
     }
 
