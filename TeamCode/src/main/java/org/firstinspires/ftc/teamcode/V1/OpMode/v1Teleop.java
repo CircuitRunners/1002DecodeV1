@@ -474,51 +474,18 @@ public class v1Teleop extends OpMode {
                         //converts position to inches
                         double llX_in = llX_m * METERS_TO_INCH;
                         double llY_in = llY_m * METERS_TO_INCH;
+                        //rotates limelight points 90 degrees counterclockwise
+                        double llX_in_rotated = -llY_in;
+                        double llY_in_rotated = llX_in;
                         //shifts position to bottom left corner field origin for pedro pathing use
-                        double llX_in_shifted = llX_in + 72.0;
-                        double llY_in_shifted = llY_in + 72.0;
+                        double llX_in_shifted = llX_in_rotated + 72.0;
+                        double llY_in_shifted = llY_in_rotated + 72.0;
 
                         double currentHeadingRad = pinpoint.getPosition().getHeading(AngleUnit.RADIANS);  // keep heading from Pinpoint
                         Pose2D newPose = new Pose2D(DistanceUnit.INCH,
                                 llX_in_shifted, llY_in_shifted,
                                 AngleUnit.RADIANS, currentHeadingRad);
-                        //pinpoint.setPosition(newPose);
-                        if (llX_in_shifted > 72 && llX_in_shifted > 72){
-                            follower.setPose(new Pose(llX_in_shifted,144 - llY_in_shifted, currentHeadingRad));
-                            gamepad1.rumble(500);
-                            telemetry.addData("New Pose From Apriltag:", "X: %.2f in, Y: %.2f in, H: %.1f°", llX_in_shifted, llY_in_shifted, Math.toDegrees(currentHeadingRad));
-
-                        }
-                        if (llX_in_shifted > 72 && llY_in_shifted < 72){
-                            follower.setPose(new Pose(144 - llX_in_shifted, llY_in_shifted, currentHeadingRad));
-                            gamepad1.rumble(500);
-                            telemetry.addData("New Pose From Apriltag:", "X: %.2f in, Y: %.2f in, H: %.1f°", llX_in_shifted, llY_in_shifted, Math.toDegrees(currentHeadingRad));
-
-                        }
-                        if (llX_in_shifted < 72 && llY_in_shifted > 72){
-                            follower.setPose(new Pose(144 - llX_in_shifted, llY_in_shifted, currentHeadingRad));
-                            gamepad1.rumble(500);
-                            telemetry.addData("New Pose From Apriltag:", "X: %.2f in, Y: %.2f in, H: %.1f°", llX_in_shifted, llY_in_shifted, Math.toDegrees(currentHeadingRad));
-
-                        }
-                        if (llX_in_shifted < 72 && llY_in_shifted < 72){
-                            follower.setPose(new Pose(llX_in_shifted,144 - llY_in_shifted, currentHeadingRad));
-                            gamepad1.rumble(500);
-                            telemetry.addData("New Pose From Apriltag:", "X: %.2f in, Y: %.2f in, H: %.1f°", llX_in_shifted, llY_in_shifted, Math.toDegrees(currentHeadingRad));
-
-                        }
-
-//                               follower.setPose(new Pose(144-llX_in_shifted, llY_in_shifted, currentHeadingRad));
-//                               gamepad1.rumble(500);
-//                               telemetry.addData("New Pose From Apriltag:", "X: %.2f in, Y: %.2f in, H: %.1f°", llX_in_shifted, llY_in_shifted, Math.toDegrees(currentHeadingRad));
-//                           }
-//                           else if (fr.getFiducialId() == 20 && follower.getPose().getX() > 72){
-//                               follower.setPose(new Pose(llX_in_shifted, llY_in_shifted, currentHeadingRad));
-//                               gamepad1.rumble(500);
-//                               telemetry.addData("New Pose From Apriltag:", "X: %.2f in, Y: %.2f in, H: %.1f°", llX_in_shifted, llY_in_shifted, Math.toDegrees(currentHeadingRad));
-//                          // }
-
-                       // }
+                        pinpoint.setPosition(newPose);
                     }
                     break;
                 }
