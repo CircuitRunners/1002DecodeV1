@@ -334,7 +334,7 @@ public class v1Teleop extends OpMode {
                         }
                         else if (!isHeadingLocked){
                             isHeadingLocked = true;
-                            follower.holdPoint(new BezierPoint(follower.getPose()), follower.getHeading());
+                            follower.holdPoint(follower.getPose());
                         }
 
                        // follower.holdPoint(new BezierPoint(follower.getPose()), follower.getHeading());
@@ -348,7 +348,7 @@ public class v1Teleop extends OpMode {
                         }
                         else if (!isHeadingLocked){
                             isHeadingLocked = true;
-                            follower.holdPoint(new BezierPoint(follower.getPose()), follower.getHeading());
+                            follower.holdPoint(follower.getPose());
                         }
 
                         //follower.holdPoint(new BezierPoint(follower.getPose()), follower.getHeading());
