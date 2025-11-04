@@ -55,11 +55,6 @@ public class GoalSideAuto extends OpMode {
         // --- Alliance-Aware Path Generation ---
         // Poses.get(POSE_NAME) ensures the correct RED or BLUE coordinates are used.
 
-        // Path 1: Travel from Start to a Shooting Position
-//        travelToShoot = follower.pathBuilder()
-//                .addPath(new BezierLine(Poses.get(Poses.startPoseGoalSide), Poses.get(Poses.shootPositionGoalSide)))
-//                .setLinearHeadingInterpolation(Poses.get(Poses.startPoseGoalSide).getHeading(), Poses.get(Poses.shootPositionGoalSide).getHeading(), 0.8) // endtime is between 0.0 and 1.0
-//                .build();
 
 //        travelToShoot = follower.pathBuilder()
 //                .addPath(new BezierLine(Poses.get(Poses.startPoseGoalSide), Poses.get(Poses.shootPositionGoalSide)))
@@ -363,12 +358,9 @@ public class GoalSideAuto extends OpMode {
 
 
         Poses.updateAlliance(gamepad1, telemetry);
-
+        follower.setStartingPose(Poses.get(Poses.startPoseGoalSide));
 
         if (Poses.getAlliance() != lastKnownAlliance) {
-
-            follower.setStartingPose(Poses.get(Poses.startPoseGoalSide));
-
 
             buildPaths();
 
@@ -389,64 +381,6 @@ public class GoalSideAuto extends OpMode {
         setPathState(0);
     }
 
-//    public void shootBalls(){
-//    ////////////
-//        /*ONLY USING PATH TIMER STUFF - NOT CURRENTLY USING SHOOTING TIMER OR THE DELTA STUFF*/
-//    ////////////
-//        shooter.shoot(shooterDesiredVelo);
-//        double currentVelo = shooter.getCurrentVelo();
-//        boolean shootingStarted = false;
-//        Timer shootingTimer = new Timer();
-//
-//        // --- Skip detection until shooter is near speed ---
-//        if (currentVelo < shooterDesiredVelo * SHOOTER_READY_THRESHOLD) {
-//            lastShooterVelo = currentVelo;
-//            intake.intakeIn();
-//            intake.setServoPower(0);
-//        }
-//
-//        // --- Feed balls only when shooter is up to speed ---
-//        if (currentVelo >= shooterDesiredVelo - 25 && currentVelo <= shooterDesiredVelo + 55) {
-//            intake.intakeIn();
-//            intake.setServoPower(1);
-//            shootingStarted = true;
-//
-//        } else {
-//            intake.intakeRetainBalls();
-//            intake.setServoPower(0);
-//        }
-//
-//        if (shootingStarted){
-//            shootingTimer.resetTimer();
-//        }
-//
-//        // --- Detect velocity drop (shot fired) ---
-//        double delta = lastShooterVelo - currentVelo;
-//
-//
-//        // If speed dropped sharply, count one shot
-//        if (!shotDetected && delta > DROP_THRESHOLD) {
-//            shotDetected = true;
-//            shotCounter++;
-//            telemetry.addData("Shot Detected", shotCounter);
-//        }
-//
-//        // When shooter recovers, re-arm detection for next ball
-//        if (shotDetected && currentVelo >= shooterDesiredVelo - RECOVER_THRESHOLD) {
-//            shotDetected = false;
-//        }
-//
-//        // --- Move to next path after 3 confirmed shots ---
-//        //og was >= 7.7
-//        if (pathTimer.getElapsedTimeSeconds() >= 7) {
-//            shotCounter = 0;
-//            setPathState();
-//        }
-//
-//        lastShooterVelo = currentVelo;
-//    }
-
-
 
     //LESS CHOPPED SHOOT BALLS HERE:
     public void shootBalls(){
@@ -463,34 +397,7 @@ public class GoalSideAuto extends OpMode {
             intake.intakeIn();
             intake.setServoPower(1);
         }
-//        else {
-//            // When NOT ready, or if speed drops too far, stop feeding.
-//            // This is the only place we command intake/servo OFF/retain.
-//            // Use intakeIdle() or intakeRetainBalls() depending on what state you want
-//            // the main intake motor to be in when waiting. We'll use intakeIdle()
-//            // to ensure the motor isn't fighting itself.
-//            intake.intakeIdle();
-//            intake.setServoPower(0);
-//        }
-
-        // --- Shot Detection Logic (Remains the same) ---
-        // ... your shot detection and path state transition logic here ...
-
-        // --- Detect velocity drop (shot fired) ---
-//        double delta = lastShooterVelo - currentVelo;
 //
-//        // If speed dropped sharply, count one shot
-//        if (!shotDetected && delta > DROP_THRESHOLD) {
-//            shotDetected = true;
-//            shotCounter++;
-//            telemetry.addData("Shot Detected", shotCounter);
-//        }
-
-        // When shooter recovers, re-arm detection for next ball
-//        if (shotDetected && currentVelo >= shooterDesiredVelo - RECOVER_THRESHOLD) {
-//            shotDetected = false;
-//        }
-
         // --- Move to next path after timeout ---
         if (pathTimer.getElapsedTimeSeconds() >= 7) {
             shooter.stopShooter();
