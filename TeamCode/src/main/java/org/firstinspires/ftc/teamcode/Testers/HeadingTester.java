@@ -31,8 +31,8 @@ public class HeadingTester extends OpMode {
         public static double kD = 0.02;
 
         // Fixed target coordinates (can also be made tunable)
-        public static double targetX = 11;
-        public static double targetY = 135;
+        public static double targetX = 9;
+        public static double targetY = 140;
 
         private GoBildaPinpointDriver pinpoint;
         private MecanumDrive drive;
@@ -132,14 +132,14 @@ public class HeadingTester extends OpMode {
             limelight.limelightCamera.stop();
         }
 
-        private void configurePinpoint() {
-            pinpoint.setOffsets(2.3 * 25.4, 1 * 25.4, DistanceUnit.MM);
-            pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
-            pinpoint.setEncoderDirections(
-                    GoBildaPinpointDriver.EncoderDirection.FORWARD,
-                    GoBildaPinpointDriver.EncoderDirection.REVERSED
-            );
-            pinpoint.resetPosAndIMU();
-        }
+    private void configurePinpoint() {
+        pinpoint.setOffsets(1.91, -2.64, DistanceUnit.INCH);
+        pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
+        pinpoint.setEncoderDirections(
+                GoBildaPinpointDriver.EncoderDirection.REVERSED,
+                GoBildaPinpointDriver.EncoderDirection.REVERSED
+        );
+        pinpoint.recalibrateIMU();
+    }
     }
 

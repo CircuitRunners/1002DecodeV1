@@ -2,13 +2,14 @@ package org.firstinspires.ftc.teamcode.V1.Config.subsystems;
 
 
 import com.bylazar.configurables.annotations.Configurable;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.CRServo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 @Configurable
     public class Intake {
@@ -16,6 +17,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
         private Telemetry telemetry;
         private DcMotorEx intake;
         private CRServo servoIntake;
+        private DistanceSensor distanceSensor;
 
         public static double motorPower = 0;
 
@@ -30,6 +32,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
             intake = hardwareMap.get(DcMotorEx.class, "intake");
             servoIntake = hardwareMap.get(CRServo.class, "feederWheel");
+            distanceSensor = hardwareMap.get(DistanceSensor.class, "distanceSensor");
 
 
             servoIntake.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -72,21 +75,53 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
             motorPower = 1;
         }
 
+        public void intakeInDistance(){
+            intake.setPower(1);
+            motorPower = 1;
+            if (distanceSensor.getDistance(DistanceUnit.MM) <= 60){
+               servoIntake.setPower(0);
+            }
+            else if (distanceSensor.getDistance(DistanceUnit.MM )>60){
+                servoIntake.setPower(1);
+            }
+        }
+
         public void intakeOut(){
             intake.setPower(-1);
             motorPower = -1;
         }
+        public void intakeOutDistance(){
+        intake.setPower(-1);
+        motorPower = -1;
+        if (distanceSensor.getDistance(DistanceUnit.MM) <= 60){
+            servoIntake.setPower(1);
+        }
+        else if (distanceSensor.getDistance(DistanceUnit.MM )>60){
+            servoIntake.setPower(0);
+        }
+    }
         public void intakeRetainBalls(){
             intake.setPower(0.5);
             motorPower = 0.5;
         }
 
-        public void intakeIdle(){
+        public void fullIntakeIdle(){
             intake.setPower(0);
             servoIntake.setPower(0);
             motorPower = 0;
         }
 
+        public void intakeMotorIdle(){
+            intake.setPower(0);
+            motorPower = 0;
+        }
+        public void intakeServoIdle(){
+           servoIntake.setPower(0);
+        }
+
+        public double getDistanceMM(){
+           return distanceSensor.getDistance(DistanceUnit.MM);
+        }
 
 
         // --- Periodic update (optional) ---

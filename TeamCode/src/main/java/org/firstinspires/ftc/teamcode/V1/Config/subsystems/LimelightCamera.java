@@ -9,7 +9,7 @@ public class LimelightCamera {
 
     public Limelight3A limelightCamera;
 
-    public static double HEADING_KP_TX = 0.2; //0.02
+    public static double HEADING_KP_TX = 0.027 ; //0.02
     public static double HEADING_KI_TX = 0.0;
     public static double HEADING_KD_TX = 0.0;
     public static double ROTATION_MIN_POWER = 0.0;

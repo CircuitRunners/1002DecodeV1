@@ -7,7 +7,6 @@ import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierLine;
-import com.pedropathing.geometry.BezierPoint;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.HeadingInterpolator;
 import com.pedropathing.paths.Path;
@@ -72,6 +71,13 @@ public class v1Teleop extends OpMode {
     private boolean isIntakeInUse = false;
     private final double MINIMUM_SHOOTER_VELO = 1600; //   tick/sec
     private final double MAXIMUM_SHOOTER_VELO = 1650; //   tick/sec
+
+
+    private double desiredVeloRed = 0;
+    private double desiredVeloBlue = 0;
+    private double shooterIncrement = 0;
+
+
 
 
 
@@ -157,6 +163,7 @@ public class v1Teleop extends OpMode {
 
 
 
+
         telemetry.addLine("Ready!");
         telemetry.update();
     }
@@ -165,6 +172,10 @@ public class v1Teleop extends OpMode {
     public void start(){
 //        Pose2D newPose = new Pose2D(DistanceUnit.INCH, Poses.getStartingPose().getX(), Poses.getStartingPose().getY(), AngleUnit.RADIANS, Math.toRadians(Poses.getStartingPose().getHeading()));
 //        pinpoint.setPosition(newPose);
+
+//        desiredVeloRed = shooter.calculateFlywheelVelocity(limelight.calculateDistanceToGoal(follower.getPose().getX(), follower.getPose().getY(), 12, 137));
+//        desiredVeloBlue = shooter.calculateFlywheelVelocity(limelight.calculateDistanceToGoal(follower.getPose().getX(), follower.getPose().getY(), 132, 137));
+
     }
 
     @Override
@@ -233,14 +244,32 @@ public class v1Teleop extends OpMode {
         double rotate = player1.getRightX();
 
         double robotHeading = Math.toRadians(currentPose.getHeading(AngleUnit.DEGREES));
-        double finalRotation;
+        double finalRotation = rotate;
 
         if (isHeadingLocked) {
-            finalRotation = limelightRotation; // Replaced limelight.autoAlign()
-            telemetry.addLine("Using Limelight Data for Heading Lock.");
-            telemetry.addData("Error from tag center", limelight.error);
-            telemetry.addData("PID Rotation", limelightRotation); // Replaced limelight.autoAlign()
 
+                if (limelight.getResult().isValid()) {
+                    for (LLResultTypes.FiducialResult fr : limelight.getResult().getFiducialResults()) {
+                        if (fr.getFiducialId() == 20 || fr.getFiducialId() == 24) {
+
+                            finalRotation = limelightRotation;
+
+
+                            // Replaced limelight.autoAlign()
+                            telemetry.addLine("Using Limelight Data for Heading Lock.");
+                            telemetry.addData("Error from tag center", limelight.error);
+                            telemetry.addData("PID Rotation", limelightRotation); // Replaced limelight.autoAlign()
+
+                        }
+                        else {
+                            finalRotation = rotate;
+                        }
+                    }
+                }
+                else {
+                    finalRotation = rotate;
+                    telemetry.addData("Using Pinpoint IMU Heading.", "");
+                }
         }
         else {
             finalRotation = rotate;
@@ -301,7 +330,7 @@ public class v1Teleop extends OpMode {
         //main state machine loop where all of the actions actually happen
         switch (stateMachine){
             case 0:
-
+                isHeadingLocked = false;
                 shooter.stopShooter();
                 //intake stuff
                 isIntakeInUse= true;
@@ -316,7 +345,7 @@ public class v1Teleop extends OpMode {
                 }
                 else if (leftTriggerValue > 0.8) { // Replaced gamepad1.left_trigger
                     intake.setServoPower(0);
-                    intake.intakeIdle();
+                    intake.fullIntakeIdle();
                 }
 
                 break;
@@ -330,11 +359,12 @@ public class v1Teleop extends OpMode {
                     if (isRedAlliance){
                         if (isHeadingLocked){
                             isHeadingLocked = false;
-                            follower.breakFollowing();
+                            //follower.breakFollowing();
+                            gamepad1.rumble(500);
                         }
                         else if (!isHeadingLocked){
                             isHeadingLocked = true;
-                            follower.holdPoint(follower.getPose());
+                            //follower.holdPoint(follower.getPose());
                         }
 
                        // follower.holdPoint(new BezierPoint(follower.getPose()), follower.getHeading());
@@ -344,11 +374,13 @@ public class v1Teleop extends OpMode {
 //
                         if (isHeadingLocked){
                             isHeadingLocked = false;
-                            follower.breakFollowing();
+                            //follower.breakFollowing();
+
                         }
                         else if (!isHeadingLocked){
                             isHeadingLocked = true;
-                            follower.holdPoint(follower.getPose());
+                            gamepad1.rumble(500);
+                            //follower.holdPoint(follower.getPose());
                         }
 
                         //follower.holdPoint(new BezierPoint(follower.getPose()), follower.getHeading());
@@ -357,20 +389,36 @@ public class v1Teleop extends OpMode {
                 }
 
 
-                int desiredVelo = 1250;
+
                 //int desiredVelo = shooter.calculateFlywheelVelocity(limelight.calculateDistanceToGoal(follower.getPose().getX(), follower.getPose().getY(), 132, 132));
 
                 if (gamepad1.dpad_up){
-                    desiredVelo += 250;
+                   shooterIncrement +=50;
                 } else if (gamepad1.dpad_down) {
-                    desiredVelo -=250;
+                    shooterIncrement -=50;
+                }
+                else if (gamepad1.dpad_left){
+                   shooterIncrement =0;
+                }
+
+                if(isRedAlliance) {
+                    desiredVeloRed = shooter.calculateFlywheelVelocity(limelight.calculateDistanceToGoal(follower.getPose().getX(), follower.getPose().getY(), 12, 137)) + shooterIncrement;
+                }
+                else if (!isRedAlliance){
+                    desiredVeloRed = shooter.calculateFlywheelVelocity(limelight.calculateDistanceToGoal(follower.getPose().getX(), follower.getPose().getY(), 132, 137)) + shooterIncrement;
                 }
 
                 //  if (zoneChecker.isInsideShootingZone(currentPose.getX(DistanceUnit.INCH), currentPose.getY(DistanceUnit.INCH))) {
-                shooter.shoot(desiredVelo);
+
+                if (isRedAlliance){
+                    shooter.shoot(desiredVeloRed);
+                }
+                else if (!isRedAlliance){
+                    shooter.shoot(desiredVeloBlue);
+                }
 
                 //shooting logic
-                if ((shooterVelo >= desiredVelo - 40) && (shooterVelo <= desiredVelo + 55)) { // Replaced shooter.getCurrentVelo()
+                if ((shooterVelo >= desiredVeloRed - 40) && (shooterVelo <= desiredVeloRed + 55)) { // Replaced shooter.getCurrentVelo()
                     isIntakeInUse = true;
                     intake.intakeIn();
                     if (rightTriggerValue > 0.2) { // Replaced gamepad1.right_trigger
@@ -384,7 +432,7 @@ public class v1Teleop extends OpMode {
 
                 else {
                     intake.setServoPower(0);
-                    intake.intakeIdle();
+                    intake.fullIntakeIdle();
 
                     isIntakeInUse = false;
                 }
@@ -475,17 +523,16 @@ public class v1Teleop extends OpMode {
                         double llX_in = llX_m * METERS_TO_INCH;
                         double llY_in = llY_m * METERS_TO_INCH;
                         //rotates limelight points 90 degrees counterclockwise
-                        double llX_in_rotated = -llY_in;
-                        double llY_in_rotated = llX_in;
+                        double llX_in_rotated = llY_in;
+                        double llY_in_rotated = -llX_in;
                         //shifts position to bottom left corner field origin for pedro pathing use
                         double llX_in_shifted = llX_in_rotated + 72.0;
                         double llY_in_shifted = llY_in_rotated + 72.0;
 
                         double currentHeadingRad = pinpoint.getPosition().getHeading(AngleUnit.RADIANS);  // keep heading from Pinpoint
-                        Pose2D newPose = new Pose2D(DistanceUnit.INCH,
-                                llX_in_shifted, llY_in_shifted,
-                                AngleUnit.RADIANS, currentHeadingRad);
-                        pinpoint.setPosition(newPose);
+                        follower.setPose(new Pose(llX_in_shifted,llY_in_shifted,currentHeadingRad));
+                        gamepad1.rumble(500);
+                        telemetry.addData("New Pose From Apriltag:", "X: %.2f in, Y: %.2f in, H: %.1f°", llX_in_shifted, llY_in_shifted, Math.toDegrees(currentHeadingRad));
                     }
                     break;
                 }

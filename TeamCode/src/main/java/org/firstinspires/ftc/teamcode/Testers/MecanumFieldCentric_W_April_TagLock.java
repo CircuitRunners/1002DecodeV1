@@ -19,7 +19,7 @@ import org.firstinspires.ftc.teamcode.MemDevDecode.Config.MecanumDrive;
 
 import java.util.List;
 import java.util.Locale;
-@Disabled
+//@Disabled
 @Configurable
 @TeleOp(name = "Field Centric With April Tags Lock")
 public class MecanumFieldCentric_W_April_TagLock extends OpMode {
@@ -79,17 +79,17 @@ public class MecanumFieldCentric_W_April_TagLock extends OpMode {
         double rotate  =  player1.getRightX();
 
         // Toggle the heading lock with dpad up/down
-//        if (player1.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
-//            isHeadingLocked = true;
-//            timer.reset();
-//            integralSum = 0;
-//            lastError = 0;
-//            telemetry.addLine("Heading Lock Enabled.");
-//        }
-//        if (player1.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
-//            isHeadingLocked = false;
-//            telemetry.addLine("Heading Lock Disabled.");
-//        }
+        if (player1.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
+            isHeadingLocked = true;
+            timer.reset();
+            integralSum = 0;
+            lastError = 0;
+            telemetry.addLine("Heading Lock Enabled.");
+        }
+        if (player1.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
+            isHeadingLocked = false;
+            telemetry.addLine("Heading Lock Disabled.");
+        }
 
         pinpoint.update();
         Pose2D currentPose = pinpoint.getPosition();
@@ -99,25 +99,25 @@ public class MecanumFieldCentric_W_April_TagLock extends OpMode {
 
         LLResult result = limelight.getLatestResult();
 
-        if (player1.isDown(GamepadKeys.Button.DPAD_UP)) {
-
-            int[] validIDs = {3, 4};
-
-            //limelight.updateRobotOrientation(0.0);
-            telemetry.addData("MT2", result.getBotpose_MT2().toString());
-            telemetry.addData("Botpose mt2 x", result.getBotpose_MT2().getPosition().x);
-            telemetry.addData("Botpose mt2 y" , result.getBotpose_MT2().getPosition().y);
-            telemetry.addData("Botpose mt2 z", result.getBotpose_MT2().getPosition().z);
-
-
-            List<LLResultTypes.FiducialResult> fiducialResults = result.getFiducialResults();
-            for (LLResultTypes.FiducialResult fr : fiducialResults) {
-                if (result.isValid() && ((fr.getFiducialId() == 20) || (fr.getFiducialId() == 24))){
-                    pinpoint.setPosX(result.getBotpose_MT2().getPosition().x + 72, DistanceUnit.INCH);
-                    pinpoint.setPosY(result.getBotpose_MT2().getPosition().y + 72, DistanceUnit.INCH);
-                }
-
-            }
+//        if (player1.isDown(GamepadKeys.Button.DPAD_UP)) {
+//
+//            int[] validIDs = {3, 4};
+//
+//            //limelight.updateRobotOrientation(0.0);
+//            telemetry.addData("MT2", result.getBotpose_MT2().toString());
+//            telemetry.addData("Botpose mt2 x", result.getBotpose_MT2().getPosition().x);
+//            telemetry.addData("Botpose mt2 y" , result.getBotpose_MT2().getPosition().y);
+//            telemetry.addData("Botpose mt2 z", result.getBotpose_MT2().getPosition().z);
+//
+//
+//            List<LLResultTypes.FiducialResult> fiducialResults = result.getFiducialResults();
+//            for (LLResultTypes.FiducialResult fr : fiducialResults) {
+//                if (result.isValid() && ((fr.getFiducialId() == 20) || (fr.getFiducialId() == 24))){
+//                    pinpoint.setPosX(result.getBotpose_MT2().getPosition().x + 72, DistanceUnit.INCH);
+//                    pinpoint.setPosY(result.getBotpose_MT2().getPosition().y + 72, DistanceUnit.INCH);
+//                }
+//
+//            }
 
 
 //        } if (player1.isDown(GamepadKeys.Button.DPAD_DOWN)) {
@@ -139,7 +139,7 @@ public class MecanumFieldCentric_W_April_TagLock extends OpMode {
 //            }
 //
 
-        }
+    //    }
 
         if (isHeadingLocked) {
 

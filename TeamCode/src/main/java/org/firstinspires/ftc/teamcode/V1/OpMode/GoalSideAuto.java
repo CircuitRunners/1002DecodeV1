@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.V1.OpMode;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
-import com.pedropathing.paths.HeadingInterpolator;
 import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -14,7 +13,6 @@ import java.util.List;
 
 import org.firstinspires.ftc.teamcode.V1.Config.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.V1.Config.subsystems.LimelightCamera;
-import org.firstinspires.ftc.teamcode.V1.Config.subsystems.LimelightCamera.BallOrder;
 import org.firstinspires.ftc.teamcode.V1.Config.subsystems.Shooter;
 import org.firstinspires.ftc.teamcode.V1.Config.util.HeadingAutoAligner;
 import org.firstinspires.ftc.teamcode.V1.Config.util.Poses;
@@ -38,6 +36,7 @@ public class GoalSideAuto extends OpMode {
     private final double DROP_THRESHOLD = 45;      // RPM drop to count as a shot (tune this)
     private final double RECOVER_THRESHOLD = 20;   // How close to target before re-arming detection
     private final double SHOOTER_READY_THRESHOLD = 0.8; // 80% of target before enabling detection
+    private boolean ball_was_present = true;
 
     private final double shooterDesiredVelo = 1000;
     private Poses.Alliance lastKnownAlliance = null;
@@ -263,7 +262,7 @@ public class GoalSideAuto extends OpMode {
 //                }
 //                break;
             case 13:
-                intake.intakeIdle();
+                intake.fullIntakeIdle();
                 shooter.stopShooter();
                 intake.setServoPower(0);
                 if (!follower.isBusy()){
@@ -274,7 +273,7 @@ public class GoalSideAuto extends OpMode {
 
             default: // End State (-1)
                 shooter.stopShooter();
-                intake.intakeIdle();
+                intake.fullIntakeIdle();
                 intake.setServoPower(0);
                 if (!follower.isBusy()) {
                     requestOpModeStop();
@@ -320,7 +319,7 @@ public class GoalSideAuto extends OpMode {
     @Override
     public void stop() {
         shooter.stopShooter();
-        intake.intakeIdle();
+        intake.fullIntakeIdle();
         intake.setServoPower(0);
         Poses.savePose(follower.getPose());
         //limelight.limelightCamera.pause();
@@ -402,13 +401,45 @@ public class GoalSideAuto extends OpMode {
         if (pathTimer.getElapsedTimeSeconds() >= 7) {
             shooter.stopShooter();
             intake.setServoPower(0);
-            intake.intakeIdle();
+            intake.fullIntakeIdle();
             shotCounter = 0;
             setPathState();
         }
 
-        lastShooterVelo = currentVelo;
+       // lastShooterVelo = currentVelo;
     }
+
+    //new distance sensor version
+
+//    public void shootBalls(){
+//        shooter.shoot(shooterDesiredVelo);
+//        double currentVelo = shooter.getCurrentVelo();
+//
+//        boolean isShooterReady = currentVelo >= shooterDesiredVelo - 25 && currentVelo <= shooterDesiredVelo + 55;
+//
+//        if (isShooterReady) {
+//            intake.intakeIn();
+//            intake.setServoPower(1);
+//        }
+//
+//        boolean ball_is_present = (intake.getDistanceMM() <= 60);
+//
+//        if (ball_was_present && !ball_is_present) {
+//            shotCounter++;
+//        }
+//
+//        ball_was_present = ball_is_present;
+//
+//        if (shotCounter >= 3 || pathTimer.getElapsedTimeSeconds() >= 7) {
+//            shooter.stopShooter();
+//            intake.setServoPower(0);
+//            intake.fullIntakeIdle();
+//            shotCounter = 0;
+//            setPathState();
+//        }
+//
+//
+//    }
 
 
 

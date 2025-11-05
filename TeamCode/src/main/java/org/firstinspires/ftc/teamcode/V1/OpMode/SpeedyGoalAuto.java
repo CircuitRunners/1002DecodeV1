@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.V1.OpMode;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
-import com.pedropathing.paths.HeadingInterpolator;
 import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -14,7 +13,6 @@ import java.util.List;
 
 import org.firstinspires.ftc.teamcode.V1.Config.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.V1.Config.subsystems.LimelightCamera;
-import org.firstinspires.ftc.teamcode.V1.Config.subsystems.LimelightCamera.BallOrder;
 import org.firstinspires.ftc.teamcode.V1.Config.subsystems.Shooter;
 import org.firstinspires.ftc.teamcode.V1.Config.util.HeadingAutoAligner;
 import org.firstinspires.ftc.teamcode.V1.Config.util.Poses;
@@ -120,7 +118,7 @@ public class SpeedyGoalAuto extends OpMode {
                 .setLinearHeadingInterpolation(Poses.get(Poses.shootPositionGoalSide).getHeading(), Poses.get(Poses.lineupLine2).getHeading())
                 .addPath(new BezierLine(Poses.get(Poses.lineupLine2), Poses.get(Poses.pickupLine2)))
                 .setConstantHeadingInterpolation(Poses.get(Poses.pickupLine2).getHeading())
-                .addPath(new BezierCurve(Poses.get(Poses.pickupLine2), Poses.get(Poses.backToShootControlPoint2), Poses.get(Poses.shootPositionGoalSide2)))
+                .addPath(new BezierCurve(Poses.get(Poses.pickupLine2), Poses.get(Poses.backToShoot2ControlPoint), Poses.get(Poses.shootPositionGoalSide2)))
                 .setConstantHeadingInterpolation(Poses.get(Poses.shootPositionGoalSide2).getHeading())
                 .build();
 //
@@ -215,7 +213,7 @@ public class SpeedyGoalAuto extends OpMode {
                     }
                 }
             case 7:
-                intake.intakeIdle();
+                intake.fullIntakeIdle();
                 shooter.stopShooter();
                 intake.setServoPower(0);
                 if (!follower.isBusy()){
@@ -226,7 +224,7 @@ public class SpeedyGoalAuto extends OpMode {
 
             default: // End State (-1)
                 shooter.stopShooter();
-                intake.intakeIdle();
+                intake.fullIntakeIdle();
                 intake.setServoPower(0);
                 if (!follower.isBusy()) {
                     requestOpModeStop();
@@ -273,7 +271,7 @@ public class SpeedyGoalAuto extends OpMode {
     @Override
     public void stop() {
         shooter.stopShooter();
-        intake.intakeIdle();
+        intake.fullIntakeIdle();
         intake.setServoPower(0);
         Poses.savePose(follower.getPose());
         //limelight.limelightCamera.pause();

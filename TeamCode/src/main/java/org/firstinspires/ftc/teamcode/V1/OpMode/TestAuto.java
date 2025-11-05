@@ -1,10 +1,8 @@
 package org.firstinspires.ftc.teamcode.V1.OpMode;
 
 import com.pedropathing.follower.Follower;
-import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
-import com.pedropathing.paths.PathBuilder;
 import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.hardware.lynx.LynxModule;
@@ -81,7 +79,7 @@ import java.util.List;
 
                 default: // End State (-1)
                     shooter.stopShooter();
-                    intake.intakeIdle();
+                    intake.fullIntakeIdle();
                     intake.setServoPower(0);
                     if (!follower.isBusy()) {
                         requestOpModeStop();
@@ -128,7 +126,7 @@ import java.util.List;
         @Override
         public void stop() {
             shooter.stopShooter();
-            intake.intakeIdle();
+            intake.fullIntakeIdle();
             intake.setServoPower(0);
             Poses.savePose(follower.getPose());
             //limelight.limelightCamera.pause();

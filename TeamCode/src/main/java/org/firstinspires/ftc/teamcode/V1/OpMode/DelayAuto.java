@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.V1.OpMode;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
-import com.pedropathing.paths.HeadingInterpolator;
 import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -14,7 +13,6 @@ import java.util.List;
 
 import org.firstinspires.ftc.teamcode.V1.Config.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.V1.Config.subsystems.LimelightCamera;
-import org.firstinspires.ftc.teamcode.V1.Config.subsystems.LimelightCamera.BallOrder;
 import org.firstinspires.ftc.teamcode.V1.Config.subsystems.Shooter;
 import org.firstinspires.ftc.teamcode.V1.Config.util.HeadingAutoAligner;
 import org.firstinspires.ftc.teamcode.V1.Config.util.Poses;
@@ -280,7 +278,7 @@ public class DelayAuto extends OpMode {
 //                }
 //                break;
             case 13:
-                intake.intakeIdle();
+                intake.fullIntakeIdle();
                 shooter.stopShooter();
                 intake.setServoPower(0);
                 if (!follower.isBusy()){
@@ -291,7 +289,7 @@ public class DelayAuto extends OpMode {
 
             default: // End State (-1)
                 shooter.stopShooter();
-                intake.intakeIdle();
+                intake.fullIntakeIdle();
                 intake.setServoPower(0);
                 if (!follower.isBusy()) {
                     requestOpModeStop();
@@ -337,7 +335,7 @@ public class DelayAuto extends OpMode {
     @Override
     public void stop() {
         shooter.stopShooter();
-        intake.intakeIdle();
+        intake.fullIntakeIdle();
         intake.setServoPower(0);
         Poses.savePose(follower.getPose());
         //limelight.limelightCamera.pause();
@@ -507,7 +505,7 @@ public class DelayAuto extends OpMode {
         if (pathTimer.getElapsedTimeSeconds() >= 7) {
             shooter.stopShooter();
             intake.setServoPower(0);
-            intake.intakeIdle();
+            intake.fullIntakeIdle();
             shotCounter = 0;
             setPathState();
         }

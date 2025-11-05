@@ -34,7 +34,7 @@ public class TESTIING_HeadingAligner {
         public double getRotationPower(double robotX, double robotY, double robotHeading,
                                        double kP, double kI, double kD) {
             double worldAngleToTarget = Math.atan2(targetY - robotY, targetX - robotX);
-            double headingError = MathFunctions.normalizeAngle(worldAngleToTarget - robotHeading);
+            double headingError = MathFunctions.normalizeAngle(robotHeading - worldAngleToTarget);
 
             integral += headingError;
             integral = Math.max(-integralLimit, Math.min(integralLimit, integral));

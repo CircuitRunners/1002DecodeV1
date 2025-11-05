@@ -26,11 +26,12 @@ public class Shooter {
 
     // --- Pre-calculated Linear Model ---
     // Slope (m) = (1250 - 1000) / (48 - 12) = 6.9444...
-    private static final double VELO_SLOPE = 6.9444444;
-    // Y-Intercept (b) = 1000 - (6.9444444 * 12) = 916.6666...
-    private static final double VELO_INTERCEPT = 916.66667;
+    private static final double VELO_SLOPE = 7.41071;
 
-    private static final double MAXIMUM_VELO = 916.66667;
+    private static final double VELO_INTERCEPT = 802.23214;
+
+    private static final double MIMIMUM_VELO = 802.23214;
+    private static final double MAXIMUM_VELO = 2000;
 
     // ===== Hardware =====
     public DcMotorEx shooter1;
@@ -137,7 +138,7 @@ public class Shooter {
         double targetVelocity = (VELO_SLOPE * distanceInInches) + VELO_INTERCEPT;
 
         // Safety check: ensure velocity doesn't go below the lowest tuned bound
-        targetVelocity = Math.max(targetVelocity, MAXIMUM_VELO);
+        targetVelocity = Range.clip(targetVelocity, MIMIMUM_VELO, MAXIMUM_VELO);
 
         return targetVelocity;
     }
