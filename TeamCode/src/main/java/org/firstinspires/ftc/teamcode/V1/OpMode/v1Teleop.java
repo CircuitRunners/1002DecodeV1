@@ -355,12 +355,12 @@ public class v1Teleop extends OpMode {
                 if (!isIntakeInUse){
                     intake.intakeRetainBalls();
                 }
-                if (player1.wasJustPressed(GamepadKeys.Button.CIRCLE)) {
+                if (player1.wasJustPressed(GamepadKeys.Button.TRIANGLE)) {
                     if (isRedAlliance){
                         if (isHeadingLocked){
                             isHeadingLocked = false;
                             //follower.breakFollowing();
-                            gamepad1.rumble(500);
+
                         }
                         else if (!isHeadingLocked){
                             isHeadingLocked = true;

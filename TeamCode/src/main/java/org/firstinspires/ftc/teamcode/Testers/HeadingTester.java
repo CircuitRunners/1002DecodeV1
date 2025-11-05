@@ -16,7 +16,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.V1.Config.subsystems.LimelightCamera;
 import org.firstinspires.ftc.teamcode.V1.Config.subsystems.MecanumDrive;
 import org.firstinspires.ftc.teamcode.V1.Config.util.HeadingAutoAligner;
-//@Disabled
+@Disabled
 @TeleOp(name = "Heading Auto Aligner (Dashboard Tunable PID)", group = "Testers")
 @Configurable
 public class HeadingTester extends OpMode {

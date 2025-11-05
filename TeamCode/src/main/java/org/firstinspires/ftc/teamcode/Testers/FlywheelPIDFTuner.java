@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Testers;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.hardware.lynx.LynxModule;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -53,6 +54,8 @@ import java.util.List;
  *
  *    NOTE - if its good enough with just Kf and Kp then just leave it - no need for Kd and Ki unless absoulutely neccesary
  *    **/
+
+@Disabled
 @Configurable
 @TeleOp
 public class FlywheelPIDFTuner extends OpMode {

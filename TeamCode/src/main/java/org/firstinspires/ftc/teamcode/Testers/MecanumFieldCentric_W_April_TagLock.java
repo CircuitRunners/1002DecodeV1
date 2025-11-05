@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Locale;
 //@Disabled
 @Configurable
-@TeleOp(name = "Field Centric With April Tags Lock")
+@TeleOp(name = "Field Centric With April Tags Lock", group = "Test")
 public class MecanumFieldCentric_W_April_TagLock extends OpMode {
 
 
@@ -34,7 +34,7 @@ public class MecanumFieldCentric_W_April_TagLock extends OpMode {
     private Limelight3A limelight;
 
     // PID constants are public and static for Panels UI
-    public static double HEADING_KP_TX = 0.02;
+    public static double HEADING_KP_TX = 0.027;
     public static double HEADING_KI_TX = 0.0000;
     public static double HEADING_KD_TX = 0.000;
     public static double ROTATION_MIN_POWER = 0.0;

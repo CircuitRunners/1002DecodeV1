@@ -9,8 +9,9 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
+
 @Configurable
-@TeleOp
+@TeleOp (name = "ShooterTest", group = "Test")
 public class ShooterTest extends OpMode {
     public DcMotorEx shooter1;
     public DcMotorEx shooter2;
