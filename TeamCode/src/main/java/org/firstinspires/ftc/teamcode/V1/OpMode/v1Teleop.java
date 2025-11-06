@@ -337,6 +337,7 @@ public class v1Teleop extends OpMode {
             case 0:
                 isHeadingLocked = false;
                 shooter.stopShooter();
+                shooter.setLight(0.611);
                 //intake stuff
                 isIntakeInUse= true;
                 if(rightTriggerValue > 0.25){ // Replaced gamepad1.right_trigger
@@ -425,6 +426,7 @@ public class v1Teleop extends OpMode {
                 //shooting logic
                 if ((shooterVelo >= desiredVeloRed - 40) && (shooterVelo <= desiredVeloRed + 55)) { // Replaced shooter.getCurrentVelo()
                     isIntakeInUse = true;
+                    shooter.setLight(0.5);
 
                     if (rightTriggerValue > 0.2) { // Replaced gamepad1.right_trigger
                         intake.setServoPower(1);
@@ -439,6 +441,7 @@ public class v1Teleop extends OpMode {
                 else {
                     intake.setServoPower(0);
                     intake.fullIntakeIdle();
+                    shooter.setLight(0.227);
 
                     isIntakeInUse = false;
                 }
