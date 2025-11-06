@@ -126,7 +126,7 @@ public class v1Teleop extends OpMode {
         // Set up bulk caching
         List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
         for (LynxModule hub : allHubs) {
-            hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
+            hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
         }
 
         if(Poses.getAlliance() !=null){
@@ -180,6 +180,10 @@ public class v1Teleop extends OpMode {
 
     @Override
     public void loop() {
+
+        for (LynxModule hub : hardwareMap.getAll(LynxModule.class)) {
+            hub.clearBulkCache();
+        }
         //boolean control to check if pedro is in use
         if (follower.isBusy()){
             automatedDrive = true;

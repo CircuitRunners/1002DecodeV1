@@ -4,6 +4,8 @@ import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.Range;
+import com.seattlesolvers.solverslib.controller.PIDFController;
 
 public class LimelightCamera {
 
@@ -12,7 +14,20 @@ public class LimelightCamera {
     public static double HEADING_KP_TX = 0.027 ; //0.02
     public static double HEADING_KI_TX = 0.0;
     public static double HEADING_KD_TX = 0.0;
+    public static double HEADING_KF_TX = 0.0;
     public static double ROTATION_MIN_POWER = 0.0;
+
+    private PIDFController pidf;
+
+    /*
+     RECOMENDED NEW VALUES - YALL SHOULD TEST THO
+
+     public static double HEADING_KP_TX = 0.045 ; // Increased for faster response
+    public static double HEADING_KI_TX = 0.0;     // Keep at 0 for now
+    public static double HEADING_KD_TX = 0.003;  // Added for damping/braking
+    public static double ROTATION_MIN_POWER = 0.07; // Added to overcome motor friction
+    */
+
 
     public double finalRotation = 0;
     public double error = 0;
@@ -23,6 +38,10 @@ public class LimelightCamera {
         if (limelightCamera == null) {
             throw new IllegalStateException("❌ Limelight not found in hardwareMap! Check config name 'limelight'.");
         }
+
+        pidf = new PIDFController(HEADING_KP_TX, HEADING_KI_TX, HEADING_KD_TX, HEADING_KF_TX);
+        // Set the target to 0 (we want the Limelight Tx error to be zero)
+        pidf.setSetPoint(0.0);
     }
 
     /** Returns the latest LLResult safely */
@@ -44,22 +63,27 @@ public class LimelightCamera {
 
     /** Auto-align PID rotation value based on limelight data */
     public double autoAlign() {
-        // Make sure we are on the correct pipeline - one with digital game field
         limelightCamera.pipelineSwitch(3);
 
         LLResult result = getResult();
+        pidf.setPIDF(HEADING_KP_TX, HEADING_KI_TX, HEADING_KD_TX, HEADING_KF_TX);
 
         if (result != null && result.isValid()) {
             error = updateError();
-            finalRotation = error * HEADING_KP_TX;
+            finalRotation = pidf.calculate(error);
 
-            // enforce minimum rotation power
             if (Math.abs(finalRotation) > 0 && Math.abs(finalRotation) < ROTATION_MIN_POWER) {
                 finalRotation = Math.signum(finalRotation) * ROTATION_MIN_POWER;
             }
+
+
+            finalRotation = Range.clip(finalRotation, -1.0, 1.0);
+
         } else {
-            finalRotation = 0;
+            finalRotation = 0.0;
+            pidf.reset();
         }
+
         return finalRotation;
     }
 

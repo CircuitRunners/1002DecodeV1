@@ -18,7 +18,7 @@ import org.firstinspires.ftc.teamcode.V1.Config.util.HeadingAutoAligner;
 import org.firstinspires.ftc.teamcode.V1.Config.util.Poses;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
-@Autonomous(name = "Goal Side Auto", preselectTeleOp = "v1Teleop")
+@Autonomous(name = "Goal Side Auto", group = "AA", preselectTeleOp = "v1Teleop")
 public class GoalSideAuto extends OpMode {
 
     private Follower follower;

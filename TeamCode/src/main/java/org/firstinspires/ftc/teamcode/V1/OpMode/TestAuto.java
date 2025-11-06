@@ -7,6 +7,7 @@ import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.V1.Config.subsystems.Intake;
@@ -20,8 +21,8 @@ import java.util.List;
 
 
 
-
-    @Autonomous(name = "test", preselectTeleOp = "v1Teleop")
+@Disabled
+    @Autonomous(name = "test",group = "Test", preselectTeleOp = "v1Teleop")
     public class TestAuto extends OpMode {
 
         private Follower follower;

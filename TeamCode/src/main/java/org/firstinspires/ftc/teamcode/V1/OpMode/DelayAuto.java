@@ -18,7 +18,7 @@ import org.firstinspires.ftc.teamcode.V1.Config.util.HeadingAutoAligner;
 import org.firstinspires.ftc.teamcode.V1.Config.util.Poses;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
-@Autonomous(name = "DelayAuto", preselectTeleOp = "v1Teleop")
+@Autonomous(name = "DelayAuto",group = "BB", preselectTeleOp = "v1Teleop")
 public class DelayAuto extends OpMode {
 
     private Follower follower;

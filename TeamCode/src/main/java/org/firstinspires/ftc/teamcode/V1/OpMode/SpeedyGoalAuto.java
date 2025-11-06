@@ -18,7 +18,7 @@ import org.firstinspires.ftc.teamcode.V1.Config.util.HeadingAutoAligner;
 import org.firstinspires.ftc.teamcode.V1.Config.util.Poses;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
-@Autonomous(name = "zoom", preselectTeleOp = "v1Teleop")
+@Autonomous(name = "zoom", group = "BB", preselectTeleOp = "v1Teleop")
 public class SpeedyGoalAuto extends OpMode {
 
     private Follower follower;
