@@ -366,6 +366,7 @@ public class v1_1Teleop extends OpMode {
                 break;
             default:
                 isHeadingLocked = false;
+                intakeState = 3;
                 stateMachine = 0;
                 break;
         }
