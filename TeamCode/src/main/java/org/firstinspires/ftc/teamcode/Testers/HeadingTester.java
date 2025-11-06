@@ -39,7 +39,7 @@ public class HeadingTester extends OpMode {
         private LimelightCamera limelight;
         private GamepadEx player1;
         private TriggerReader leftTriggerReader;
-        private TESTIING_HeadingAligner aligner;
+        private HeadingAutoAligner aligner;
 
         private boolean headingLock = false;
         private boolean useCoordinateAlign = true;
@@ -62,7 +62,7 @@ public class HeadingTester extends OpMode {
             player1 = new GamepadEx(gamepad1);
             leftTriggerReader = new TriggerReader(player1, GamepadKeys.Trigger.LEFT_TRIGGER);
 
-            aligner = new TESTIING_HeadingAligner(targetX, targetY);
+            aligner = new HeadingAutoAligner(targetX, targetY);
 
             for (LynxModule hub : hardwareMap.getAll(LynxModule.class))
                 hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);

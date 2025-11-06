@@ -1,8 +1,6 @@
 package org.firstinspires.ftc.teamcode.V1.OpMode;
 
 import com.bylazar.configurables.annotations.Configurable;
-//import com.pedropathing.follower.Follower;
-//import com.pedropathing.geometry.Pose;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.follower.Follower;
@@ -34,32 +32,25 @@ import org.firstinspires.ftc.teamcode.V1.Config.util.Poses;
 import org.firstinspires.ftc.teamcode.V1.Config.util.ValidShootingZoneChecker;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
-
 import java.util.List;
 import java.util.Locale;
 import java.util.function.Supplier;
 
-@TeleOp (name = "Quatro Teleop", group = "a")
+@TeleOp (name = "NEW - Quatro Teleop 1.1", group = "a")
 @Configurable
-public class v1Teleop extends OpMode {
+public class v1_1Teleop extends OpMode {
 
     private MecanumDrive drive;
     private GoBildaPinpointDriver pinpoint;
     private Follower follower;
     private LimelightCamera limelight;
-    private ValidShootingZoneChecker zoneChecker;
     private Intake intake;
     private Shooter shooter;
-    private Supplier<PathChain> pathChainBlue;
-    private Supplier<PathChain> pathChainRed;
     private TelemetryManager panelsTelemetry;
 
     private GamepadEx player1;
     TriggerReader leftTriggerReader;
     TriggerReader rightTriggerReader;
-
-    private final ElapsedTime timer = new ElapsedTime();
-
     private int stateMachine = 0;
     private static final double METERS_TO_INCH = 39.37;
 
@@ -69,9 +60,11 @@ public class v1Teleop extends OpMode {
     private boolean automatedDrive = false;
     private boolean preselectFromAuto = false;
     private boolean isIntakeInUse = false;
-    private final double MINIMUM_SHOOTER_VELO = 1600; //   tick/sec
-    private final double MAXIMUM_SHOOTER_VELO = 1650; //   tick/sec
+    private int intakeState = 1; //1 is in, 2 is out, 3 is stop
 
+    boolean isShooterReady = false;
+    boolean ball_was_present = true;
+    int shotCounter = 0;
 
     private double desiredVeloRed = 0;
     private double desiredVeloBlue = 0;
@@ -95,7 +88,6 @@ public class v1Teleop extends OpMode {
 
 
 
-
         leftTriggerReader = new TriggerReader(
                 player1, GamepadKeys.Trigger.LEFT_TRIGGER
         );
@@ -112,16 +104,10 @@ public class v1Teleop extends OpMode {
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "odo");
         configurePinpoint();
 
-        Pose2D newPose = new Pose2D(DistanceUnit.INCH, Poses.getStartingPose().getX(), Poses.getStartingPose().getY(), AngleUnit.RADIANS, Math.toRadians(Poses.getStartingPose().getHeading())); //causing errors when initializing
-
-        //pinpoint.setPosition(newPose); //causing errors when initializing
-        // follower.setPose(new Pose(Poses.getStartingPose().getX(), Poses.getStartingPose().getY(), Poses.getStartingPose().getHeading()));
-
 
         limelight = new LimelightCamera(hardwareMap);
         limelight.limelightCamera.start();
 
-        zoneChecker = new ValidShootingZoneChecker();
 
         // Set up bulk caching
         List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
@@ -144,37 +130,12 @@ public class v1Teleop extends OpMode {
             preselectFromAuto = false;
         }
 
-
-        pathChainBlue = () -> follower.pathBuilder() //Lazy Curve Generation for blue shoot pos
-                .addPath(new Path(new BezierLine(follower::getPose, new Pose(55, 88))))
-                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(-135), 0.8))
-                .build();
-
-
-        pathChainRed = () -> follower.pathBuilder() //Lazy Curve Generation for red shoot pos
-                .addPath(new Path(new BezierLine(follower::getPose, new Pose(88, 88))))
-                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(-45), 0.8))
-                .build();
-
-
-
-
-
-
-
-
-
         telemetry.addLine("Ready!");
         telemetry.update();
     }
 
     @Override
     public void start(){
-//        Pose2D newPose = new Pose2D(DistanceUnit.INCH, Poses.getStartingPose().getX(), Poses.getStartingPose().getY(), AngleUnit.RADIANS, Math.toRadians(Poses.getStartingPose().getHeading()));
-//        pinpoint.setPosition(newPose);
-
-//        desiredVeloRed = shooter.calculateFlywheelVelocity(limelight.calculateDistanceToGoal(follower.getPose().getX(), follower.getPose().getY(), 12, 137));
-//        desiredVeloBlue = shooter.calculateFlywheelVelocity(limelight.calculateDistanceToGoal(follower.getPose().getX(), follower.getPose().getY(), 132, 137));
 
     }
 
@@ -188,17 +149,17 @@ public class v1Teleop extends OpMode {
         if (follower.isBusy()){
             automatedDrive = true;
         }
+        else if (!follower.isBusy()){
+            automatedDrive = false;
+        }
 
         pinpoint.update();
         Pose2D currentPose = pinpoint.getPosition();
         follower.update();
 
         // --- CONSOLIDATED SENSOR AND INPUT READS (Added for single-pass data) ---
-        // Read Limelight/PID calculation once
         double limelightRotation = limelight.autoAlign();
-        // Read Shooter Velocity once
         double shooterVelo = shooter.getCurrentVelo();
-        // Read raw trigger values once
         double leftTriggerValue = gamepad1.left_trigger;
         double rightTriggerValue = gamepad1.right_trigger;
         // ------------------------------------------------------------------------
@@ -215,30 +176,26 @@ public class v1Teleop extends OpMode {
         boolean leftTriggerIsPressed = leftTriggerReader.isDown();
         boolean rightTriggerIsPressed = rightTriggerReader.isDown();
 
+        //selector logic for alliance
 
-        //localization + pedropathing logic
+        if (player1.wasJustPressed(GamepadKeys.Button.RIGHT_STICK_BUTTON)) {
+            isRedAlliance = true;
+        } else if (player1.wasJustPressed(GamepadKeys.Button.LEFT_STICK_BUTTON)) {
+            isRedAlliance = false;
+        }
 
-
+        //Relocalize from AprilTags
         if (player1.wasJustPressed(GamepadKeys.Button.TRIANGLE)){
             updateCoordinates();
         }
 
-        //selector logic for alliance
-
-            if (player1.wasJustPressed(GamepadKeys.Button.RIGHT_STICK_BUTTON)) {
-                isRedAlliance = true;
-            } else if (player1.wasJustPressed(GamepadKeys.Button.LEFT_STICK_BUTTON)) {
-                isRedAlliance = false;
-            }
-
-
         //state machine control
         if (rightBumperJustPressed) {
-            stateMachine = (stateMachine + 1) % 2;
+            stateMachine = (stateMachine + 1) % 3;
         }
 
         if (leftBumperJustPressed) {
-            stateMachine = (stateMachine - 1) % 2;
+            stateMachine = (stateMachine - 1) % 3;
 
         }
 
@@ -251,27 +208,17 @@ public class v1Teleop extends OpMode {
         double finalRotation = rotate;
 
         if (isHeadingLocked) {
-
                 if (limelight.getResult().isValid()) {
                     for (LLResultTypes.FiducialResult fr : limelight.getResult().getFiducialResults()) {
                         if (fr.getFiducialId() == 20 || fr.getFiducialId() == 24) {
 
                             finalRotation = limelightRotation;
 
-
-
                             telemetry.addLine("Using Limelight Data for Heading Lock.");
                             telemetry.addData("Error from tag center", limelight.error);
                             telemetry.addData("PID Rotation", limelightRotation);
                         }
-                        else {
-                            finalRotation = rotate;
-                        }
                     }
-                }
-                else {
-                    finalRotation = rotate;
-                    telemetry.addData("Using Pinpoint IMU Heading.", "");
                 }
         }
         else {
@@ -296,31 +243,11 @@ public class v1Teleop extends OpMode {
         }
 
 
-        // recalibrate pinpoint
-//        if (player1.wasJustPressed(GamepadKeys.Button.SQUARE)) {
-//            pinpoint.resetPosAndIMU();
-//            telemetry.addLine("Pinpoint IMU Reset!");
-//        }
-//        if (player1.wasJustPressed(GamepadKeys.Button.TRIANGLE)) {
-//            pinpoint.recalibrateIMU();
-//            telemetry.addLine("Pinpoint IMU Recalibrated!");
-//        }
         if (player1.wasJustPressed(GamepadKeys.Button.SQUARE)) {
-            //pinpoint.recalibrateIMU();
-            Pose2D newPose = new Pose2D(DistanceUnit.INCH,
-                    72,72,
-                    AngleUnit.RADIANS, Math.toRadians(90));
-            //pinpoint.setPosition(newPose);
             follower.setPose(new Pose(72,72, Math.toRadians(-90)));
             telemetry.addLine("Pinpoint Reset - Position now 72,72 (Middle)!");
         }
 
-//        String data = String.format(Locale.US,
-//                "{X: %.3f, Y: %.3f, H: %.3f}",
-//                currentPose.getX(DistanceUnit.INCH),
-//                currentPose.getY(DistanceUnit.INCH),
-//                currentPose.getHeading(AngleUnit.DEGREES)
-//        );,
 
         String followerData = String.format(Locale.US,
                 "{X: %.3f, Y: %.3f, H: %.3f}",
@@ -335,83 +262,59 @@ public class v1Teleop extends OpMode {
             case 0:
                 isHeadingLocked = false;
                 shooter.stopShooter();
-                //intake stuff
-                isIntakeInUse= true;
-                if(rightTriggerValue > 0.25){ // Replaced gamepad1.right_trigger
-                    intake.intakeIn();
-                    intake.setServoPower(0);
 
+                //intake stuff
+                if(rightTriggerJustPressed){
+                    if (intakeState == 1){
+                       intakeState =2;
+                    }
+                    else if (intakeState == 2){
+                        intakeState = 1;
+                    }
+                    else if (intakeState == 3){
+                        intakeState = 1;
+                    }
                 }
-                else if (leftTriggerValue > 0.25 && leftTriggerValue < 0.7){ // Replaced gamepad1.left_trigger
-                    intake.intakeOut();
-                    intake.setServoPower(0);
+                if (leftTriggerValue > 0.25){
+                    intakeState = 3;
                 }
-                else if (leftTriggerValue > 0.8) { // Replaced gamepad1.left_trigger
-                    intake.setServoPower(0);
+
+                if (intakeState == 1){
+                    intake.intakeInDistance();
+                    isIntakeInUse= true;
+                } else if (intakeState == 2) {
+                    intake.fullIntakeOut();
+                    isIntakeInUse= true;
+                }
+                else if (intakeState == 3){
                     intake.fullIntakeIdle();
+                    isIntakeInUse= false;
                 }
 
                 break;
             case 1:
                 //score stuff
 
-                if (!isIntakeInUse){
+                    isIntakeInUse = true;
                     intake.intakeRetainBalls();
-                }
+                    intake.intakeServoIdle();
+
                 if (player1.wasJustPressed(GamepadKeys.Button.TRIANGLE)) {
-                    if (isRedAlliance){
-                        if (isHeadingLocked){
-                            isHeadingLocked = false;
-                            //follower.breakFollowing();
-
-                        }
-                        else if (!isHeadingLocked){
-                            isHeadingLocked = true;
-                            //follower.holdPoint(follower.getPose());
-                        }
-
-                       // follower.holdPoint(new BezierPoint(follower.getPose()), follower.getHeading());
-                       // follower.followPath(pathChainRed.get(), true);
+                    if (isHeadingLocked){
+                        isHeadingLocked = false;
                     }
-                    else {
-//
-                        if (isHeadingLocked){
-                            isHeadingLocked = false;
-                            //follower.breakFollowing();
-
-                        }
-                        else if (!isHeadingLocked){
-                            isHeadingLocked = true;
-                            gamepad1.rumble(500);
-                            //follower.holdPoint(follower.getPose());
-                        }
-
-                        //follower.holdPoint(new BezierPoint(follower.getPose()), follower.getHeading());
-                        //follower.followPath(pathChainBlue.get(), true);
+                    else if (!isHeadingLocked){
+                        isHeadingLocked = true;
                     }
-                }
-
-
-
-                //int desiredVelo = shooter.calculateFlywheelVelocity(limelight.calculateDistanceToGoal(follower.getPose().getX(), follower.getPose().getY(), 132, 132));
-
-                if (gamepad1.dpad_up){
-                   shooterIncrement +=50;
-                } else if (gamepad1.dpad_down) {
-                    shooterIncrement -=50;
-                }
-                else if (gamepad1.dpad_left){
-                   shooterIncrement =0;
                 }
 
                 if(isRedAlliance) {
                     desiredVeloRed = shooter.calculateFlywheelVelocity(limelight.calculateDistanceToGoal(follower.getPose().getX(), follower.getPose().getY(), 132, 137)) + shooterIncrement;
                 }
                 else if (!isRedAlliance){
-                    desiredVeloRed = shooter.calculateFlywheelVelocity(limelight.calculateDistanceToGoal(follower.getPose().getX(), follower.getPose().getY(), 12, 137)) + shooterIncrement;
+                    desiredVeloBlue = shooter.calculateFlywheelVelocity(limelight.calculateDistanceToGoal(follower.getPose().getX(), follower.getPose().getY(), 12, 137)) + shooterIncrement;
                 }
 
-                //  if (zoneChecker.isInsideShootingZone(currentPose.getX(DistanceUnit.INCH), currentPose.getY(DistanceUnit.INCH))) {
 
                 if (isRedAlliance){
                     shooter.shoot(desiredVeloRed);
@@ -420,34 +323,56 @@ public class v1Teleop extends OpMode {
                     shooter.shoot(desiredVeloBlue);
                 }
 
+
+                if (gamepad1.dpad_up){
+                shooterIncrement +=50;
+                } else if (gamepad1.dpad_down) {
+                    shooterIncrement -=50;
+                }
+                else if (gamepad1.dpad_left){
+                    shooterIncrement =0;
+                }
+                else if (gamepad1.dpad_right){
+                    shooterIncrement =0;
+                }
+
+                break;
+            case 2:
+                if (player1.wasJustPressed(GamepadKeys.Button.TRIANGLE)) {
+                    if (isHeadingLocked){
+                        isHeadingLocked = false;
+                    }
+                    else if (!isHeadingLocked){
+                        isHeadingLocked = true;
+                    }
+                }
+
+                if (gamepad1.dpad_up){
+                    shooterIncrement +=50;
+                } else if (gamepad1.dpad_down) {
+                    shooterIncrement -=50;
+                }
+                else if (gamepad1.dpad_left){
+                    shooterIncrement =0;
+                }
+                else if (gamepad1.dpad_right){
+                    shooterIncrement =0;
+                }
+
                 //shooting logic
-                if ((shooterVelo >= desiredVeloRed - 40) && (shooterVelo <= desiredVeloRed + 55)) { // Replaced shooter.getCurrentVelo()
-                    isIntakeInUse = true;
-                    intake.intakeIn();
-                    if (rightTriggerValue > 0.2) { // Replaced gamepad1.right_trigger
-                        intake.setServoPower(1);
-                    }
-                    else if (rightTriggerValue < 0.2){ // Replaced gamepad1.right_trigger
-                        intake.setServoPower(0);
-                    }
+               shootBalls();
 
-                }
 
-                else {
-                    intake.setServoPower(0);
-                    intake.fullIntakeIdle();
-
-                    isIntakeInUse = false;
-                }
                 break;
             default:
                 isHeadingLocked = false;
+                stateMachine = 0;
                 break;
         }
-        if (stateMachine > 1){
+        if (stateMachine > 2 || stateMachine < 0){
             stateMachine = 0;
         }
-        //telemetry.addData("Position", data);
+
         telemetry.addData("FOLLOWER (Pedro) Position", followerData);
         telemetry.addData("State", stateMachine);
         telemetry.addData("Heading Lock", isHeadingLocked ? "ON" : "OFF");
@@ -456,7 +381,7 @@ public class v1Teleop extends OpMode {
         telemetry.addData("Intake in use: ", isIntakeInUse? "Yes" : "No");
 
 
-//        panelsTelemetry.debug("Position", data);
+//        panelsTelemetry.debug("Position", followerData);
 //        panelsTelemetry.debug("State", stateMachine);
 //        panelsTelemetry.debug("Heading Lock", isHeadingLocked ? "ON" : "OFF");
 //        panelsTelemetry.debug("Alliance: ", isRedAlliance? "Red" : "Blue");
@@ -483,36 +408,6 @@ public class v1Teleop extends OpMode {
         //limelight.limelightCamera.updateRobotOrientation(follower.getHeading());
         limelight.limelightCamera.pipelineSwitch(3);
         LLResult result = limelight.getResult();
-
-        //ensures result exsists and is from an acceptable apriltag
-//        if (result != null && result.isValid()) {
-//            for (LLResultTypes.FiducialResult fr : result.getFiducialResults()) {
-//                if (fr.getFiducialId() == 20 || fr.getFiducialId() == 24) {
-//                    Pose3D mt2Pose = result.getBotpose_MT2();
-//                    if (mt2Pose != null) {
-//                        //gets raw position from limelight in m
-//                        double llX_m = mt2Pose.getPosition().x;
-//                        double llY_m = mt2Pose.getPosition().y;
-//                        //converts position to inches
-//                        double llX_in = llX_m * METERS_TO_INCH;
-//                        double llY_in = llY_m * METERS_TO_INCH;
-//                        //shifts position to bottom left corner field origin for pedro pathing use
-//                        double llX_in_shifted = llX_in + 72.0;
-//                        double llY_in_shifted = llY_in + 72.0;
-//
-//                        double currentHeadingRad = pinpoint.getPosition().getHeading(AngleUnit.RADIANS);  // keep heading from Pinpoint
-//                        Pose2D newPose = new Pose2D(DistanceUnit.INCH,
-//                                llX_in_shifted, llY_in_shifted,
-//                                AngleUnit.RADIANS, currentHeadingRad);
-//                        //pinpoint.setPosition(newPose);
-//                        follower.setPose(new Pose(llX_in_shifted,llY_in_shifted,currentHeadingRad));
-//                        gamepad1.rumble(500);
-//                        telemetry.addData("New Pose From Apriltag:", "X: %.2f in, Y: %.2f in, H: %.1f°", llX_in_shifted, llY_in_shifted, Math.toDegrees(currentHeadingRad));
-//                    }
-//                    break;
-//                }
-//            }
-//        }
 
         if (result != null && result.isValid()) {
             for (LLResultTypes.FiducialResult fr : result.getFiducialResults()) {
@@ -556,5 +451,42 @@ public class v1Teleop extends OpMode {
         pinpoint.recalibrateIMU();
     }
 
+    public void shootBalls(){
+        double currentVelo = shooter.getCurrentVelo();
+
+
+        if (isRedAlliance) {
+            isShooterReady = currentVelo >= (desiredVeloRed+shooterIncrement) - 30 && currentVelo <= (desiredVeloRed+shooterIncrement) + 45;
+        }
+        else if (!isRedAlliance){
+            isShooterReady = currentVelo >= (desiredVeloBlue+shooterIncrement) - 30 && currentVelo <= (desiredVeloBlue+shooterIncrement) + 45;
+        }
+
+
+        if (isShooterReady) {
+            isIntakeInUse = true;
+            intake.intakeIn();
+            intake.setServoPower(1);
+            telemetry.addLine("Shooting");
+        }
+        else if (!isShooterReady){
+            intake.intakeRetainBalls();
+            intake.setServoPower(0);
+        }
+
+        boolean ball_is_present = (intake.getDistanceMM() <= 60);
+
+        if (ball_was_present && !ball_is_present) {
+            shotCounter++;
+        }
+
+        ball_was_present = ball_is_present;
+
+        if (shotCounter >= 3) {
+            shotCounter = 0;
+            stateMachine++;
+        }
+        telemetry.update();
+    }
 
 }

@@ -90,6 +90,12 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
             intake.setPower(-1);
             motorPower = -1;
         }
+
+        public void fullIntakeOut(){
+            intake.setPower(-1);
+            motorPower = -1;
+            servoIntake.setPower(-1);
+        }
         public void intakeOutDistance(){
         intake.setPower(-1);
         motorPower = -1;

@@ -65,6 +65,26 @@ public class HeadingAutoAligner {
 
         return output;
     }
+    public double getRotationPower(double robotX, double robotY, double robotHeading, double newKp, double newKi, double newKd) {
+
+
+        double worldAngleToTarget = Math.atan2(targetY - robotY, targetX - robotX);
+
+        // The *error* (the value we feed to the controller) is the difference between the
+        // desired angle and the current robot angle, normalized to the shortest path [-pi, pi].
+        double headingError = MathFunctions.normalizeAngle(worldAngleToTarget - robotHeading);
+
+
+        pidfController.setPIDF(newKp, newKi, newKd, kF);
+
+
+        double output = pidfController.calculate(headingError);
+
+
+        output = Range.clip(output, -1.0, 1.0);
+
+        return output;
+    }
 
     public void reset() {
         pidfController.reset();
