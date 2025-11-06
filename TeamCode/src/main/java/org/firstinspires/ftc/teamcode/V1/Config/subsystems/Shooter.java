@@ -31,7 +31,7 @@ public class Shooter {
     private static final double VELO_INTERCEPT = 802.23214;
 
     private static final double MIMIMUM_VELO =1000;
-    private static final double MAXIMUM_VELO = 2000;
+    private static final double MAXIMUM_VELO = 2100;
 
     // ===== Hardware =====
     public DcMotorEx shooter1;
