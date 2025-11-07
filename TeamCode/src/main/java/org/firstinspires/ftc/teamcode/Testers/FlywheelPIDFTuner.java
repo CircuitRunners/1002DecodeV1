@@ -55,7 +55,7 @@ import java.util.List;
  *    NOTE - if its good enough with just Kf and Kp then just leave it - no need for Kd and Ki unless absoulutely neccesary
  *    **/
 
-@Disabled
+//@Disabled
 @Configurable
 @TeleOp
 public class FlywheelPIDFTuner extends OpMode {

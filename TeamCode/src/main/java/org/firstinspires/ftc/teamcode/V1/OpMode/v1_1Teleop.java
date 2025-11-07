@@ -209,16 +209,16 @@ public class v1_1Teleop extends OpMode {
 
         if (isHeadingLocked) {
                 if (limelight.getResult().isValid()) {
-                    for (LLResultTypes.FiducialResult fr : limelight.getResult().getFiducialResults()) {
-                        if (fr.getFiducialId() == 20 || fr.getFiducialId() == 24) {
+//                    for (LLResultTypes.FiducialResult fr : limelight.getResult().getFiducialResults()) {
+//                        if (fr.getFiducialId() == 20 || fr.getFiducialId() == 24) {
 
                             finalRotation = limelightRotation;
 
                             telemetry.addLine("Using Limelight Data for Heading Lock.");
                             telemetry.addData("Error from tag center", limelight.error);
                             telemetry.addData("PID Rotation", limelightRotation);
-                        }
-                    }
+                    //    }
+                   // }
                 }
         }
         else {

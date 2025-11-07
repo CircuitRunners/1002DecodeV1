@@ -253,32 +253,29 @@ public class v1Teleop extends OpMode {
         if (isHeadingLocked) {
 
                 if (limelight.getResult().isValid()) {
-                    for (LLResultTypes.FiducialResult fr : limelight.getResult().getFiducialResults()) {
-                        if (fr.getFiducialId() == 20 || fr.getFiducialId() == 24) {
+//                    for (LLResultTypes.FiducialResult fr : limelight.getResult().getFiducialResults()) {
+//                        if (fr.getFiducialId() == 20 || fr.getFiducialId() == 24) {
 
                             finalRotation = -limelight.autoAlign();
 
 
 
-                            telemetry.addLine("Using Limelight Data for Heading Lock.");
-                            telemetry.addData("Error from tag center", limelight.error);
-                            telemetry.addData("april tag id", fr.getFiducialId());
-                            telemetry.addData("PID Rotation", limelightRotation);
-                            telemetry.addData("PID Rotation from autoAlign()", limelight.autoAlign());
+//                            telemetry.addLine("Using Limelight Data for Heading Lock.");
+//                            telemetry.addData("Error from tag center", limelight.error);
+//                            //telemetry.addData("april tag id", fr.getFiducialId());
+//                            telemetry.addData("PID Rotation", limelightRotation);
+//                            telemetry.addData("PID Rotation from autoAlign()", limelight.autoAlign());
                         }
                         else {
                             finalRotation = rotate;
                         }
-                    }
-                }
-                else {
-                    finalRotation = rotate;
-                    telemetry.addData("Using Pinpoint IMU Heading.", "");
-                }
-        }
+
+                   }
+
+
         else {
             finalRotation = rotate;
-            telemetry.addData("Using Pinpoint IMU Heading.", "");
+           // telemetry.addData("Using Pinpoint IMU Heading.", "");
         }
 
         double theta = Math.atan2(forward, strafe);
@@ -308,21 +305,23 @@ public class v1Teleop extends OpMode {
 //            telemetry.addLine("Pinpoint IMU Recalibrated!");
 //        }
         if (player1.wasJustPressed(GamepadKeys.Button.SQUARE)) {
+            pinpoint.recalibrateIMU();
             //pinpoint.recalibrateIMU();
             Pose2D newPose = new Pose2D(DistanceUnit.INCH,
                     72,72,
                     AngleUnit.RADIANS, Math.toRadians(90));
             //pinpoint.setPosition(newPose);
+
             follower.setPose(new Pose(72,72, Math.toRadians(-90)));
             telemetry.addLine("Pinpoint Reset - Position now 72,72 (Middle)!");
         }
 
-//        String data = String.format(Locale.US,
-//                "{X: %.3f, Y: %.3f, H: %.3f}",
-//                currentPose.getX(DistanceUnit.INCH),
-//                currentPose.getY(DistanceUnit.INCH),
-//                currentPose.getHeading(AngleUnit.DEGREES)
-//        );,
+        String data = String.format(Locale.US,
+                "{X: %.3f, Y: %.3f, H: %.3f}",
+                currentPose.getX(DistanceUnit.INCH),
+                currentPose.getY(DistanceUnit.INCH),
+                currentPose.getHeading(AngleUnit.DEGREES)
+        );
 
         String followerData = String.format(Locale.US,
                 "{X: %.3f, Y: %.3f, H: %.3f}",
@@ -441,7 +440,7 @@ public class v1Teleop extends OpMode {
                 else {
                     intake.setServoPower(0);
                     intake.fullIntakeIdle();
-                    shooter.setLight(0.227);
+                    shooter.setLight(0);
 
                     isIntakeInUse = false;
                 }
@@ -453,12 +452,13 @@ public class v1Teleop extends OpMode {
         if (stateMachine > 1){
             stateMachine = 0;
         }
-        //telemetry.addData("Position", data);
+        telemetry.addData("Position", data);
         telemetry.addData("FOLLOWER (Pedro) Position", followerData);
         telemetry.addData("State", stateMachine);
         telemetry.addData("Heading Lock", isHeadingLocked ? "ON" : "OFF");
         telemetry.addData("Alliance: ", isRedAlliance? "Red" : "Blue");
         telemetry.addData("Shooter Velo", shooterVelo); // Replaced shooter.getCurrentVelo()
+        telemetry.addData("Shooter Target", isRedAlliance ? desiredVeloRed : desiredVeloBlue ); // Replaced shooter.getCurrentVelo()
         telemetry.addData("Intake in use: ", isIntakeInUse? "Yes" : "No");
 
 

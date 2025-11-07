@@ -239,19 +239,23 @@ public class FarAuto  extends OpMode {
 
 
         Poses.updateAlliance(gamepad1, telemetry);
-        follower.setStartingPose(Poses.get(Poses.startPoseFar));
+
 
         if (Poses.getAlliance() != lastKnownAlliance) {
-
+            follower.setStartingPose(Poses.get(Poses.startPoseGoalSide));
             buildPaths();
 
             lastKnownAlliance = Poses.getAlliance();
             telemetry.addData("STATUS", "Paths Rebuilt for " + lastKnownAlliance);
+            telemetry.addLine("");
         }
 
 
+        telemetry.addLine("--- Alliance Selector ---");
+        telemetry.addLine("D-pad UP → RED | D-pad DOWN → BLUE");
+        telemetry.addLine("");
         telemetry.addData("Alliance Set", Poses.getAlliance());
-        telemetry.addData("Start Pose", Poses.get(Poses.startPoseFar));
+        telemetry.addData("Start Pose", Poses.get(Poses.startPoseGoalSide));
         telemetry.update();
     }
 

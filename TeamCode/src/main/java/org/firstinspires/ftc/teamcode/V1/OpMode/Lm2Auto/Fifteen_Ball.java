@@ -59,10 +59,10 @@ public class Fifteen_Ball extends OpMode {
         // Path 2: Travel from Shooting Position to Intake Position
         intake1 = follower.pathBuilder()
                 .addPath(new BezierLine(Poses.get(Poses.shootPositionGoalSide), Poses.get(Poses.pickupLine1)))
-                .setLinearHeadingInterpolation(Poses.get(Poses.shootPositionGoalSide).getHeading(), Poses.get(Poses.pickupLine1).getHeading(),0.4)
+                .setLinearHeadingInterpolation(Poses.get(Poses.shootPositionGoalSide).getHeading(), Poses.get(Poses.pickupLine1).getHeading(),0.25)
                 .build();
         openGate = follower.pathBuilder()
-                .addPath(new BezierCurve(Poses.get(Poses.pickupLine1), Poses.get(Poses.pickupLine1ToGateControlPoint), Poses.get(Poses.lineupAtGate)))
+                .addPath(new BezierCurve(Poses.get(Poses.pickupLine1), Poses.get(Poses.pickupLine1ToGateControlPoint), Poses.get(Poses.openGate)))
                 .setConstantHeadingInterpolation(Poses.get(Poses.pickupLine1).getHeading())
                 .build();
 
@@ -325,17 +325,21 @@ public class Fifteen_Ball extends OpMode {
 
 
         Poses.updateAlliance(gamepad1, telemetry);
-        follower.setStartingPose(Poses.get(Poses.startPoseGoalSide));
+
 
         if (Poses.getAlliance() != lastKnownAlliance) {
-
+            follower.setStartingPose(Poses.get(Poses.startPoseGoalSide));
             buildPaths();
 
             lastKnownAlliance = Poses.getAlliance();
             telemetry.addData("STATUS", "Paths Rebuilt for " + lastKnownAlliance);
+            telemetry.addLine("");
         }
 
 
+        telemetry.addLine("--- Alliance Selector ---");
+        telemetry.addLine("D-pad UP → RED | D-pad DOWN → BLUE");
+        telemetry.addLine("");
         telemetry.addData("Alliance Set", Poses.getAlliance());
         telemetry.addData("Start Pose", Poses.get(Poses.startPoseGoalSide));
         telemetry.update();

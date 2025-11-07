@@ -45,7 +45,7 @@ public class  Nine_BallGoalSide extends OpMode {
     // private static final double ALIGN_THRESHOLD = Math.toRadians(2);
 
 
-    private PathChain travelToShoot, openGate, intake1, travelBackToShoot1, intake2, travelBackToShoot2,  intake3, travelBackToShoot3, travelToGate;
+    private PathChain travelToShoot,  intake1, travelBackToShoot1, intake2, travelBackToShoot2,  intake3, travelBackToShoot3, travelToGate;
 
     public void buildPaths() {
         // --- Alliance-Aware Path Generation ---
@@ -58,15 +58,12 @@ public class  Nine_BallGoalSide extends OpMode {
         // Path 2: Travel from Shooting Position to Intake Position
         intake1 = follower.pathBuilder()
                 .addPath(new BezierCurve(Poses.get(Poses.shootPositionGoalSide2), Poses.get(Poses.controlPointLine1ForShootPose2),Poses.get(Poses.pickupLine1)))
-                .setLinearHeadingInterpolation(Poses.get(Poses.shootPositionGoalSide2).getHeading(), Poses.get(Poses.pickupLine1).getHeading(),0.4)
-                .build();
-        openGate = follower.pathBuilder()
-                .addPath(new BezierCurve(Poses.get(Poses.pickupLine1), Poses.get(Poses.pickupLine1ToGateControlPoint), Poses.get(Poses.lineupAtGate)))
-                .setConstantHeadingInterpolation(Poses.get(Poses.pickupLine1).getHeading())
+                .setLinearHeadingInterpolation(Poses.get(Poses.shootPositionGoalSide2).getHeading(), Poses.get(Poses.pickupLine1).getHeading(),0.25)
                 .build();
 
+
         travelBackToShoot1 = follower.pathBuilder()
-                .addPath(new BezierLine(Poses.get(Poses.lineupAtGate), Poses.get(Poses.shootPositionGoalSide2)))
+                .addPath(new BezierLine(Poses.get(Poses.pickupLine1), Poses.get(Poses.shootPositionGoalSide2)))
                 .setLinearHeadingInterpolation(Poses.get(Poses.pickupLine1).getHeading(), Poses.get(Poses.shootPositionGoalSide2).getHeading())
                 .build();
         intake2 = follower.pathBuilder()
@@ -106,11 +103,13 @@ public class  Nine_BallGoalSide extends OpMode {
                 break;
             case 1: // Shooter Shoot
                 if (!follower.isBusy()) {
-                    shootBalls(shooterDesiredVelo);
+                    setPathState();
+                    //shootBalls(shooterDesiredVelo);
                 }
                 break;
             case 2: //go to intake
                 intake.intakeInDistance();
+//                intake.intakeIn();
 
                 if (!follower.isBusy()) {
 
@@ -118,14 +117,7 @@ public class  Nine_BallGoalSide extends OpMode {
                     setPathState();
                 }
                 break;
-            case 3:
-                if (!follower.isBusy()) {
-                    intake.intakeRetainBalls();
-                    follower.followPath(openGate, true);
-                    setPathState();
-                }
-                break;
-            case 4: //go to shoot
+            case 3: //go to shoot
 
                 if (!follower.isBusy()) {
                     follower.followPath(travelBackToShoot1, true);
@@ -133,13 +125,15 @@ public class  Nine_BallGoalSide extends OpMode {
                     setPathState();
                 }
                 break;
-            case 5: //shoot
+            case 4: //shoot
                 if (!follower.isBusy()) {
-                    shootBalls(shooterDesiredVelo);
+                    setPathState();
+                   // shootBalls(shooterDesiredVelo);
                 }
                 break;
-            case 6: //go to intake
+            case 5: //go to intake
                 intake.intakeInDistance();
+//                intake.intakeIn();
 
                 if (!follower.isBusy()) {
 
@@ -147,7 +141,7 @@ public class  Nine_BallGoalSide extends OpMode {
                     setPathState();
                 }
                 break;
-            case 7: //go to shoot
+            case 6: //go to shoot
 
                 if (!follower.isBusy()) {
                     intake.intakeRetainBalls();
@@ -156,35 +150,14 @@ public class  Nine_BallGoalSide extends OpMode {
                     setPathState();
                 }
                 break;
-            case 8: //shoot
+            case 7: //shoot
                 if (!follower.isBusy()) {
-                    shootBalls(shooterDesiredVelo);
-                }
-                break;
-            case 9: //go to intake
-                intake.intakeInDistance();
-
-                if (!follower.isBusy()) {
-
-                    follower.followPath(intake3, true);
                     setPathState();
+                   // shootBalls(shooterDesiredVelo);
                 }
                 break;
-            case 10: //go to shoot
 
-                if (!follower.isBusy()) {
-                    intake.intakeRetainBalls();
-                    follower.followPath(travelBackToShoot3, true);
-
-                    setPathState();
-                }
-                break;
-            case 11: //shoot
-                if (!follower.isBusy()) {
-                    shootBalls(shooterDesiredVelo);
-                }
-                break;
-            case 12:
+            case 8:
                 if (!follower.isBusy()) {
                     follower.followPath(travelToGate,true);
                     setPathState();
@@ -277,17 +250,21 @@ public class  Nine_BallGoalSide extends OpMode {
 
 
         Poses.updateAlliance(gamepad1, telemetry);
-        follower.setStartingPose(Poses.get(Poses.startPoseGoalSide));
+
 
         if (Poses.getAlliance() != lastKnownAlliance) {
-
+            follower.setStartingPose(Poses.get(Poses.startPoseGoalSide));
             buildPaths();
 
             lastKnownAlliance = Poses.getAlliance();
             telemetry.addData("STATUS", "Paths Rebuilt for " + lastKnownAlliance);
+            telemetry.addLine("");
         }
 
 
+        telemetry.addLine("--- Alliance Selector ---");
+        telemetry.addLine("D-pad UP → RED | D-pad DOWN → BLUE");
+        telemetry.addLine("");
         telemetry.addData("Alliance Set", Poses.getAlliance());
         telemetry.addData("Start Pose", Poses.get(Poses.startPoseGoalSide));
         telemetry.update();
