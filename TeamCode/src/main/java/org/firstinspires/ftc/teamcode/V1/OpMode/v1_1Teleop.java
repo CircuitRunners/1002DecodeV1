@@ -336,6 +336,20 @@ public class v1_1Teleop extends OpMode {
                     shooterIncrement =0;
                 }
 
+                if (isRedAlliance) {
+                    isShooterReady = shooter.getCurrentVelo() >= (desiredVeloRed+shooterIncrement) - 30 && shooter.getCurrentVelo() <= (desiredVeloRed+shooterIncrement) + 45;
+                }
+                else if (!isRedAlliance){
+                    isShooterReady = shooter.getCurrentVelo() >= (desiredVeloBlue+shooterIncrement) - 30 && shooter.getCurrentVelo() <= (desiredVeloBlue+shooterIncrement) + 45;
+                }
+
+                if (isShooterReady){
+                    shooter.setLight(0.5);
+                }
+                else if (!isShooterReady){
+                    shooter.setLight(0.388);
+                }
+
                 break;
             case 2:
                 if (player1.wasJustPressed(GamepadKeys.Button.TRIANGLE)) {
@@ -345,6 +359,13 @@ public class v1_1Teleop extends OpMode {
                     else if (!isHeadingLocked){
                         isHeadingLocked = true;
                     }
+                }
+
+                if (isHeadingLocked){
+                    shooter.setLight(0.444);
+                }
+                else if(!isHeadingLocked){
+                    shooter.setLight(0);
                 }
 
                 if (gamepad1.dpad_up){
@@ -366,6 +387,7 @@ public class v1_1Teleop extends OpMode {
                 break;
             default:
                 isHeadingLocked = false;
+                shooter.setLight(0);
                 intakeState = 3;
                 stateMachine = 0;
                 break;
