@@ -116,7 +116,7 @@ public class DelayAuto extends OpMode {
 //                .setLinearHeadingInterpolation(Poses.get(Poses.lineupLine2).getHeading(), Poses.get(Poses.shootPositionGoalSide).getHeading())
 //                .build();
         travelBackToShoot2 = follower.pathBuilder()
-                .addPath(new BezierCurve(Poses.get(Poses.pickupLine2), Poses.get(Poses.backToShoot2ControlPoint), Poses.get(Poses.shootPositionGoalSide2)))
+                .addPath(new BezierCurve(Poses.get(Poses.pickupLine2), Poses.get(Poses.line2ControlPoint), Poses.get(Poses.shootPositionGoalSide2)))
                 .setLinearHeadingInterpolation(Poses.get(Poses.pickupLine2).getHeading(), Poses.get(Poses.shootPositionGoalSide2).getHeading())
                 .build();
         travelToIntake3 = follower.pathBuilder()

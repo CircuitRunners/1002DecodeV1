@@ -118,7 +118,7 @@ public class SpeedyGoalAuto extends OpMode {
                 .setLinearHeadingInterpolation(Poses.get(Poses.shootPositionGoalSide).getHeading(), Poses.get(Poses.lineupLine2).getHeading())
                 .addPath(new BezierLine(Poses.get(Poses.lineupLine2), Poses.get(Poses.pickupLine2)))
                 .setConstantHeadingInterpolation(Poses.get(Poses.pickupLine2).getHeading())
-                .addPath(new BezierCurve(Poses.get(Poses.pickupLine2), Poses.get(Poses.backToShoot2ControlPoint), Poses.get(Poses.shootPositionGoalSide2)))
+                .addPath(new BezierCurve(Poses.get(Poses.pickupLine2), Poses.get(Poses.line2ControlPoint), Poses.get(Poses.shootPositionGoalSide2)))
                 .setConstantHeadingInterpolation(Poses.get(Poses.shootPositionGoalSide2).getHeading())
                 .build();
 //
@@ -127,7 +127,7 @@ public class SpeedyGoalAuto extends OpMode {
 //                .setLinearHeadingInterpolation(Poses.get(Poses.lineupLine2).getHeading(), Poses.get(Poses.shootPositionGoalSide).getHeading())
 //                .build();
         travelBackToShoot2 = follower.pathBuilder()
-                .addPath(new BezierCurve(Poses.get(Poses.pickupLine2), Poses.get(Poses.backToShoot2ControlPoint), Poses.get(Poses.shootPositionGoalSide2)))
+                .addPath(new BezierCurve(Poses.get(Poses.pickupLine2), Poses.get(Poses.line2ControlPoint), Poses.get(Poses.shootPositionGoalSide2)))
                 .setLinearHeadingInterpolation(Poses.get(Poses.pickupLine2).getHeading(), Poses.get(Poses.shootPositionGoalSide2).getHeading())
                 .build();
         travelToIntake3 = follower.pathBuilder()
