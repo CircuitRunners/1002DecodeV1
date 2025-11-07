@@ -3,12 +3,17 @@ package org.firstinspires.ftc.teamcode.V1.OpMode.Lm2Auto;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
+import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.teamcode.V1.Config.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.V1.Config.subsystems.LimelightCamera;
 import org.firstinspires.ftc.teamcode.V1.Config.subsystems.Shooter;
@@ -108,6 +113,7 @@ public class MidLadderMenace extends OpMode {
                 break;
             case 1: // Shooter Shoot
                 if (!follower.isBusy()) {
+                    updateCoordinates();
                     shootBalls();
                 }
                 break;
@@ -244,8 +250,8 @@ public class MidLadderMenace extends OpMode {
         intake.fullIntakeIdle();
         intake.setServoPower(0);
         Poses.savePose(follower.getPose());
-        //limelight.limelightCamera.pause();
-        //shooterIntake.stopAll();
+        limelight.limelightCamera.pause();
+
     }
 
     @Override
@@ -265,8 +271,8 @@ public class MidLadderMenace extends OpMode {
 
         intake = new Intake(hardwareMap, telemetry);
         shooter = new Shooter(hardwareMap, telemetry);
-//        limelight = new LimelightCamera(hardwareMap);
-//        limelight.limelightCamera.start();
+        limelight = new LimelightCamera(hardwareMap);
+        limelight.limelightCamera.start();
 //
 //        BallOrder detected = limelight.detectBallOrder();
 //
@@ -330,6 +336,42 @@ public class MidLadderMenace extends OpMode {
         }
 
 
+    }
+
+    public void updateCoordinates(){
+       final double METERS_TO_INCH = 39.37;
+        limelight.limelightCamera.updateRobotOrientation(follower.getHeading());
+        limelight.limelightCamera.pipelineSwitch(3);
+        LLResult result = limelight.getResult();
+
+
+
+        if (result != null && result.isValid()) {
+            for (LLResultTypes.FiducialResult fr : result.getFiducialResults()) {
+                if (fr.getFiducialId() == 20 || fr.getFiducialId() == 24) {
+                    Pose3D mt1Pose = result.getBotpose();
+                    if (mt1Pose != null) {
+                        //gets raw position from limelight in m
+                        double llX_m = mt1Pose.getPosition().x;
+                        double llY_m = mt1Pose.getPosition().y;
+                        //converts position to inches
+                        double llX_in = llX_m * METERS_TO_INCH;
+                        double llY_in = llY_m * METERS_TO_INCH;
+                        //rotates limelight points 90 degrees counterclockwise
+                        double llX_in_rotated = llY_in;
+                        double llY_in_rotated = -llX_in;
+                        //shifts position to bottom left corner field origin for pedro pathing use
+                        double llX_in_shifted = llX_in_rotated + 72.0;
+                        double llY_in_shifted = llY_in_rotated + 72.0;
+
+                        double currentHeadingRad = follower.getHeading();
+                        follower.setPose(new Pose(llX_in_shifted,llY_in_shifted,currentHeadingRad));
+
+                    }
+                    break;
+                }
+            }
+        }
     }
 
 

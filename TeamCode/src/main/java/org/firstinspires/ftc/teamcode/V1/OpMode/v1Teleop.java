@@ -490,35 +490,7 @@ public class v1Teleop extends OpMode {
         limelight.limelightCamera.pipelineSwitch(3);
         LLResult result = limelight.getResult();
 
-        //ensures result exsists and is from an acceptable apriltag
-//        if (result != null && result.isValid()) {
-//            for (LLResultTypes.FiducialResult fr : result.getFiducialResults()) {
-//                if (fr.getFiducialId() == 20 || fr.getFiducialId() == 24) {
-//                    Pose3D mt2Pose = result.getBotpose_MT2();
-//                    if (mt2Pose != null) {
-//                        //gets raw position from limelight in m
-//                        double llX_m = mt2Pose.getPosition().x;
-//                        double llY_m = mt2Pose.getPosition().y;
-//                        //converts position to inches
-//                        double llX_in = llX_m * METERS_TO_INCH;
-//                        double llY_in = llY_m * METERS_TO_INCH;
-//                        //shifts position to bottom left corner field origin for pedro pathing use
-//                        double llX_in_shifted = llX_in + 72.0;
-//                        double llY_in_shifted = llY_in + 72.0;
-//
-//                        double currentHeadingRad = pinpoint.getPosition().getHeading(AngleUnit.RADIANS);  // keep heading from Pinpoint
-//                        Pose2D newPose = new Pose2D(DistanceUnit.INCH,
-//                                llX_in_shifted, llY_in_shifted,
-//                                AngleUnit.RADIANS, currentHeadingRad);
-//                        //pinpoint.setPosition(newPose);
-//                        follower.setPose(new Pose(llX_in_shifted,llY_in_shifted,currentHeadingRad));
-//                        gamepad1.rumble(500);
-//                        telemetry.addData("New Pose From Apriltag:", "X: %.2f in, Y: %.2f in, H: %.1f°", llX_in_shifted, llY_in_shifted, Math.toDegrees(currentHeadingRad));
-//                    }
-//                    break;
-//                }
-//            }
-//        }
+
 
         if (result != null && result.isValid()) {
             for (LLResultTypes.FiducialResult fr : result.getFiducialResults()) {
