@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 import com.seattlesolvers.solverslib.controller.PIDFController;
@@ -23,6 +24,7 @@ public class Shooter {
     private static double maxPower = 1.0;          // safety clamp
 
     public static final int TICKS_PER_REV = 537; // goBILDA 312 RPM Yellow Jacket
+    public double lightPosition = 0.0;
 
     // --- Pre-calculated Linear Model ---
     // Slope (m) = (1250 - 1000) / (48 - 12) = 6.9444...
@@ -36,6 +38,7 @@ public class Shooter {
     // ===== Hardware =====
     public DcMotorEx shooter1;
     public DcMotorEx shooter2;
+    private final Servo light;
     private PIDFController pidf;
     private ElapsedTime loopTimer = new ElapsedTime();
 
@@ -52,6 +55,8 @@ public class Shooter {
         shooter2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         shooter2.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
+        light = hardwareMap.get(Servo.class, "light");
+
         shooter2.setDirection(DcMotorSimple.Direction.REVERSE);
 
         shooter1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
@@ -64,6 +69,12 @@ public class Shooter {
 
     }
 
+    public void setLight(double position) {
+        if (lightPosition != position) {
+            lightPosition = position;
+            light.setPosition(position);
+        }
+    }
 
     public void shoot(double desiredVelo){
 

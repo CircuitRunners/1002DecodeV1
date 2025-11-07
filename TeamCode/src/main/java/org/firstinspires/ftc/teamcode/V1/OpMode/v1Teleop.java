@@ -225,11 +225,11 @@ public class v1Teleop extends OpMode {
 
         //selector logic for alliance
 
-            if (player1.wasJustPressed(GamepadKeys.Button.RIGHT_STICK_BUTTON)) {
-                isRedAlliance = true;
-            } else if (player1.wasJustPressed(GamepadKeys.Button.LEFT_STICK_BUTTON)) {
-                isRedAlliance = false;
-            }
+        if (player1.wasJustPressed(GamepadKeys.Button.RIGHT_STICK_BUTTON)) {
+            isRedAlliance = true;
+        } else if (player1.wasJustPressed(GamepadKeys.Button.LEFT_STICK_BUTTON)) {
+            isRedAlliance = false;
+        }
 
 
         //state machine control
@@ -256,13 +256,15 @@ public class v1Teleop extends OpMode {
                     for (LLResultTypes.FiducialResult fr : limelight.getResult().getFiducialResults()) {
                         if (fr.getFiducialId() == 20 || fr.getFiducialId() == 24) {
 
-                            finalRotation = limelightRotation;
+                            finalRotation = -limelight.autoAlign();
 
 
 
                             telemetry.addLine("Using Limelight Data for Heading Lock.");
                             telemetry.addData("Error from tag center", limelight.error);
+                            telemetry.addData("april tag id", fr.getFiducialId());
                             telemetry.addData("PID Rotation", limelightRotation);
+                            telemetry.addData("PID Rotation from autoAlign()", limelight.autoAlign());
                         }
                         else {
                             finalRotation = rotate;
@@ -335,6 +337,7 @@ public class v1Teleop extends OpMode {
             case 0:
                 isHeadingLocked = false;
                 shooter.stopShooter();
+                shooter.setLight(0.611);
                 //intake stuff
                 isIntakeInUse= true;
                 if(rightTriggerValue > 0.25){ // Replaced gamepad1.right_trigger
@@ -423,9 +426,11 @@ public class v1Teleop extends OpMode {
                 //shooting logic
                 if ((shooterVelo >= desiredVeloRed - 40) && (shooterVelo <= desiredVeloRed + 55)) { // Replaced shooter.getCurrentVelo()
                     isIntakeInUse = true;
-                    intake.intakeIn();
+                    shooter.setLight(0.5);
+
                     if (rightTriggerValue > 0.2) { // Replaced gamepad1.right_trigger
                         intake.setServoPower(1);
+                        intake.intakeIn();
                     }
                     else if (rightTriggerValue < 0.2){ // Replaced gamepad1.right_trigger
                         intake.setServoPower(0);
@@ -436,6 +441,7 @@ public class v1Teleop extends OpMode {
                 else {
                     intake.setServoPower(0);
                     intake.fullIntakeIdle();
+                    shooter.setLight(0.227);
 
                     isIntakeInUse = false;
                 }
