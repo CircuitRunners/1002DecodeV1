@@ -12,14 +12,13 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import org.firstinspires.ftc.teamcode.V1.Config.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.V1.Config.subsystems.LimelightCamera;
 import org.firstinspires.ftc.teamcode.V1.Config.subsystems.Shooter;
-import org.firstinspires.ftc.teamcode.V1.Config.util.HeadingAutoAligner;
 import org.firstinspires.ftc.teamcode.V1.Config.util.Poses;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 import java.util.List;
 
-@Autonomous(name = "NEW - GS 12 Ball - PARTIALLY COMPATABLE", group = "AA", preselectTeleOp = "v1Teleop")
-public class MidLadderMenace extends OpMode {
+@Autonomous(name = "NEW  - GS 9 Ball Alliance Partner Friendly", group = "AA", preselectTeleOp = "v1Teleop")
+public class  Nine_BallGoalSide extends OpMode {
 
     private Follower follower;
     private Timer pathTimer;
@@ -43,7 +42,7 @@ public class MidLadderMenace extends OpMode {
 
 
     // Tolerance for alignment in radians (approx. 2 degrees)
-   // private static final double ALIGN_THRESHOLD = Math.toRadians(2);
+    // private static final double ALIGN_THRESHOLD = Math.toRadians(2);
 
 
     private PathChain travelToShoot, openGate, intake1, travelBackToShoot1, intake2, travelBackToShoot2,  intake3, travelBackToShoot3, travelToGate;
@@ -51,15 +50,15 @@ public class MidLadderMenace extends OpMode {
     public void buildPaths() {
         // --- Alliance-Aware Path Generation ---
         travelToShoot = follower.pathBuilder()
-                .addPath(new BezierLine(Poses.get(Poses.startPoseGoalSide), Poses.get(Poses.shootPositionGoalSide)))
-                .setLinearHeadingInterpolation(Poses.get(Poses.startPoseGoalSide).getHeading(), Poses.get(Poses.shootPositionGoalSide).getHeading())
+                .addPath(new BezierLine(Poses.get(Poses.startPoseGoalSide), Poses.get(Poses.shootPositionGoalSide2)))
+                .setLinearHeadingInterpolation(Poses.get(Poses.startPoseGoalSide).getHeading(), Poses.get(Poses.shootPositionGoalSide2).getHeading())
 
                 .build();
 
         // Path 2: Travel from Shooting Position to Intake Position
         intake1 = follower.pathBuilder()
-                .addPath(new BezierLine(Poses.get(Poses.shootPositionGoalSide), Poses.get(Poses.pickupLine1)))
-                .setLinearHeadingInterpolation(Poses.get(Poses.shootPositionGoalSide).getHeading(), Poses.get(Poses.pickupLine1).getHeading(),0.4)
+                .addPath(new BezierCurve(Poses.get(Poses.shootPositionGoalSide2), Poses.get(Poses.controlPointLine1ForShootPose2),Poses.get(Poses.pickupLine1)))
+                .setLinearHeadingInterpolation(Poses.get(Poses.shootPositionGoalSide2).getHeading(), Poses.get(Poses.pickupLine1).getHeading(),0.4)
                 .build();
         openGate = follower.pathBuilder()
                 .addPath(new BezierCurve(Poses.get(Poses.pickupLine1), Poses.get(Poses.pickupLine1ToGateControlPoint), Poses.get(Poses.lineupAtGate)))
@@ -67,32 +66,31 @@ public class MidLadderMenace extends OpMode {
                 .build();
 
         travelBackToShoot1 = follower.pathBuilder()
-                .addPath(new BezierLine(Poses.get(Poses.lineupAtGate), Poses.get(Poses.shootPositionGoalSide)))
-                .setLinearHeadingInterpolation(Poses.get(Poses.pickupLine1).getHeading(), Poses.get(Poses.shootPositionGoalSide).getHeading())
+                .addPath(new BezierLine(Poses.get(Poses.lineupAtGate), Poses.get(Poses.shootPositionGoalSide2)))
+                .setLinearHeadingInterpolation(Poses.get(Poses.pickupLine1).getHeading(), Poses.get(Poses.shootPositionGoalSide2).getHeading())
                 .build();
         intake2 = follower.pathBuilder()
-                .addPath(new BezierCurve(Poses.get(Poses.shootPositionGoalSide), Poses.get(Poses.line2ControlPoint),Poses.get(Poses.pickupLine2)))
-                .setLinearHeadingInterpolation(Poses.get(Poses.shootPositionGoalSide).getHeading(), Poses.get(Poses.pickupLine2).getHeading(),0.45)
+                .addPath(new BezierCurve(Poses.get(Poses.shootPositionGoalSide2), Poses.get(Poses.line2ControlPoint),Poses.get(Poses.pickupLine2)))
+                .setLinearHeadingInterpolation(Poses.get(Poses.shootPositionGoalSide2).getHeading(), Poses.get(Poses.pickupLine2).getHeading(),0.45)
                 .build();
         travelBackToShoot2 = follower.pathBuilder()
-                .addPath(new BezierCurve(Poses.get(Poses.pickupLine2), Poses.get(Poses.line2ControlPoint), Poses.get(Poses.shootPositionGoalSide)))
-                .setLinearHeadingInterpolation(Poses.get(Poses.pickupLine2).getHeading(), Poses.get(Poses.shootPositionGoalSide).getHeading(),0.85,0.4)
+                .addPath(new BezierCurve(Poses.get(Poses.pickupLine2), Poses.get(Poses.line2ControlPoint), Poses.get(Poses.shootPositionGoalSide2)))
+                .setLinearHeadingInterpolation(Poses.get(Poses.pickupLine2).getHeading(), Poses.get(Poses.shootPositionGoalSide2).getHeading(),0.85,0.4)
                 .build();
 
         intake3 = follower.pathBuilder()
-                .addPath(new BezierCurve(Poses.get(Poses.shootPositionGoalSide), Poses.get(Poses.Line3ControlPoint),Poses.get(Poses.pickupLine3)))
-                .setLinearHeadingInterpolation(Poses.get(Poses.shootPositionGoalSide).getHeading(), Poses.get(Poses.pickupLine3).getHeading(),0.45)
+                .addPath(new BezierCurve(Poses.get(Poses.shootPositionGoalSide2), Poses.get(Poses.Line3ControlPoint),Poses.get(Poses.pickupLine3)))
+                .setLinearHeadingInterpolation(Poses.get(Poses.shootPositionGoalSide2).getHeading(), Poses.get(Poses.pickupLine3).getHeading(),0.45)
                 .build();
 
         travelBackToShoot3 = follower.pathBuilder()
-                .addPath(new BezierCurve(Poses.get(Poses.pickupLine3), Poses.get(Poses.Line3ControlPoint), Poses.get(Poses.shootPositionGoalSide)))
-                .setLinearHeadingInterpolation(Poses.get(Poses.pickupLine3).getHeading(), Poses.get(Poses.shootPositionGoalSide).getHeading())
+                .addPath(new BezierCurve(Poses.get(Poses.pickupLine3), Poses.get(Poses.Line3ControlPoint), Poses.get(Poses.shootPositionGoalSide2)))
+                .setLinearHeadingInterpolation(Poses.get(Poses.pickupLine3).getHeading(), Poses.get(Poses.shootPositionGoalSide2).getHeading())
                 .build();
         travelToGate = follower.pathBuilder()
-                .addPath(new BezierLine(Poses.get(Poses.shootPositionGoalSide), Poses.get(Poses.lineupAtGate)))
-                .setLinearHeadingInterpolation(Poses.get(Poses.shootPositionGoalSide).getHeading(), Poses.get(Poses.lineupAtGate).getHeading())
+                .addPath(new BezierLine(Poses.get(Poses.shootPositionGoalSide2), Poses.get(Poses.lineupAtGate)))
+                .setLinearHeadingInterpolation(Poses.get(Poses.shootPositionGoalSide2).getHeading(), Poses.get(Poses.lineupAtGate).getHeading())
                 .build();
-
     }
 
 
@@ -227,7 +225,7 @@ public class MidLadderMenace extends OpMode {
         telemetry.addData("Shooter Velocity", shooter.getCurrentVelo());
         telemetry.addData("Intake Power", intake.getPower());
 
-       // telemetry.addData("Shooter Velo: ", shooter.getCurrentVelo());
+        // telemetry.addData("Shooter Velo: ", shooter.getCurrentVelo());
 
         telemetry.update();
 
@@ -335,3 +333,4 @@ public class MidLadderMenace extends OpMode {
 
 
 }
+

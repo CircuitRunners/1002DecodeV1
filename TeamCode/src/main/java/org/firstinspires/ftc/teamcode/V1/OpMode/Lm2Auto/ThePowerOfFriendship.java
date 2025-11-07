@@ -17,7 +17,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 import java.util.List;
 
-    @Autonomous(name = "NEW Goal Side Auto - Alliance Partner Friendly", group = "AA", preselectTeleOp = "v1Teleop")
+    @Autonomous(name = "NEW - GS 12 Ball Alliance Partner Friendly", group = "AA", preselectTeleOp = "v1Teleop")
     public class ThePowerOfFriendship extends OpMode {
 
         private Follower follower;

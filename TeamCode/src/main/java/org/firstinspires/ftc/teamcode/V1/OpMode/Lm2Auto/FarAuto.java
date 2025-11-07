@@ -19,7 +19,7 @@ import java.util.List;
 
 
 
-@Autonomous(name = "Far Auto - 9 Ball", group = "AA", preselectTeleOp = "v1Teleop")
+@Autonomous(name = "Far Auto - 9 Ball - SOMEWHAT COMPATABLE", group = "AA", preselectTeleOp = "v1Teleop")
 public class FarAuto  extends OpMode {
 
     private Follower follower;

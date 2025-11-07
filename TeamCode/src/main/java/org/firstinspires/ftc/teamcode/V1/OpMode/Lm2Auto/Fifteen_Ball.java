@@ -18,7 +18,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import java.util.List;
 
 
-@Autonomous(name = "NEW Goal Side Auto", group = "AA", preselectTeleOp = "v1Teleop")
+@Autonomous(name = "NEW  - GS 15 Ball Solo", group = "AA", preselectTeleOp = "v1Teleop")
 public class Fifteen_Ball extends OpMode {
 
     private Follower follower;
