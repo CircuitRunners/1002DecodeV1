@@ -97,7 +97,7 @@ public class FarAuto  extends OpMode {
                 break;
             case 1: // Shooter Shoot
                 if (!follower.isBusy()) {
-                    shootBalls();
+                    shootBalls(shooterDesiredVelo);
                 }
                 break;
             case 2: //go to intake
@@ -120,7 +120,7 @@ public class FarAuto  extends OpMode {
                 break;
             case 4: //shoot
                 if (!follower.isBusy()) {
-                    shootBalls();
+                    shootBalls(shooterDesiredVelo);
                 }
                 break;
             case 5: //go to intake
@@ -143,7 +143,7 @@ public class FarAuto  extends OpMode {
                 break;
             case 7: //shoot
                 if (!follower.isBusy()) {
-                    shootBalls();
+                    shootBalls(shooterDesiredVelo);
                 }
                 break;
             case 8:
@@ -262,11 +262,11 @@ public class FarAuto  extends OpMode {
         setPathState(0);
     }
 
-    public void shootBalls(){
-        shooter.shoot(shooterDesiredVelo);
+    public void shootBalls(double velo){
+        shooter.shoot(velo);
         double currentVelo = shooter.getCurrentVelo();
 
-        boolean isShooterReady = currentVelo >= shooterDesiredVelo - 25 && currentVelo <= shooterDesiredVelo + 55;
+        boolean isShooterReady = currentVelo >= velo - 25 && currentVelo <= velo + 55;
 
         if (isShooterReady) {
             intake.intakeIn();

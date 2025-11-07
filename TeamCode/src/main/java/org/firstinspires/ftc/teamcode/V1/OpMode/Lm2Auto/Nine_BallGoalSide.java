@@ -106,7 +106,7 @@ public class  Nine_BallGoalSide extends OpMode {
                 break;
             case 1: // Shooter Shoot
                 if (!follower.isBusy()) {
-                    shootBalls();
+                    shootBalls(shooterDesiredVelo);
                 }
                 break;
             case 2: //go to intake
@@ -135,7 +135,7 @@ public class  Nine_BallGoalSide extends OpMode {
                 break;
             case 5: //shoot
                 if (!follower.isBusy()) {
-                    shootBalls();
+                    shootBalls(shooterDesiredVelo);
                 }
                 break;
             case 6: //go to intake
@@ -158,7 +158,7 @@ public class  Nine_BallGoalSide extends OpMode {
                 break;
             case 8: //shoot
                 if (!follower.isBusy()) {
-                    shootBalls();
+                    shootBalls(shooterDesiredVelo);
                 }
                 break;
             case 9: //go to intake
@@ -181,7 +181,7 @@ public class  Nine_BallGoalSide extends OpMode {
                 break;
             case 11: //shoot
                 if (!follower.isBusy()) {
-                    shootBalls();
+                    shootBalls(shooterDesiredVelo);
                 }
                 break;
             case 12:
@@ -300,11 +300,11 @@ public class  Nine_BallGoalSide extends OpMode {
         setPathState(0);
     }
 
-    public void shootBalls(){
-        shooter.shoot(shooterDesiredVelo);
+    public void shootBalls(double velo){
+        shooter.shoot(velo);
         double currentVelo = shooter.getCurrentVelo();
 
-        boolean isShooterReady = currentVelo >= shooterDesiredVelo - 25 && currentVelo <= shooterDesiredVelo + 55;
+        boolean isShooterReady = currentVelo >= velo - 25 && currentVelo <= velo + 55;
 
         if (isShooterReady) {
             intake.intakeIn();
@@ -329,7 +329,6 @@ public class  Nine_BallGoalSide extends OpMode {
 
 
     }
-
 
 
 }

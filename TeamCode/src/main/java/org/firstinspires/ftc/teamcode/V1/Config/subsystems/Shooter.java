@@ -98,12 +98,12 @@ public class Shooter {
         shooter2.setPower(output);
 
         // --- Telemetry ---
-        telemetry.addData("Target Vel (ticks/sec)", targetVelocity);
-//        telemetry.addData("Measured Vel motor 1 (tick/sec)", shooter1Velocity);
-//        telemetry.addData("Measured Vel motor 1 (tick/sec)", shooter2Velocity);
-        telemetry.addData("Measured Avg Vel (tick/sec)", averageVelo);
-        telemetry.addData("Shooter Motor Power Set Point: ", output);
-        telemetry.addData("At Set Point?", pidf.atSetPoint() ? "Yes" : "Nah gang");
+//        telemetry.addData("Target Vel (ticks/sec)", targetVelocity);
+////        telemetry.addData("Measured Vel motor 1 (tick/sec)", shooter1Velocity);
+////        telemetry.addData("Measured Vel motor 1 (tick/sec)", shooter2Velocity);
+//        telemetry.addData("Measured Avg Vel (tick/sec)", averageVelo);
+//        telemetry.addData("Shooter Motor Power Set Point: ", output);
+//        telemetry.addData("At Set Point?", pidf.atSetPoint() ? "Yes" : "Nah gang");
         telemetry.update();
 
         // Reset the timer for the next loop iteration (optional, for loop time tracking)

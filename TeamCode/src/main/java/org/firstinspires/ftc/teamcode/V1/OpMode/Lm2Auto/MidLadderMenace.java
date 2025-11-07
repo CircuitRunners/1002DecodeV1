@@ -41,7 +41,7 @@ public class MidLadderMenace extends OpMode {
     private final double SHOOTER_READY_THRESHOLD = 0.8; // 80% of target before enabling detection
     private boolean ball_was_present = true;
 
-    private final double shooterDesiredVelo = 1000;
+    private double shooterDesiredVelo = 1000;
     private Poses.Alliance lastKnownAlliance = null;
 
 
@@ -114,7 +114,7 @@ public class MidLadderMenace extends OpMode {
             case 1: // Shooter Shoot
                 if (!follower.isBusy()) {
                     updateCoordinates();
-                    shootBalls();
+                    shootBalls(shooterDesiredVelo);
                 }
                 break;
             case 2: //go to intake
@@ -143,7 +143,7 @@ public class MidLadderMenace extends OpMode {
                 break;
             case 5: //shoot
                 if (!follower.isBusy()) {
-                    shootBalls();
+                    shootBalls(shooterDesiredVelo);
                 }
                 break;
             case 6: //go to intake
@@ -166,7 +166,7 @@ public class MidLadderMenace extends OpMode {
                 break;
             case 8: //shoot
                 if (!follower.isBusy()) {
-                    shootBalls();
+                    shootBalls(shooterDesiredVelo);
                 }
                 break;
             case 9: //go to intake
@@ -189,7 +189,7 @@ public class MidLadderMenace extends OpMode {
                 break;
             case 11: //shoot
                 if (!follower.isBusy()) {
-                    shootBalls();
+                    shootBalls(shooterDesiredVelo);
                 }
                 break;
             case 12:
@@ -308,11 +308,11 @@ public class MidLadderMenace extends OpMode {
         setPathState(0);
     }
 
-    public void shootBalls(){
-        shooter.shoot(shooterDesiredVelo);
+    public void shootBalls(double velo){
+        shooter.shoot(velo);
         double currentVelo = shooter.getCurrentVelo();
 
-        boolean isShooterReady = currentVelo >= shooterDesiredVelo - 25 && currentVelo <= shooterDesiredVelo + 55;
+        boolean isShooterReady = currentVelo >= velo - 25 && currentVelo <= velo + 55;
 
         if (isShooterReady) {
             intake.intakeIn();
@@ -334,8 +334,6 @@ public class MidLadderMenace extends OpMode {
             shotCounter = 0;
             setPathState();
         }
-
-
     }
 
     public void updateCoordinates(){
