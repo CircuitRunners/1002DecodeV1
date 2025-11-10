@@ -7,11 +7,13 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.Range;
 import com.seattlesolvers.solverslib.controller.PIDFController;
 
+import java.util.List;
+
 public class LimelightCamera {
 
     public Limelight3A limelightCamera;
 
-    public static double HEADING_KP_TX = 0.027 ; //0.02
+    public static double HEADING_KP_TX = 0.027; //0.02
     public static double HEADING_KI_TX = 0.0;
     public static double HEADING_KD_TX = 0.0;
     public static double HEADING_KF_TX = 0.0;
@@ -29,6 +31,13 @@ public class LimelightCamera {
     */
 
 
+    /**
+     * PIPELINE NUMBER GUIDE -
+     * 3 is for the april tags on the goals
+     * 5 is for the obilisk
+     * 6 is for detector pipeline
+     */
+
     public double finalRotation = 0;
     public double error = 0;
 
@@ -44,13 +53,17 @@ public class LimelightCamera {
         pidf.setSetPoint(0.0);
     }
 
-    /** Returns the latest LLResult safely */
+    /**
+     * Returns the latest LLResult safely
+     */
     public LLResult getResult() {
         LLResult result = limelightCamera.getLatestResult();
         return result;
     }
 
-    /** Updates the error based on the latest tag result */
+    /**
+     * Updates the error based on the latest tag result
+     */
     public double updateError() {
         LLResult result = getResult();
         if (result != null && result.isValid()) {
@@ -61,7 +74,9 @@ public class LimelightCamera {
         return error;
     }
 
-    /** Auto-align PID rotation value based on limelight data */
+    /**
+     * Auto-align PID rotation value based on limelight data
+     */
     public double autoAlign() {
         limelightCamera.pipelineSwitch(3);
 
@@ -87,36 +102,6 @@ public class LimelightCamera {
         return finalRotation;
     }
 
-    /** Detects ball order based on AprilTag IDs 21-23; switches pipeline to detection pipeline */
-    public BallOrder detectBallOrder() {
-        limelightCamera.pipelineSwitch(5); // detection pipeline for ALL april tags
-
-        LLResult result = getResult();
-        BallOrder detectedOrder = BallOrder.GREEN_PURPLE_PURPLE; // default
-
-        if (result != null && result.isValid()) {
-            for (LLResultTypes.FiducialResult fr : result.getFiducialResults()) {
-                switch (fr.getFiducialId()) {
-                    case 21:
-                        detectedOrder = BallOrder.GREEN_PURPLE_PURPLE;
-                        break;
-                    case 22:
-                        detectedOrder = BallOrder.PURPLE_GREEN_PURPLE;
-                        break;
-                    case 23:
-                        detectedOrder = BallOrder.PURPLE_PURPLE_GREEN;
-                        break;
-                    default:
-                        // ignore other tags
-                        break;
-                }
-                if (fr.getFiducialId() >= 21 && fr.getFiducialId() <= 23) break; // stop at first relevant tag
-            }
-        }
-
-        return detectedOrder;
-    }
-
     public double calculateDistanceToGoal(double robotX, double robotY, double goalX, double goalY) {
         // Change in X and Y
         double deltaX = goalX - robotX;
@@ -127,10 +112,91 @@ public class LimelightCamera {
     }
 
 
-    /** Enum for ball orders */
+    /**
+     * Enum for ball orders
+     */
     public enum BallOrder {
         GREEN_PURPLE_PURPLE, // id 21
         PURPLE_GREEN_PURPLE, // id 22
         PURPLE_PURPLE_GREEN  // id 23
     }
+
+    /**
+     * Detects ball order based on AprilTag IDs 21-23; switches pipeline to detection pipeline
+     */
+    public BallOrder detectBallOrder() {
+        limelightCamera.pipelineSwitch(5); // detection pipeline for ALL april tags
+
+        LLResult result = getResult();
+        BallOrder detectedOrder = BallOrder.GREEN_PURPLE_PURPLE; // default
+
+        if (result != null && result.isValid()) {
+            for (LLResultTypes.FiducialResult fr : result.getFiducialResults()) {
+                int id = fr.getFiducialId();
+
+                if (id == 21) {
+                    detectedOrder = BallOrder.GREEN_PURPLE_PURPLE;
+                }
+                if (id == 22) {
+                    detectedOrder = BallOrder.PURPLE_GREEN_PURPLE;
+                }
+                if (id == 23) {
+                    detectedOrder = BallOrder.PURPLE_PURPLE_GREEN;
+                }
+
+            }
+            return detectedOrder;
+        }
+        return null;
+    }
+
+    public double[] getLimeLightTargetDegrees() {
+        limelightCamera.pipelineSwitch(3);
+        double[] targetDegrees = new double[2];
+
+        if (getResult() != null) {
+            for (LLResultTypes.FiducialResult fiducial : getResult().getFiducialResults()) {
+                int id = fiducial.getFiducialId();
+
+                if ((id == 20) || (id == 24)) {
+
+                    targetDegrees[0] = fiducial.getTargetXDegrees();
+                    targetDegrees[1] = fiducial.getTargetYDegrees();
+
+                    return targetDegrees;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public double[] getArtifactsOnRamp() {
+        limelightCamera.pipelineSwitch(5); //idk we need a detector pipeline
+        double[] totalResults = new double[3];
+
+        List<LLResultTypes.ClassifierResult> classifierResults = getResult().getClassifierResults();
+        for (LLResultTypes.ClassifierResult cr : classifierResults) {
+
+            double totalDetectedArtifacts = classifierResults.size();
+            totalResults[0] = totalDetectedArtifacts;
+
+            String className = cr.getClassName();
+            int purpleCount = 0;
+            int greenCount = 0;
+
+            // Use exact string comparison (case-sensitive) for your model's labels
+            if (className.equals("purple") && cr.getConfidence() > 0.6) {
+                purpleCount++;
+            } else if (className.equals("green") && cr.getConfidence() > 0.6) {
+                greenCount++;
+            }
+
+            totalResults[1] = greenCount;
+            totalResults[2] = purpleCount;
+        }
+
+        return totalResults;
+    }
+
 }

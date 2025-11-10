@@ -305,7 +305,7 @@ public class v1Teleop extends OpMode {
 //            telemetry.addLine("Pinpoint IMU Recalibrated!");
 //        }
         if (player1.wasJustPressed(GamepadKeys.Button.SQUARE)) {
-            pinpoint.recalibrateIMU();
+            
             //pinpoint.recalibrateIMU();
             Pose2D newPose = new Pose2D(DistanceUnit.INCH,
                     72,72,

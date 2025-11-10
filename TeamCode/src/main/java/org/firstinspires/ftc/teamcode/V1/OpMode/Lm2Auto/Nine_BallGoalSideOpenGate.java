@@ -17,8 +17,8 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 import java.util.List;
 
-    @Autonomous(name = "NEW - GS 12 Ball AP Friendly", group = "AA", preselectTeleOp = "v1Teleop")
-    public class ThePowerOfFriendship extends OpMode {
+    @Autonomous(name = "NEW  - GS 9 Ball Open Gate AP Friendly", group = "AA", preselectTeleOp = "v1Teleop")
+    public class Nine_BallGoalSideOpenGate extends OpMode {
 
         private Follower follower;
         private Timer pathTimer;
@@ -60,13 +60,15 @@ import java.util.List;
                     .addPath(new BezierCurve(Poses.get(Poses.shootPositionGoalSide2), Poses.get(Poses.controlPointLine1ForShootPose2),Poses.get(Poses.pickupLine1)))
                     .setLinearHeadingInterpolation(Poses.get(Poses.shootPositionGoalSide2).getHeading(), Poses.get(Poses.pickupLine1).getHeading(),0.25)
                     .build();
+
             openGate = follower.pathBuilder()
                     .addPath(new BezierCurve(Poses.get(Poses.pickupLine1), Poses.get(Poses.pickupLine1ToGateControlPoint), Poses.get(Poses.openGate)))
                     .setConstantHeadingInterpolation(Poses.get(Poses.pickupLine1).getHeading())
                     .build();
 
+
             travelBackToShoot1 = follower.pathBuilder()
-                    .addPath(new BezierLine(Poses.get(Poses.lineupAtGate), Poses.get(Poses.shootPositionGoalSide2)))
+                    .addPath(new BezierLine(Poses.get(Poses.pickupLine1), Poses.get(Poses.shootPositionGoalSide2)))
                     .setLinearHeadingInterpolation(Poses.get(Poses.pickupLine1).getHeading(), Poses.get(Poses.shootPositionGoalSide2).getHeading())
                     .build();
             intake2 = follower.pathBuilder()
@@ -277,21 +279,17 @@ import java.util.List;
 
 
             Poses.updateAlliance(gamepad1, telemetry);
-
+            follower.setStartingPose(Poses.get(Poses.startPoseGoalSide));
 
             if (Poses.getAlliance() != lastKnownAlliance) {
-                follower.setStartingPose(Poses.get(Poses.startPoseGoalSide));
+
                 buildPaths();
 
                 lastKnownAlliance = Poses.getAlliance();
                 telemetry.addData("STATUS", "Paths Rebuilt for " + lastKnownAlliance);
-                telemetry.addLine("");
             }
 
 
-            telemetry.addLine("--- Alliance Selector ---");
-            telemetry.addLine("D-pad UP → RED | D-pad DOWN → BLUE");
-            telemetry.addLine("");
             telemetry.addData("Alliance Set", Poses.getAlliance());
             telemetry.addData("Start Pose", Poses.get(Poses.startPoseGoalSide));
             telemetry.update();
@@ -336,4 +334,5 @@ import java.util.List;
 
 
     }
+
 

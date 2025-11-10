@@ -133,12 +133,25 @@ public class SensorLimelight3A extends LinearOpMode {
                 List<LLResultTypes.DetectorResult> detectorResults = result.getDetectorResults();
                 for (LLResultTypes.DetectorResult dr : detectorResults) {
                     telemetry.addData("Detector", "Class: %s, Area: %.2f", dr.getClassName(), dr.getTargetArea());
+//                    int totalDetectedArtifacts = detectorResults.size();
+//                    String className = dr.getClassName();
+//                    int noteCount = 0;
+//                    int cubeCount = 0;
+//
+//                    // Use exact string comparison (case-sensitive) for your model's labels
+//                    if (className.equals("Note") && dr.getConfidence() > 0.6) {
+//                        noteCount++;
+//                    } else if (className.equals("Cube") && dr.getConfidence() > 0.6) {
+//                        cubeCount++;
+//                    }
+
                 }
 
                 // Access fiducial results
                 List<LLResultTypes.FiducialResult> fiducialResults = result.getFiducialResults();
                 for (LLResultTypes.FiducialResult fr : fiducialResults) {
                     telemetry.addData("Fiducial", "ID: %d, Family: %s, X: %.2f, Y: %.2f", fr.getFiducialId(), fr.getFamily(), fr.getTargetXDegrees(), fr.getTargetYDegrees());
+
                 }
 
                 // Access color results

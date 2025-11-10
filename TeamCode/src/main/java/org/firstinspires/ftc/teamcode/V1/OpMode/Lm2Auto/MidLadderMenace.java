@@ -23,7 +23,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 import java.util.List;
 
-@Autonomous(name = "NEW - GS 12 Ball - PARTIALLY COMPATABLE", group = "AA", preselectTeleOp = "v1Teleop")
+@Autonomous(name = "NEW - GS 12 Ball - AP Far Only", group = "AA", preselectTeleOp = "v1Teleop")
 public class MidLadderMenace extends OpMode {
 
     private Follower follower;
