@@ -10,7 +10,7 @@ import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
 
-@Disabled
+//@Disabled
 @TeleOp(name = "IntakeTest")
 public class IntakeTest extends OpMode {
 

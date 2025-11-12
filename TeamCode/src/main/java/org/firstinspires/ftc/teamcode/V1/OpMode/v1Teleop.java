@@ -69,6 +69,7 @@ public class v1Teleop extends OpMode {
     private boolean automatedDrive = false;
     private boolean preselectFromAuto = false;
     private boolean isIntakeInUse = false;
+    private boolean intakeIn = false;
     private final double MINIMUM_SHOOTER_VELO = 1600; //   tick/sec
     private final double MAXIMUM_SHOOTER_VELO = 1650; //   tick/sec
 
@@ -339,19 +340,33 @@ public class v1Teleop extends OpMode {
                 shooter.setLight(0.611);
                 //intake stuff
                 isIntakeInUse= true;
+
+
                 if(rightTriggerValue > 0.25){ // Replaced gamepad1.right_trigger
-                    intake.intakeIn();
-                    intake.setServoPower(0);
+                  intakeIn = true;
 
                 }
-                else if (leftTriggerValue > 0.25 && leftTriggerValue < 0.7){ // Replaced gamepad1.left_trigger
-                    intake.intakeOut();
-                    intake.setServoPower(0);
+                else if (leftTriggerValue > 0.25 ){ // Replaced gamepad1.left_trigger
+                   intakeIn = false;
                 }
-                else if (leftTriggerValue > 0.8) { // Replaced gamepad1.left_trigger
-                    intake.setServoPower(0);
-                    intake.fullIntakeIdle();
+
+                if (intakeIn){
+                    intake.intakeIn();
+                    if ( intake.getDistanceMM() <= 60){
+                        intake.setServoPower(0);
+                    }
+                    else if(intake.getDistanceMM() >60){
+                        intake.setServoPower(1);
+                    }
                 }
+
+
+                else if(!intakeIn){
+                    if (leftTriggerValue > 0.25 && leftTriggerValue < 0.7){ // Replaced gamepad1.left_trigger
+                        intake.intakeOutDistance();
+                    }
+                }
+
 
                 break;
             case 1:
@@ -447,11 +462,12 @@ public class v1Teleop extends OpMode {
                 break;
             default:
                 isHeadingLocked = false;
+                intakeIn = false;
                 break;
         }
-        if (stateMachine > 1){
-            stateMachine = 0;
-        }
+//        if (stateMachine > 1){
+//            stateMachine = 0;
+//        }
         telemetry.addData("Position", data);
         telemetry.addData("FOLLOWER (Pedro) Position", followerData);
         telemetry.addData("State", stateMachine);
@@ -460,6 +476,8 @@ public class v1Teleop extends OpMode {
         telemetry.addData("Shooter Velo", shooterVelo); // Replaced shooter.getCurrentVelo()
         telemetry.addData("Shooter Target", isRedAlliance ? desiredVeloRed : desiredVeloBlue ); // Replaced shooter.getCurrentVelo()
         telemetry.addData("Intake in use: ", isIntakeInUse? "Yes" : "No");
+        telemetry.addData("Distance Sensor", intake.getDistanceMM());
+        telemetry.addData("Distance isRIghtDIstance", intake.isRightDistance()? "yeah" : "nah");
 
 
 //        panelsTelemetry.debug("Position", data);

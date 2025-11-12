@@ -67,6 +67,7 @@ public class FlywheelPIDFTuner extends OpMode {
     public static double kF = 0.00025;      // feedforward ≈ 1 / maxTicksPerSec
     public static double targetVelocity = 1633; // desired speed (ticks/sec)
     public static double maxPower = 1.0;          // safety clamp
+    public static final int TICKS_PER_REV = 537;
 
     // ===== Hardware =====
     public DcMotorEx shooter1;
@@ -87,10 +88,10 @@ public class FlywheelPIDFTuner extends OpMode {
         shooter1.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
         shooter2 = hardwareMap.get(DcMotorEx.class, "motor2");
-        shooter1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        shooter2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         shooter2.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
-        shooter1.setDirection(DcMotorSimple.Direction.REVERSE);
+        shooter2.setDirection(DcMotorSimple.Direction.REVERSE);
 
         shooter1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         shooter2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
@@ -119,8 +120,9 @@ public class FlywheelPIDFTuner extends OpMode {
         shooter2.setPower(output);
 
         // --- Telemetry ---
-        telemetry.addData("Target Vel (rotations/minute)", targetVelocity);
-        telemetry.addData("Measured Vel motor 1 (rotations/minute)", rPM);
+        telemetry.addData("Target Vel (tick/sec)", targetVelocity);
+       // telemetry.addData("Target RPM (rotation/min)", targetVelocity * 60.0 / TICKS_PER_REV);
+        telemetry.addData("Measured Vel  ()", rPM);
         telemetry.addData("Motor Power", output);
         telemetry.addData("Loop Time (ms)", loopTimer.milliseconds());
         telemetry.update();

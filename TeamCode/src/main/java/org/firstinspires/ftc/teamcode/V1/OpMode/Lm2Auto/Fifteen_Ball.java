@@ -363,7 +363,7 @@ public class Fifteen_Ball extends OpMode {
             intake.setServoPower(1);
         }
 
-        boolean ball_is_present = (intake.getDistanceMM() <= 60);
+        boolean ball_is_present = (intake.isRightDistance());
 
         if (ball_was_present && !ball_is_present) {
             shotCounter++;

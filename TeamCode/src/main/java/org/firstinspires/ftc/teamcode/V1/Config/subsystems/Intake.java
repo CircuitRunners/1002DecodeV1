@@ -78,10 +78,10 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
         public void intakeInDistance(){
             intake.setPower(1);
             motorPower = 1;
-            if (distanceSensor.getDistance(DistanceUnit.MM) <= 60){
+            if (getDistanceMM() <=53){
                servoIntake.setPower(0);
             }
-            else if (distanceSensor.getDistance(DistanceUnit.MM )>60){
+            else if (getDistanceMM() > 53){
                 servoIntake.setPower(1);
             }
         }
@@ -96,15 +96,21 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
             motorPower = -1;
             servoIntake.setPower(-1);
         }
+
+    public void fullIntakeIn(){
+        intake.setPower(1);
+        motorPower = 1;
+        servoIntake.setPower(1);
+    }
         public void intakeOutDistance(){
         intake.setPower(-1);
         motorPower = -1;
-        if (distanceSensor.getDistance(DistanceUnit.MM) <= 60){
-            servoIntake.setPower(1);
-        }
-        else if (distanceSensor.getDistance(DistanceUnit.MM )>60){
-            servoIntake.setPower(0);
-        }
+            if (isRightDistance()){
+                servoIntake.setPower(-1);
+            }
+            else if (!isRightDistance()){
+                servoIntake.setPower(0);
+            }
     }
         public void intakeRetainBalls(){
             intake.setPower(0.5);
@@ -139,6 +145,13 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
         }
 
         // --- Utility methods ---
+
+        public boolean isRightDistance(){
+            if( getDistanceMM()<= 53){
+                return true;
+            }
+            return false;
+        }
         private double rpmToTicksPerSecond(double rpm) {
             return (rpm / 60.0) * TICKS_PER_REV;
         }
@@ -163,6 +176,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
     public double getPower(){
         return motorPower;
     }
+
+
 
 
 

@@ -19,7 +19,7 @@ import java.util.List;
 
 
 
-@Autonomous(name = "NEW - HPS 9 Ball - SOMEWHAT COMPATABLE", group = "AA", preselectTeleOp = "v1Teleop")
+@Autonomous(name = "NEW - HPS 9 Ball - AP Super Close Only", group = "AA", preselectTeleOp = "v1Teleop")
 public class FarAuto  extends OpMode {
 
     private Follower follower;
@@ -277,7 +277,7 @@ public class FarAuto  extends OpMode {
             intake.setServoPower(1);
         }
 
-        boolean ball_is_present = (intake.getDistanceMM() <= 60);
+        boolean ball_is_present = (intake.isRightDistance());
 
         if (ball_was_present && !ball_is_present) {
             shotCounter++;
