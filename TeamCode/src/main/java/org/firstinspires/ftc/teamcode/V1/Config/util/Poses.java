@@ -142,7 +142,7 @@ public class Poses {
 
     // SHOOT_POSITION_GOAL_SIDE_2
     public static final AlliancePose shootPositionGoalSide2 = new AlliancePose(
-            new Pose(105.5, 105.5, Math.toRadians(47.5)),     // Red: X=144-48=96, Theta=180-132.5=47.5
+            new Pose(105.5, 105.5, Math.toRadians(40)),     // Red: X=144-48=96, Theta=180-132.5=47.5
             new Pose(38.5, 105.5, Math.toRadians(132.5))       // Blue
     );
 
@@ -160,7 +160,7 @@ public class Poses {
 
     // PICKUP_LINE_1
     public static final AlliancePose pickupLine1 = new AlliancePose(
-            new Pose(131.5, 84.0, Math.toRadians(0)),
+            new Pose(126, 80.5, Math.toRadians(0)),
             new Pose(13.5, 84, Math.toRadians(180))
     );
 
@@ -172,7 +172,7 @@ public class Poses {
 
     // PICKUP_LINE_2
     public static final AlliancePose pickupLine2 = new AlliancePose(
-            new Pose(136.0, 57.5, Math.toRadians(0)),
+            new Pose(131.0, 57.5, Math.toRadians(0)),
             new Pose(8, 57.5, Math.toRadians(180))
     );
 
@@ -202,7 +202,7 @@ public class Poses {
 
     // LINEUP_AT_GATE
     public static final AlliancePose lineupAtGate = new AlliancePose(
-            new Pose(128.0, 70.0, Math.toRadians(180)),
+            new Pose(124.0, 70.0, Math.toRadians(180)),
             new Pose(16, 70, Math.toRadians(0))
     );
 

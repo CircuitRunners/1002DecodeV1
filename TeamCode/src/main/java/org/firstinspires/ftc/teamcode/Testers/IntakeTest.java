@@ -11,7 +11,7 @@ import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
 
 //@Disabled
-@TeleOp(name = "IntakeTest")
+@TeleOp(name = "IntakeTest", group = "TEST")
 public class IntakeTest extends OpMode {
 
     private GamepadEx player1;

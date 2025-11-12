@@ -84,6 +84,7 @@ public class LimelightCamera {
         pidf.setPIDF(HEADING_KP_TX, HEADING_KI_TX, HEADING_KD_TX, HEADING_KF_TX);
 
         if (result != null && result.isValid()) {
+
             error = updateError();
             finalRotation = pidf.calculate(error);
 

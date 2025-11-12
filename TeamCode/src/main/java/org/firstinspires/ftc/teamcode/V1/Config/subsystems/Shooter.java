@@ -24,10 +24,10 @@ public class Shooter {
 //    public static double kD = 0.000;      // derivative gain
 //    public static double kF = 0.00025;      // feedforward ≈ 1 / maxTicksPerSec
 
-    public static double kP = 0.000011;       // proportional gain
+    public static double kP = 0.002;       // proportional gain
     public static double kI = 0.000;      // integral gain
-    public static double kD = 0.000;      // derivative gain
-    public static double kF = 0.00042;      // feedforward ≈ 1 / maxTicksPerSec
+    public static double kD = 0.0001;      // derivative gain
+    public static double kF = 0.000423;      // feedforward ≈ 1 / maxTicksPerSec  old is 0.00042
     public static double targetVelocity = 0; // desired speed (ticks/sec) // 1633og, 1110 new for close/auto spot
     private static double maxPower = 1.0;          // safety clamp
 
@@ -165,7 +165,7 @@ public class Shooter {
         // Safety check: ensure velocity doesn't go below the lowest tuned bound
         targetVelocity = Range.clip(targetVelocity, MIMIMUM_VELO, MAXIMUM_VELO);
 
-        return targetVelocity;
+        return targetVelocity -25;
     }
 
 

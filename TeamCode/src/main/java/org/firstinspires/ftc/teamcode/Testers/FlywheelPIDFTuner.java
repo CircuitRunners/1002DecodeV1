@@ -12,6 +12,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 import com.seattlesolvers.solverslib.controller.PIDFController;
 
+import org.firstinspires.ftc.teamcode.V1.Config.subsystems.Intake;
+
 import java.util.List;
 
 
@@ -57,30 +59,34 @@ import java.util.List;
 
 //@Disabled
 @Configurable
-@TeleOp
+@TeleOp(name = "FlywheelPIDFTuner", group = "TEST")
 public class FlywheelPIDFTuner extends OpMode {
 
     // ===== Dashboard Tunables =====
-    public static double kP = 0.01;       // proportional gain
+    public static double kP = 0.007;       // proportional gain
     public static double kI = 0.000;      // integral gain
     public static double kD = 0.000;      // derivative gain
-    public static double kF = 0.00025;      // feedforward ≈ 1 / maxTicksPerSec
+    public static double kF = 0.00042;      // feedforward ≈ 1 / maxTicksPerSec  old is 0.00042
     public static double targetVelocity = 1633; // desired speed (ticks/sec)
     public static double maxPower = 1.0;          // safety clamp
     public static final int TICKS_PER_REV = 537;
+
+    public static boolean intakeOn = false;
+    public static double cookedLoopTargetMS = 100;
 
     // ===== Hardware =====
     public DcMotorEx shooter1;
     public DcMotorEx shooter2;
     private PIDFController pidf;
+    private Intake intake;
     private ElapsedTime loopTimer = new ElapsedTime();
     // Removed lastTicks and lastTime since they're no longer needed for manual calculation
 
     @Override
     public void init() {
-        // Enable bulk reads for faster loops
-//        List<LynxModule> hubs = hardwareMap.getAll(LynxModule.class);
-//        for (LynxModule hub : hubs) hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
+       //  Enable bulk reads for faster loops
+        List<LynxModule> hubs = hardwareMap.getAll(LynxModule.class);
+        for (LynxModule hub : hubs) hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
 
 
         shooter1 = hardwareMap.get(DcMotorEx.class, "motor1");
@@ -95,6 +101,7 @@ public class FlywheelPIDFTuner extends OpMode {
 
         shooter1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         shooter2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        intake = new Intake(hardwareMap, telemetry);
 
         pidf = new PIDFController(kP, kI, kD, kF);
         pidf.setSetPoint(targetVelocity);
@@ -102,7 +109,15 @@ public class FlywheelPIDFTuner extends OpMode {
 
     @Override
     public void loop() {
-
+        for (LynxModule hub : hardwareMap.getAll(LynxModule.class)) {
+            hub.clearBulkCache();
+        }
+        if (intakeOn) {
+            intake.fullIntakeIn();
+        }
+        else if (!intakeOn){
+            intake.fullIntakeIdle();
+        }
         double rPM = shooter1.getVelocity();
         double rPM2 = shooter2.getVelocity();
 
@@ -119,23 +134,31 @@ public class FlywheelPIDFTuner extends OpMode {
         shooter1.setPower(output);
         shooter2.setPower(output);
 
-        /*
-        YALL SHOULD USE THIS INSTEAD
-        shooter1.setVelocity(output);
-        shooter2.setVelocity(output);
 
-         */
+        //YALL SHOULD USE THIS INSTEAD
+//        shooter1.setVelocity(output);
+//        shooter2.setVelocity(output);
+
+
 
 
         // --- Telemetry ---
-        telemetry.addData("Target Vel (tick/sec)", targetVelocity);
-       // telemetry.addData("Target RPM (rotation/min)", targetVelocity * 60.0 / TICKS_PER_REV);
-        telemetry.addData("Measured Vel  ()", rPM);
-        telemetry.addData("Motor Power", output);
-        telemetry.addData("Loop Time (ms)", loopTimer.milliseconds());
+        double loopTime = loopTimer.milliseconds();
+        telemetry.addData("Target Vel (ticks/s)", targetVelocity);
+        telemetry.addData("Measured Vel (ticks/s)", averageRPM);
+        telemetry.addData("Output Power", output);
+        telemetry.addData("Loop Time (ms)", loopTime);
+        telemetry.addData("Cooked Delay (ms)", cookedLoopTargetMS);
         telemetry.update();
 
-        // Reset the timer for the next loop iteration (optional, for loop time tracking)
+        // --- Cooked delay to simulate TeleOp lag (~100 ms total loop) ---
+        double remaining = cookedLoopTargetMS - loopTime;
+        if (remaining > 0) {
+            try {
+                Thread.sleep((long) remaining);
+            } catch (InterruptedException ignored) {}
+        }
+
         loopTimer.reset();
     }
 }

@@ -10,7 +10,7 @@ import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
 import org.firstinspires.ftc.teamcode.V1.Config.subsystems.Intake;
 
-@TeleOp
+@TeleOp (name = "Distance Sensor Test", group = "TEST")
 public class DistanceSensorTest  extends OpMode {
 
 

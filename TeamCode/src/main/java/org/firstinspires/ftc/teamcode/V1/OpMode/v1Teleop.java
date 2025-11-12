@@ -11,6 +11,7 @@ import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.HeadingInterpolator;
 import com.pedropathing.paths.Path;
 import com.pedropathing.paths.PathChain;
+import com.pedropathing.util.Timer;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
@@ -39,7 +40,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.function.Supplier;
 
-@TeleOp (name = "Quatro Teleop", group = "a")
+@TeleOp (name = "Quatro Teleop", group = "A")
 @Configurable
 public class v1Teleop extends OpMode {
 
@@ -72,6 +73,11 @@ public class v1Teleop extends OpMode {
     private boolean intakeIn = false;
     private final double MINIMUM_SHOOTER_VELO = 1600; //   tick/sec
     private final double MAXIMUM_SHOOTER_VELO = 1650; //   tick/sec
+
+    public static double distanceThreshold = 135;
+    Timer newTimer = new Timer();
+
+    private boolean timerStarted = false;
 
 
     private double desiredVeloRed = 0;
@@ -235,11 +241,11 @@ public class v1Teleop extends OpMode {
 
         //state machine control
         if (rightBumperJustPressed) {
-            stateMachine = (stateMachine + 1) % 2;
+            stateMachine = (stateMachine + 1) % 3;
         }
 
         if (leftBumperJustPressed) {
-            stateMachine = (stateMachine - 1) % 2;
+            stateMachine = (stateMachine - 1) % 3;
 
         }
 
@@ -253,12 +259,11 @@ public class v1Teleop extends OpMode {
 
         if (isHeadingLocked) {
 
-                if (limelight.getResult().isValid()) {
-//                    for (LLResultTypes.FiducialResult fr : limelight.getResult().getFiducialResults()) {
-//                        if (fr.getFiducialId() == 20 || fr.getFiducialId() == 24) {
+            if (limelight.getResult().isValid()) {
+                for (LLResultTypes.FiducialResult fr : limelight.getResult().getFiducialResults()) {
+                    if (fr.getFiducialId() == 20 || fr.getFiducialId() == 24) {
 
-                            finalRotation = -limelight.autoAlign();
-
+                        finalRotation = -limelight.autoAlign();
 
 
 //                            telemetry.addLine("Using Limelight Data for Heading Lock.");
@@ -266,12 +271,16 @@ public class v1Teleop extends OpMode {
 //                            //telemetry.addData("april tag id", fr.getFiducialId());
 //                            telemetry.addData("PID Rotation", limelightRotation);
 //                            telemetry.addData("PID Rotation from autoAlign()", limelight.autoAlign());
-                        }
-                        else {
-                            finalRotation = rotate;
-                        }
+                    } else {
+                        finalRotation = rotate;
+                    }
 
-                   }
+                }
+            }
+            else {
+                finalRotation = rotate;
+            }
+        }
 
 
         else {
@@ -352,10 +361,10 @@ public class v1Teleop extends OpMode {
 
                 if (intakeIn){
                     intake.intakeIn();
-                    if ( intake.getDistanceMM() <= 60){
+                    if ( intake.getDistanceMM() <= distanceThreshold){
                         intake.setServoPower(0);
                     }
-                    else if(intake.getDistanceMM() >60){
+                    else if(intake.getDistanceMM() >distanceThreshold){
                         intake.setServoPower(1);
                     }
                 }
@@ -365,12 +374,34 @@ public class v1Teleop extends OpMode {
                     if (leftTriggerValue > 0.25 && leftTriggerValue < 0.7){ // Replaced gamepad1.left_trigger
                         intake.intakeOutDistance();
                     }
+                    else if (leftTriggerValue > 0.75 ){ // Replaced gamepad1.left_trigger
+                        intake.fullIntakeIdle();
+                    }
                 }
 
 
                 break;
+
             case 1:
+                shooter.setLight(0.388);
+                if (!timerStarted) {
+                    newTimer.resetTimer();
+                    timerStarted = true;
+                }
+
+                if (newTimer.getElapsedTimeSeconds() <= 0.5) {
+                    intake.setServoPower(-1);
+                } else {
+                    intake.setServoPower(0);
+                    timerStarted = false; // reset for next time
+                    stateMachine++;
+
+                }
+                break;
+            case 2:
                 //score stuff
+
+                shooter.setLight(0.5);
 
                 if (!isIntakeInUse){
                     intake.intakeRetainBalls();
@@ -430,17 +461,18 @@ public class v1Teleop extends OpMode {
 
                 //  if (zoneChecker.isInsideShootingZone(currentPose.getX(DistanceUnit.INCH), currentPose.getY(DistanceUnit.INCH))) {
 
-                if (isRedAlliance){
-                    shooter.shoot(desiredVeloRed);
-                }
-                else if (!isRedAlliance){
-                    shooter.shoot(desiredVeloBlue);
-                }
+
+                    if (isRedAlliance) {
+                        shooter.shoot(desiredVeloRed);
+                    } else if (!isRedAlliance) {
+                        shooter.shoot(desiredVeloBlue);
+                    }
+
 
                 //shooting logic
                 if ((shooterVelo >= desiredVeloRed - 40) && (shooterVelo <= desiredVeloRed + 55)) { // Replaced shooter.getCurrentVelo()
                     isIntakeInUse = true;
-                    shooter.setLight(0.5);
+
 
                     if (rightTriggerValue > 0.2) { // Replaced gamepad1.right_trigger
                         intake.setServoPower(1);
@@ -465,9 +497,9 @@ public class v1Teleop extends OpMode {
                 intakeIn = false;
                 break;
         }
-//        if (stateMachine > 1){
-//            stateMachine = 0;
-//        }
+        if (stateMachine > 2){
+            stateMachine = 0;
+        }
         telemetry.addData("Position", data);
         telemetry.addData("FOLLOWER (Pedro) Position", followerData);
         telemetry.addData("State", stateMachine);
@@ -478,6 +510,8 @@ public class v1Teleop extends OpMode {
         telemetry.addData("Intake in use: ", isIntakeInUse? "Yes" : "No");
         telemetry.addData("Distance Sensor", intake.getDistanceMM());
         telemetry.addData("Distance isRIghtDIstance", intake.isRightDistance()? "yeah" : "nah");
+        telemetry.addData("Loop Time", timer.milliseconds());
+
 
 
 //        panelsTelemetry.debug("Position", data);
@@ -492,6 +526,8 @@ public class v1Teleop extends OpMode {
 
         panelsTelemetry.update(telemetry);
         telemetry.update();
+        timer.reset();
+
 
     }
 

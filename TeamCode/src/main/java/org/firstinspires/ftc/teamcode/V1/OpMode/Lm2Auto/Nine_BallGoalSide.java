@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.V1.OpMode.Lm2Auto;
 
+import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
@@ -16,7 +17,7 @@ import org.firstinspires.ftc.teamcode.V1.Config.util.Poses;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 import java.util.List;
-
+@Configurable
 @Autonomous(name = "NEW  - GS 9 Ball AP Friendly", group = "AA", preselectTeleOp = "v1Teleop")
 public class  Nine_BallGoalSide extends OpMode {
 
@@ -28,14 +29,9 @@ public class  Nine_BallGoalSide extends OpMode {
     private int pathState;
     private int shotCounter = 0;
 
-    private double lastShooterVelo = 0;
-    private boolean shotDetected = false;
-    private final double DROP_THRESHOLD = 45;      // RPM drop to count as a shot (tune this)
-    private final double RECOVER_THRESHOLD = 20;   // How close to target before re-arming detection
-    private final double SHOOTER_READY_THRESHOLD = 0.8; // 80% of target before enabling detection
-    private boolean ball_was_present = true;
+    private boolean ball_was_present = false;
 
-    private final double shooterDesiredVelo = 1000;
+    private static final double shooterDesiredVelo = 1060;
     private Poses.Alliance lastKnownAlliance = null;
 
 
@@ -72,7 +68,7 @@ public class  Nine_BallGoalSide extends OpMode {
                 .build();
         travelBackToShoot2 = follower.pathBuilder()
                 .addPath(new BezierCurve(Poses.get(Poses.pickupLine2), Poses.get(Poses.line2ControlPoint), Poses.get(Poses.shootPositionGoalSide2)))
-                .setLinearHeadingInterpolation(Poses.get(Poses.pickupLine2).getHeading(), Poses.get(Poses.shootPositionGoalSide2).getHeading(),0.85,0.4)
+                .setLinearHeadingInterpolation(Poses.get(Poses.pickupLine2).getHeading(), Poses.get(Poses.shootPositionGoalSide2).getHeading(),0.8)
                 .build();
 
         intake3 = follower.pathBuilder()
@@ -92,6 +88,7 @@ public class  Nine_BallGoalSide extends OpMode {
 
 
     public void autonomousPathUpdate() {
+        follower.setMaxPower(0.8);
         switch (pathState) {
             case 0: // Initial Travel to Shoot Position
                 intake.intakeRetainBalls();
@@ -103,8 +100,7 @@ public class  Nine_BallGoalSide extends OpMode {
                 break;
             case 1: // Shooter Shoot
                 if (!follower.isBusy()) {
-                    setPathState();
-                    //shootBalls(shooterDesiredVelo);
+                    shootBalls(shooterDesiredVelo,4);
                 }
                 break;
             case 2: //go to intake
@@ -118,6 +114,12 @@ public class  Nine_BallGoalSide extends OpMode {
                 }
                 break;
             case 3: //go to shoot
+                if (pathTimer.getElapsedTimeSeconds() <= 0.5) {
+                    intake.setServoPower(-1);
+                } else {
+                    intake.setServoPower(0);
+
+                }
 
                 if (!follower.isBusy()) {
                     follower.followPath(travelBackToShoot1, true);
@@ -127,8 +129,8 @@ public class  Nine_BallGoalSide extends OpMode {
                 break;
             case 4: //shoot
                 if (!follower.isBusy()) {
-                    setPathState();
-                   // shootBalls(shooterDesiredVelo);
+                    ;
+                   shootBalls(shooterDesiredVelo,3);
                 }
                 break;
             case 5: //go to intake
@@ -142,7 +144,12 @@ public class  Nine_BallGoalSide extends OpMode {
                 }
                 break;
             case 6: //go to shoot
+                if (pathTimer.getElapsedTimeSeconds() <= 0.5) {
+                intake.setServoPower(-1);
+            } else {
+                intake.setServoPower(0);
 
+            }
                 if (!follower.isBusy()) {
                     intake.intakeRetainBalls();
                     follower.followPath(travelBackToShoot2, true);
@@ -152,8 +159,8 @@ public class  Nine_BallGoalSide extends OpMode {
                 break;
             case 7: //shoot
                 if (!follower.isBusy()) {
-                    setPathState();
-                   // shootBalls(shooterDesiredVelo);
+
+                    shootBalls(shooterDesiredVelo,3);
                 }
                 break;
 
@@ -267,6 +274,7 @@ public class  Nine_BallGoalSide extends OpMode {
         telemetry.addLine("");
         telemetry.addData("Alliance Set", Poses.getAlliance());
         telemetry.addData("Start Pose", Poses.get(Poses.startPoseGoalSide));
+        telemetry.addData("Distance Sensor", intake.getDistanceMM());
         telemetry.update();
     }
 
@@ -277,7 +285,7 @@ public class  Nine_BallGoalSide extends OpMode {
         setPathState(0);
     }
 
-    public void shootBalls(double velo){
+    public void shootBalls(double velo, int numShots){
         shooter.shoot(velo);
         double currentVelo = shooter.getCurrentVelo();
 
@@ -296,7 +304,11 @@ public class  Nine_BallGoalSide extends OpMode {
 
         ball_was_present = ball_is_present;
 
-        if (shotCounter >= 3 || pathTimer.getElapsedTimeSeconds() >= 7) {
+        if (shotCounter >= numShots  && pathTimer.getElapsedTimeSeconds() <=3){
+            shotCounter = 0;
+        }
+
+        if (shotCounter >= numShots || pathTimer.getElapsedTimeSeconds() >= 5) {
             shooter.stopShooter();
             intake.setServoPower(0);
             intake.fullIntakeIdle();

@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.V1.OpMode.Lm2Auto;
 
+import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
@@ -18,7 +19,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import java.util.List;
 
 
-
+@Configurable
 @Autonomous(name = "NEW - HPS 9 Ball - AP Super Close Only", group = "AA", preselectTeleOp = "v1Teleop")
 public class FarAuto  extends OpMode {
 
@@ -30,14 +31,9 @@ public class FarAuto  extends OpMode {
     private int pathState;
     private int shotCounter = 0;
 
-    private double lastShooterVelo = 0;
-    private boolean shotDetected = false;
-    private final double DROP_THRESHOLD = 45;      // RPM drop to count as a shot (tune this)
-    private final double RECOVER_THRESHOLD = 20;   // How close to target before re-arming detection
-    private final double SHOOTER_READY_THRESHOLD = 0.8; // 80% of target before enabling detection
-    private boolean ball_was_present = true;
+    private boolean ball_was_present = false;
 
-    private final double shooterDesiredVelo = 1000;
+    private static final double shooterDesiredVelo = 1060;
     private Poses.Alliance lastKnownAlliance = null;
 
 
@@ -86,6 +82,7 @@ public class FarAuto  extends OpMode {
 
 
     public void autonomousPathUpdate() {
+        follower.setMaxPower(0.8);
         switch (pathState) {
             case 0: // Initial Travel to Shoot Position
                 intake.intakeRetainBalls();
@@ -97,7 +94,7 @@ public class FarAuto  extends OpMode {
                 break;
             case 1: // Shooter Shoot
                 if (!follower.isBusy()) {
-                    shootBalls(shooterDesiredVelo);
+                    shootBalls(shooterDesiredVelo,4);
                 }
                 break;
             case 2: //go to intake
@@ -110,7 +107,12 @@ public class FarAuto  extends OpMode {
                 }
                 break;
             case 3: //go to shoot
+                if (pathTimer.getElapsedTimeSeconds() <= 0.5) {
+                    intake.setServoPower(-1);
+                } else {
+                    intake.setServoPower(0);
 
+                }
                 if (!follower.isBusy()) {
                     intake.intakeRetainBalls();
                     follower.followPath(travelBackToShoot3, true);
@@ -120,7 +122,7 @@ public class FarAuto  extends OpMode {
                 break;
             case 4: //shoot
                 if (!follower.isBusy()) {
-                    shootBalls(shooterDesiredVelo);
+                    shootBalls(shooterDesiredVelo,3);
                 }
                 break;
             case 5: //go to intake
@@ -133,7 +135,12 @@ public class FarAuto  extends OpMode {
                 }
                 break;
             case 6: //go to shoot
+                if (pathTimer.getElapsedTimeSeconds() <= 0.5) {
+                    intake.setServoPower(-1);
+                } else {
+                    intake.setServoPower(0);
 
+                }
                 if (!follower.isBusy()) {
                     intake.intakeRetainBalls();
                     follower.followPath(travelBackToShoot4, true);
@@ -143,7 +150,7 @@ public class FarAuto  extends OpMode {
                 break;
             case 7: //shoot
                 if (!follower.isBusy()) {
-                    shootBalls(shooterDesiredVelo);
+                    shootBalls(shooterDesiredVelo,3);
                 }
                 break;
             case 8:
@@ -256,6 +263,7 @@ public class FarAuto  extends OpMode {
         telemetry.addLine("");
         telemetry.addData("Alliance Set", Poses.getAlliance());
         telemetry.addData("Start Pose", Poses.get(Poses.startPoseGoalSide));
+        telemetry.addData("Distance Sensor", intake.getDistanceMM());
         telemetry.update();
     }
 
@@ -266,7 +274,7 @@ public class FarAuto  extends OpMode {
         setPathState(0);
     }
 
-    public void shootBalls(double velo){
+    public void shootBalls(double velo, int numShots){
         shooter.shoot(velo);
         double currentVelo = shooter.getCurrentVelo();
 
@@ -285,7 +293,11 @@ public class FarAuto  extends OpMode {
 
         ball_was_present = ball_is_present;
 
-        if (shotCounter >= 3 || pathTimer.getElapsedTimeSeconds() >= 7) {
+        if (shotCounter >= numShots  && pathTimer.getElapsedTimeSeconds() <=3){
+            shotCounter = 0;
+        }
+
+        if (shotCounter >= numShots || pathTimer.getElapsedTimeSeconds() >= 5) {
             shooter.stopShooter();
             intake.setServoPower(0);
             intake.fullIntakeIdle();

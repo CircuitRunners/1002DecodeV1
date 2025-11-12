@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.V1.OpMode.Lm2Auto;
 
+import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
@@ -22,7 +23,7 @@ import org.firstinspires.ftc.teamcode.V1.Config.util.Poses;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 import java.util.List;
-
+@Configurable
 @Autonomous(name = "NEW - GS 12 Ball - AP Far Only", group = "AA", preselectTeleOp = "v1Teleop")
 public class MidLadderMenace extends OpMode {
 
@@ -34,14 +35,10 @@ public class MidLadderMenace extends OpMode {
     private int pathState;
     private int shotCounter = 0;
 
-    private double lastShooterVelo = 0;
-    private boolean shotDetected = false;
-    private final double DROP_THRESHOLD = 45;      // RPM drop to count as a shot (tune this)
-    private final double RECOVER_THRESHOLD = 20;   // How close to target before re-arming detection
-    private final double SHOOTER_READY_THRESHOLD = 0.8; // 80% of target before enabling detection
-    private boolean ball_was_present = true;
 
-    private double shooterDesiredVelo = 1000;
+    private boolean ball_was_present = false;
+
+    private static final double shooterDesiredVelo = 1060;
     private Poses.Alliance lastKnownAlliance = null;
 
 
@@ -81,7 +78,7 @@ public class MidLadderMenace extends OpMode {
                 .build();
         travelBackToShoot2 = follower.pathBuilder()
                 .addPath(new BezierCurve(Poses.get(Poses.pickupLine2), Poses.get(Poses.line2ControlPoint), Poses.get(Poses.shootPositionGoalSide)))
-                .setLinearHeadingInterpolation(Poses.get(Poses.pickupLine2).getHeading(), Poses.get(Poses.shootPositionGoalSide).getHeading(),0.85,0.4)
+                .setLinearHeadingInterpolation(Poses.get(Poses.pickupLine2).getHeading(), Poses.get(Poses.shootPositionGoalSide).getHeading(),0.85)
                 .build();
 
         intake3 = follower.pathBuilder()
@@ -102,6 +99,7 @@ public class MidLadderMenace extends OpMode {
 
 
     public void autonomousPathUpdate() {
+        follower.setMaxPower(0.8);
         switch (pathState) {
             case 0: // Initial Travel to Shoot Position
                 intake.intakeRetainBalls();
@@ -114,7 +112,7 @@ public class MidLadderMenace extends OpMode {
             case 1: // Shooter Shoot
                 if (!follower.isBusy()) {
                     //updateCoordinates();
-                    shootBalls(shooterDesiredVelo);
+                    shootBalls(shooterDesiredVelo,4);
                 }
                 break;
             case 2: //go to intake
@@ -134,6 +132,12 @@ public class MidLadderMenace extends OpMode {
                 }
                 break;
             case 4: //go to shoot
+                if (pathTimer.getElapsedTimeSeconds() <= 0.5) {
+                    intake.setServoPower(-1);
+                } else {
+                    intake.setServoPower(0);
+
+                }
 
                 if (!follower.isBusy()) {
                     follower.followPath(travelBackToShoot1, true);
@@ -143,7 +147,7 @@ public class MidLadderMenace extends OpMode {
                 break;
             case 5: //shoot
                 if (!follower.isBusy()) {
-                    shootBalls(shooterDesiredVelo);
+                    shootBalls(shooterDesiredVelo,3);
                 }
                 break;
             case 6: //go to intake
@@ -156,7 +160,12 @@ public class MidLadderMenace extends OpMode {
                 }
                 break;
             case 7: //go to shoot
+                if (pathTimer.getElapsedTimeSeconds() <= 0.5) {
+                    intake.setServoPower(-1);
+                } else {
+                    intake.setServoPower(0);
 
+                }
                 if (!follower.isBusy()) {
                     intake.intakeRetainBalls();
                     follower.followPath(travelBackToShoot2, true);
@@ -166,7 +175,7 @@ public class MidLadderMenace extends OpMode {
                 break;
             case 8: //shoot
                 if (!follower.isBusy()) {
-                    shootBalls(shooterDesiredVelo);
+                    shootBalls(shooterDesiredVelo,3);
                 }
                 break;
             case 9: //go to intake
@@ -179,7 +188,12 @@ public class MidLadderMenace extends OpMode {
                 }
                 break;
             case 10: //go to shoot
+                if (pathTimer.getElapsedTimeSeconds() <= 0.5) {
+                    intake.setServoPower(-1);
+                } else {
+                    intake.setServoPower(0);
 
+                }
                 if (!follower.isBusy()) {
                     intake.intakeRetainBalls();
                     follower.followPath(travelBackToShoot3, true);
@@ -189,7 +203,7 @@ public class MidLadderMenace extends OpMode {
                 break;
             case 11: //shoot
                 if (!follower.isBusy()) {
-                    shootBalls(shooterDesiredVelo);
+                    shootBalls(shooterDesiredVelo,3);
                 }
                 break;
             case 12:
@@ -302,6 +316,7 @@ public class MidLadderMenace extends OpMode {
         telemetry.addLine("");
         telemetry.addData("Alliance Set", Poses.getAlliance());
         telemetry.addData("Start Pose", Poses.get(Poses.startPoseGoalSide));
+        telemetry.addData("Distance Sensor", intake.getDistanceMM());
         telemetry.update();
     }
 
@@ -312,7 +327,7 @@ public class MidLadderMenace extends OpMode {
         setPathState(0);
     }
 
-    public void shootBalls(double velo){
+    public void shootBalls(double velo, int numShots){
         shooter.shoot(velo);
         double currentVelo = shooter.getCurrentVelo();
 
@@ -331,13 +346,19 @@ public class MidLadderMenace extends OpMode {
 
         ball_was_present = ball_is_present;
 
-        if (shotCounter >= 3 || pathTimer.getElapsedTimeSeconds() >= 7) {
+        if (shotCounter >= numShots  && pathTimer.getElapsedTimeSeconds() <=3){
+            shotCounter = 0;
+        }
+
+        if (shotCounter >= numShots || pathTimer.getElapsedTimeSeconds() >= 5) {
             shooter.stopShooter();
             intake.setServoPower(0);
             intake.fullIntakeIdle();
             shotCounter = 0;
             setPathState();
         }
+
+
     }
 
     public void updateCoordinates(){

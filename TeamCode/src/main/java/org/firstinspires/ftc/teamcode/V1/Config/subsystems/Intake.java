@@ -87,13 +87,13 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
         }
 
         public void intakeOut(){
-            intake.setPower(-1);
-            motorPower = -1;
+            intake.setPower(-0.4);
+            motorPower = -0.4;
         }
 
         public void fullIntakeOut(){
-            intake.setPower(-1);
-            motorPower = -1;
+            intake.setPower(-0.4);
+            motorPower = -0.1;
             servoIntake.setPower(-1);
         }
 
@@ -103,8 +103,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
         servoIntake.setPower(1);
     }
         public void intakeOutDistance(){
-        intake.setPower(-1);
-        motorPower = -1;
+        intake.setPower(-0.4);
+        motorPower = -0.4;
             if (isRightDistance()){
                 servoIntake.setPower(-1);
             }
@@ -147,7 +147,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
         // --- Utility methods ---
 
         public boolean isRightDistance(){
-            if( getDistanceMM()<= 53){
+            if( getDistanceMM()<= 70){
                 return true;
             }
             return false;

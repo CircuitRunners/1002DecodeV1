@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.V1.OpMode.Lm2Auto;
 
+import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
@@ -17,6 +18,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 import java.util.List;
 
+    @Configurable
     @Autonomous(name = "NEW  - GS 9 Ball Open Gate AP Friendly", group = "AA", preselectTeleOp = "v1Teleop")
     public class Nine_BallGoalSideOpenGate extends OpMode {
 
@@ -28,24 +30,18 @@ import java.util.List;
         private int pathState;
         private int shotCounter = 0;
 
-        private double lastShooterVelo = 0;
-        private boolean shotDetected = false;
-        private final double DROP_THRESHOLD = 45;      // RPM drop to count as a shot (tune this)
-        private final double RECOVER_THRESHOLD = 20;   // How close to target before re-arming detection
-        private final double SHOOTER_READY_THRESHOLD = 0.8; // 80% of target before enabling detection
-        private boolean ball_was_present = true;
 
-        private final double shooterDesiredVelo = 1000;
+        private boolean ball_was_present = false;
+
+        private static final double shooterDesiredVelo = 1060;
         private Poses.Alliance lastKnownAlliance = null;
-
-
 
 
         // Tolerance for alignment in radians (approx. 2 degrees)
         // private static final double ALIGN_THRESHOLD = Math.toRadians(2);
 
 
-        private PathChain travelToShoot, openGate, intake1, travelBackToShoot1, intake2, travelBackToShoot2,  intake3, travelBackToShoot3, travelToGate;
+        private PathChain travelToShoot, openGate, intake1, travelBackToShoot1, intake2, travelBackToShoot2, intake3, travelBackToShoot3, travelToGate;
 
         public void buildPaths() {
             // --- Alliance-Aware Path Generation ---
@@ -57,8 +53,8 @@ import java.util.List;
 
             // Path 2: Travel from Shooting Position to Intake Position
             intake1 = follower.pathBuilder()
-                    .addPath(new BezierCurve(Poses.get(Poses.shootPositionGoalSide2), Poses.get(Poses.controlPointLine1ForShootPose2),Poses.get(Poses.pickupLine1)))
-                    .setLinearHeadingInterpolation(Poses.get(Poses.shootPositionGoalSide2).getHeading(), Poses.get(Poses.pickupLine1).getHeading(),0.25)
+                    .addPath(new BezierCurve(Poses.get(Poses.shootPositionGoalSide2), Poses.get(Poses.controlPointLine1ForShootPose2), Poses.get(Poses.pickupLine1)))
+                    .setLinearHeadingInterpolation(Poses.get(Poses.shootPositionGoalSide2).getHeading(), Poses.get(Poses.pickupLine1).getHeading(), 0.25)
                     .build();
 
             openGate = follower.pathBuilder()
@@ -72,17 +68,17 @@ import java.util.List;
                     .setLinearHeadingInterpolation(Poses.get(Poses.pickupLine1).getHeading(), Poses.get(Poses.shootPositionGoalSide2).getHeading())
                     .build();
             intake2 = follower.pathBuilder()
-                    .addPath(new BezierCurve(Poses.get(Poses.shootPositionGoalSide2), Poses.get(Poses.line2ControlPoint),Poses.get(Poses.pickupLine2)))
-                    .setLinearHeadingInterpolation(Poses.get(Poses.shootPositionGoalSide2).getHeading(), Poses.get(Poses.pickupLine2).getHeading(),0.45)
+                    .addPath(new BezierCurve(Poses.get(Poses.shootPositionGoalSide2), Poses.get(Poses.line2ControlPoint), Poses.get(Poses.pickupLine2)))
+                    .setLinearHeadingInterpolation(Poses.get(Poses.shootPositionGoalSide2).getHeading(), Poses.get(Poses.pickupLine2).getHeading(), 0.45)
                     .build();
             travelBackToShoot2 = follower.pathBuilder()
                     .addPath(new BezierCurve(Poses.get(Poses.pickupLine2), Poses.get(Poses.line2ControlPoint), Poses.get(Poses.shootPositionGoalSide2)))
-                    .setLinearHeadingInterpolation(Poses.get(Poses.pickupLine2).getHeading(), Poses.get(Poses.shootPositionGoalSide2).getHeading(),0.85,0.4)
+                    .setLinearHeadingInterpolation(Poses.get(Poses.pickupLine2).getHeading(), Poses.get(Poses.shootPositionGoalSide2).getHeading(), 0.85)
                     .build();
 
             intake3 = follower.pathBuilder()
-                    .addPath(new BezierCurve(Poses.get(Poses.shootPositionGoalSide2), Poses.get(Poses.Line3ControlPoint),Poses.get(Poses.pickupLine3)))
-                    .setLinearHeadingInterpolation(Poses.get(Poses.shootPositionGoalSide2).getHeading(), Poses.get(Poses.pickupLine3).getHeading(),0.45)
+                    .addPath(new BezierCurve(Poses.get(Poses.shootPositionGoalSide2), Poses.get(Poses.Line3ControlPoint), Poses.get(Poses.pickupLine3)))
+                    .setLinearHeadingInterpolation(Poses.get(Poses.shootPositionGoalSide2).getHeading(), Poses.get(Poses.pickupLine3).getHeading(), 0.45)
                     .build();
 
             travelBackToShoot3 = follower.pathBuilder()
@@ -97,6 +93,7 @@ import java.util.List;
 
 
         public void autonomousPathUpdate() {
+            follower.setMaxPower(0.8);
             switch (pathState) {
                 case 0: // Initial Travel to Shoot Position
                     intake.intakeRetainBalls();
@@ -108,7 +105,7 @@ import java.util.List;
                     break;
                 case 1: // Shooter Shoot
                     if (!follower.isBusy()) {
-                        shootBalls(shooterDesiredVelo);
+                        shootBalls(shooterDesiredVelo,4);
                     }
                     break;
                 case 2: //go to intake
@@ -128,7 +125,12 @@ import java.util.List;
                     }
                     break;
                 case 4: //go to shoot
+                    if (pathTimer.getElapsedTimeSeconds() <= 0.5) {
+                        intake.setServoPower(-1);
+                    } else {
+                        intake.setServoPower(0);
 
+                    }
                     if (!follower.isBusy()) {
                         follower.followPath(travelBackToShoot1, true);
 
@@ -137,7 +139,7 @@ import java.util.List;
                     break;
                 case 5: //shoot
                     if (!follower.isBusy()) {
-                        shootBalls(shooterDesiredVelo);
+                        shootBalls(shooterDesiredVelo,3);
                     }
                     break;
                 case 6: //go to intake
@@ -150,7 +152,12 @@ import java.util.List;
                     }
                     break;
                 case 7: //go to shoot
+                    if (pathTimer.getElapsedTimeSeconds() <= 0.5) {
+                        intake.setServoPower(-1);
+                    } else {
+                        intake.setServoPower(0);
 
+                    }
                     if (!follower.isBusy()) {
                         intake.intakeRetainBalls();
                         follower.followPath(travelBackToShoot2, true);
@@ -160,7 +167,7 @@ import java.util.List;
                     break;
                 case 8: //shoot
                     if (!follower.isBusy()) {
-                        shootBalls(shooterDesiredVelo);
+                        shootBalls(shooterDesiredVelo,3);
                     }
                     break;
                 case 9: //go to intake
@@ -174,6 +181,12 @@ import java.util.List;
                     break;
                 case 10: //go to shoot
 
+                    if (pathTimer.getElapsedTimeSeconds() <= 0.5) {
+                        intake.setServoPower(-1);
+                    } else {
+                        intake.setServoPower(0);
+
+                    }
                     if (!follower.isBusy()) {
                         intake.intakeRetainBalls();
                         follower.followPath(travelBackToShoot3, true);
@@ -183,12 +196,12 @@ import java.util.List;
                     break;
                 case 11: //shoot
                     if (!follower.isBusy()) {
-                        shootBalls(shooterDesiredVelo);
+                        shootBalls(shooterDesiredVelo,3);
                     }
                     break;
                 case 12:
                     if (!follower.isBusy()) {
-                        follower.followPath(travelToGate,true);
+                        follower.followPath(travelToGate, true);
                         setPathState();
                     }
                     break;
@@ -202,8 +215,6 @@ import java.util.List;
                     }
             }
         }
-
-
 
 
         public void setPathState(int pState) {
@@ -230,8 +241,6 @@ import java.util.List;
             // telemetry.addData("Shooter Velo: ", shooter.getCurrentVelo());
 
             telemetry.update();
-
-
 
 
             autonomousPathUpdate();
@@ -279,19 +288,24 @@ import java.util.List;
 
 
             Poses.updateAlliance(gamepad1, telemetry);
-            follower.setStartingPose(Poses.get(Poses.startPoseGoalSide));
+
 
             if (Poses.getAlliance() != lastKnownAlliance) {
-
+                follower.setStartingPose(Poses.get(Poses.startPoseGoalSide));
                 buildPaths();
 
                 lastKnownAlliance = Poses.getAlliance();
                 telemetry.addData("STATUS", "Paths Rebuilt for " + lastKnownAlliance);
+                telemetry.addLine("");
             }
 
 
+            telemetry.addLine("--- Alliance Selector ---");
+            telemetry.addLine("D-pad UP → RED | D-pad DOWN → BLUE");
+            telemetry.addLine("");
             telemetry.addData("Alliance Set", Poses.getAlliance());
             telemetry.addData("Start Pose", Poses.get(Poses.startPoseGoalSide));
+            telemetry.addData("Distance Sensor", intake.getDistanceMM());
             telemetry.update();
         }
 
@@ -302,7 +316,7 @@ import java.util.List;
             setPathState(0);
         }
 
-        public void shootBalls(double velo){
+        public void shootBalls(double velo, int numShots) {
             shooter.shoot(velo);
             double currentVelo = shooter.getCurrentVelo();
 
@@ -321,7 +335,11 @@ import java.util.List;
 
             ball_was_present = ball_is_present;
 
-            if (shotCounter >= 3 || pathTimer.getElapsedTimeSeconds() >= 7) {
+            if (shotCounter >= numShots && pathTimer.getElapsedTimeSeconds() <= 3) {
+                shotCounter = 0;
+            }
+
+            if (shotCounter >= numShots || pathTimer.getElapsedTimeSeconds() >= 5) {
                 shooter.stopShooter();
                 intake.setServoPower(0);
                 intake.fullIntakeIdle();
@@ -331,8 +349,6 @@ import java.util.List;
 
 
         }
-
-
     }
 
 
