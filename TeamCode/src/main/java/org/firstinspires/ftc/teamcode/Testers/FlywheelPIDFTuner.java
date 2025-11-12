@@ -110,7 +110,7 @@ public class FlywheelPIDFTuner extends OpMode {
 
         // --- Update gains and setpoint ---
         pidf.setPIDF(kP, kI, kD, kF);
-        pidf.setSetPoint(targetVelocity);
+        //pidf.setSetPoint(targetVelocity);
 
         // --- Compute output and send to motor ---
         // 'rPM' (the measured velocity) is passed to the custom PIDF controller.
@@ -118,6 +118,14 @@ public class FlywheelPIDFTuner extends OpMode {
         output = Range.clip(output, 0, maxPower);
         shooter1.setPower(output);
         shooter2.setPower(output);
+
+        /*
+        YALL SHOULD USE THIS INSTEAD
+        shooter1.setVelocity(output);
+        shooter2.setVelocity(output);
+
+         */
+
 
         // --- Telemetry ---
         telemetry.addData("Target Vel (tick/sec)", targetVelocity);
