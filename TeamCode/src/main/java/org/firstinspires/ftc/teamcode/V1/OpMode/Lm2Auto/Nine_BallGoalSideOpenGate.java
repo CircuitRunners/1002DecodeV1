@@ -34,7 +34,13 @@ import java.util.List;
         private boolean ball_was_present = false;
 
         private static final double shooterDesiredVelo = 1060;
+        private static final double shooterDesiredDipVelo = 955;
         private Poses.Alliance lastKnownAlliance = null;
+        boolean shooterHasSpunUp = false;
+        boolean shooterBelow = false;;
+
+        long lastDipTime = 0;
+        final long DIP_COOLDOWN_MS = 120;  // minimum time between shots
 
 
         // Tolerance for alignment in radians (approx. 2 degrees)
@@ -105,11 +111,11 @@ import java.util.List;
                     break;
                 case 1: // Shooter Shoot
                     if (!follower.isBusy()) {
-                        shootBalls(shooterDesiredVelo,4);
+                        shootBalls(shooterDesiredVelo,3,10,shooterDesiredDipVelo);
                     }
                     break;
                 case 2: //go to intake
-                    intake.intakeInDistance();
+                    intake.intakeIn();
 
                     if (!follower.isBusy()) {
 
@@ -119,7 +125,8 @@ import java.util.List;
                     break;
                 case 3:
                     if (!follower.isBusy()) {
-                        intake.intakeRetainBalls();
+                        intake.intakeIn();
+                        //intake.intakeRetainBalls();
                         follower.followPath(openGate, true);
                         setPathState();
                     }
@@ -139,11 +146,11 @@ import java.util.List;
                     break;
                 case 5: //shoot
                     if (!follower.isBusy()) {
-                        shootBalls(shooterDesiredVelo,3);
+                        shootBalls(shooterDesiredVelo,3,6,shooterDesiredDipVelo);
                     }
                     break;
                 case 6: //go to intake
-                    intake.intakeInDistance();
+                    intake.intakeIn();
 
                     if (!follower.isBusy()) {
 
@@ -159,7 +166,8 @@ import java.util.List;
 
                     }
                     if (!follower.isBusy()) {
-                        intake.intakeRetainBalls();
+                        intake.intakeIn();
+                        //intake.intakeRetainBalls();
                         follower.followPath(travelBackToShoot2, true);
 
                         setPathState();
@@ -167,39 +175,10 @@ import java.util.List;
                     break;
                 case 8: //shoot
                     if (!follower.isBusy()) {
-                        shootBalls(shooterDesiredVelo,3);
+                        shootBalls(shooterDesiredVelo,3,6,shooterDesiredDipVelo);
                     }
                     break;
-                case 9: //go to intake
-                    intake.intakeInDistance();
-
-                    if (!follower.isBusy()) {
-
-                        follower.followPath(intake3, true);
-                        setPathState();
-                    }
-                    break;
-                case 10: //go to shoot
-
-                    if (pathTimer.getElapsedTimeSeconds() <= 0.5) {
-                        intake.setServoPower(-1);
-                    } else {
-                        intake.setServoPower(0);
-
-                    }
-                    if (!follower.isBusy()) {
-                        intake.intakeRetainBalls();
-                        follower.followPath(travelBackToShoot3, true);
-
-                        setPathState();
-                    }
-                    break;
-                case 11: //shoot
-                    if (!follower.isBusy()) {
-                        shootBalls(shooterDesiredVelo,3);
-                    }
-                    break;
-                case 12:
+                case 9:
                     if (!follower.isBusy()) {
                         follower.followPath(travelToGate, true);
                         setPathState();
@@ -316,39 +295,75 @@ import java.util.List;
             setPathState(0);
         }
 
-        public void shootBalls(double velo, int numShots) {
-            shooter.shoot(velo);
+        public void shootBalls(double targetVelo, int numShots, int timerValue, double veloDipValue) {
+
+            shooter.shoot(targetVelo);
             double currentVelo = shooter.getCurrentVelo();
 
-            boolean isShooterReady = currentVelo >= velo - 25 && currentVelo <= velo + 55;
+            long now = System.currentTimeMillis();
 
-            if (isShooterReady) {
+
+            if (currentVelo >= veloDipValue) {
+                shooterHasSpunUp = true;
+            }
+
+
+            if (shooterHasSpunUp &&
+                    currentVelo < veloDipValue &&
+                    !shooterBelow &&
+                    now - lastDipTime > DIP_COOLDOWN_MS) {
+
+                shotCounter++;
+                shooterBelow = true;
+                lastDipTime = now;
+            }
+
+            if (currentVelo >= veloDipValue) {
+                shooterBelow = false;
+            }
+
+            // ------------------------------------
+            // 3) Feed balls when shooter ready
+            // ------------------------------------
+            boolean ready = currentVelo >= targetVelo - 25 && currentVelo <= targetVelo + 55;
+
+            if (ready) {
                 intake.intakeIn();
                 intake.setServoPower(1);
             }
-
-            boolean ball_is_present = (intake.isRightDistance());
-
-            if (ball_was_present && !ball_is_present) {
-                shotCounter++;
+            else if (!ready){
+                intake.intakeRetainBalls();
+                intake.setServoPower(0);
             }
 
-            ball_was_present = ball_is_present;
 
-            if (shotCounter >= numShots && pathTimer.getElapsedTimeSeconds() <= 3) {
-                shotCounter = 0;
+            if (shotCounter >= numShots) {
+
+                if (currentVelo >= veloDipValue) {
+                    shooter.stopShooter();
+                    intake.setServoPower(0);
+                    intake.fullIntakeIdle();
+
+                    shotCounter = 0;
+                    shooterHasSpunUp = false;
+
+                    setPathState();
+                    return;
+                }
             }
 
-            if (shotCounter >= numShots || pathTimer.getElapsedTimeSeconds() >= 5) {
+
+            if (pathTimer.getElapsedTimeSeconds() >= timerValue) {
                 shooter.stopShooter();
                 intake.setServoPower(0);
                 intake.fullIntakeIdle();
+
                 shotCounter = 0;
+                shooterHasSpunUp = false;
                 setPathState();
             }
-
-
         }
+
     }
 
 

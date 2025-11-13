@@ -33,8 +33,14 @@ public class FarAuto  extends OpMode {
 
     private boolean ball_was_present = false;
 
-    private static final double shooterDesiredVelo = 1060;
+    private static final double shooterDesiredVelo = 1280;
+    private static final double shooterDesiredDipVelo = 1192;
     private Poses.Alliance lastKnownAlliance = null;
+    boolean shooterHasSpunUp = false;
+    boolean shooterBelow = false;;
+
+    long lastDipTime = 0;
+    final long DIP_COOLDOWN_MS = 120;  // minimum time between shots
 
 
 
@@ -64,12 +70,12 @@ public class FarAuto  extends OpMode {
                 .build();
 
         intake4 = follower.pathBuilder()
-                .addPath(new BezierCurve(Poses.get(Poses.shootPositionGoalSide), Poses.get(Poses.Line4ControlPoint),Poses.get(Poses.pickupLine4)))
+                .addPath(new BezierCurve(Poses.get(Poses.shootPositionGoalSide), Poses.get(Poses.Line4ControlPointFar1),Poses.get(Poses.Line4ControlPointFar2),Poses.get(Poses.pickupLine4)))
                 .setLinearHeadingInterpolation(Poses.get(Poses.shootPositionGoalSide).getHeading(), Poses.get(Poses.pickupLine4).getHeading(),0.45)
                 .build();
 
         travelBackToShoot4 = follower.pathBuilder()
-                .addPath(new BezierCurve(Poses.get(Poses.pickupLine4), Poses.get(Poses.Line4ControlPoint), Poses.get(Poses.shootPositionGoalSide)))
+                .addPath(new BezierCurve(Poses.get(Poses.pickupLine4),Poses.get(Poses.Line4ControlPointFarGoBack),Poses.get(Poses.shootPositionGoalSide)))
                 .setLinearHeadingInterpolation(Poses.get(Poses.pickupLine4).getHeading(), Poses.get(Poses.shootPositionGoalSide).getHeading())
                 .build();
         travelToHumanPlayer = follower.pathBuilder()
@@ -82,10 +88,12 @@ public class FarAuto  extends OpMode {
 
 
     public void autonomousPathUpdate() {
-        follower.setMaxPower(0.8);
+
         switch (pathState) {
             case 0: // Initial Travel to Shoot Position
-                intake.intakeRetainBalls();
+                follower.setMaxPower(0.9);
+               intake.intakeRetainBalls();
+                //intake.intakeIn();
 
                 if (!follower.isBusy()) {
                     follower.followPath(travelToShoot, true);
@@ -94,11 +102,11 @@ public class FarAuto  extends OpMode {
                 break;
             case 1: // Shooter Shoot
                 if (!follower.isBusy()) {
-                    shootBalls(shooterDesiredVelo,4);
+                    shootBalls(shooterDesiredVelo,3,10,shooterDesiredDipVelo);
                 }
                 break;
             case 2: //go to intake
-                intake.intakeInDistance();
+                intake.intakeIn();
 
                 if (!follower.isBusy()) {
 
@@ -114,7 +122,8 @@ public class FarAuto  extends OpMode {
 
                 }
                 if (!follower.isBusy()) {
-                    intake.intakeRetainBalls();
+//                    intake.intakeRetainBalls();
+                    intake.intakeIn();
                     follower.followPath(travelBackToShoot3, true);
 
                     setPathState();
@@ -122,19 +131,20 @@ public class FarAuto  extends OpMode {
                 break;
             case 4: //shoot
                 if (!follower.isBusy()) {
-                    shootBalls(shooterDesiredVelo,3);
+                    shootBalls(shooterDesiredVelo,3,6,shooterDesiredDipVelo);
                 }
                 break;
             case 5: //go to intake
-                intake.intakeInDistance();
+                intake.intakeIn();
 
                 if (!follower.isBusy()) {
-
+                    follower.setMaxPower(0.7);
                     follower.followPath(intake4, true);
                     setPathState();
                 }
                 break;
             case 6: //go to shoot
+
                 if (pathTimer.getElapsedTimeSeconds() <= 0.5) {
                     intake.setServoPower(-1);
                 } else {
@@ -142,7 +152,9 @@ public class FarAuto  extends OpMode {
 
                 }
                 if (!follower.isBusy()) {
-                    intake.intakeRetainBalls();
+//                    intake.intakeRetainBalls();
+                    follower.setMaxPower(0.9);
+                   intake.intakeIn();
                     follower.followPath(travelBackToShoot4, true);
 
                     setPathState();
@@ -150,7 +162,7 @@ public class FarAuto  extends OpMode {
                 break;
             case 7: //shoot
                 if (!follower.isBusy()) {
-                    shootBalls(shooterDesiredVelo,3);
+                    shootBalls(shooterDesiredVelo,3,6,shooterDesiredDipVelo);
                 }
                 break;
             case 8:
@@ -249,7 +261,7 @@ public class FarAuto  extends OpMode {
 
 
         if (Poses.getAlliance() != lastKnownAlliance) {
-            follower.setStartingPose(Poses.get(Poses.startPoseGoalSide));
+            follower.setStartingPose(Poses.get(Poses.startPoseFar));
             buildPaths();
 
             lastKnownAlliance = Poses.getAlliance();
@@ -274,38 +286,73 @@ public class FarAuto  extends OpMode {
         setPathState(0);
     }
 
-    public void shootBalls(double velo, int numShots){
-        shooter.shoot(velo);
+    public void shootBalls(double targetVelo, int numShots, int timerValue, double veloDipValue) {
+
+        shooter.shoot(targetVelo);
         double currentVelo = shooter.getCurrentVelo();
 
-        boolean isShooterReady = currentVelo >= velo - 25 && currentVelo <= velo + 55;
+        long now = System.currentTimeMillis();
 
-        if (isShooterReady) {
+
+        if (currentVelo >= veloDipValue) {
+            shooterHasSpunUp = true;
+        }
+
+
+        if (shooterHasSpunUp &&
+                currentVelo < veloDipValue &&
+                !shooterBelow &&
+                now - lastDipTime > DIP_COOLDOWN_MS) {
+
+            shotCounter++;
+            shooterBelow = true;
+            lastDipTime = now;
+        }
+
+        if (currentVelo >= veloDipValue) {
+            shooterBelow = false;
+        }
+
+        // ------------------------------------
+        // 3) Feed balls when shooter ready
+        // ------------------------------------
+        boolean ready = currentVelo >= targetVelo - 25 && currentVelo <= targetVelo + 55;
+
+        if (ready) {
             intake.intakeIn();
             intake.setServoPower(1);
         }
-
-        boolean ball_is_present = (intake.isRightDistance());
-
-        if (ball_was_present && !ball_is_present) {
-            shotCounter++;
+        else if (!ready){
+            intake.intakeRetainBalls();
+            intake.setServoPower(0);
         }
 
-        ball_was_present = ball_is_present;
 
-        if (shotCounter >= numShots  && pathTimer.getElapsedTimeSeconds() <=3){
-            shotCounter = 0;
+        if (shotCounter >= numShots) {
+
+            if (currentVelo >= veloDipValue) {
+                shooter.stopShooter();
+                intake.setServoPower(0);
+                intake.fullIntakeIdle();
+
+                shotCounter = 0;
+                shooterHasSpunUp = false;
+
+                setPathState();
+                return;
+            }
         }
 
-        if (shotCounter >= numShots || pathTimer.getElapsedTimeSeconds() >= 5) {
+
+        if (pathTimer.getElapsedTimeSeconds() >= timerValue) {
             shooter.stopShooter();
             intake.setServoPower(0);
             intake.fullIntakeIdle();
+
             shotCounter = 0;
+            shooterHasSpunUp = false;
             setPathState();
         }
-
-
     }
 
 

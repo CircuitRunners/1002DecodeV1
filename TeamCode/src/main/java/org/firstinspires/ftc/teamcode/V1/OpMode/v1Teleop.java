@@ -456,7 +456,7 @@ public class v1Teleop extends OpMode {
                     desiredVeloRed = shooter.calculateFlywheelVelocity(limelight.calculateDistanceToGoal(follower.getPose().getX(), follower.getPose().getY(), 132, 137)) + shooterIncrement;
                 }
                 else if (!isRedAlliance){
-                    desiredVeloRed = shooter.calculateFlywheelVelocity(limelight.calculateDistanceToGoal(follower.getPose().getX(), follower.getPose().getY(), 12, 137)) + shooterIncrement;
+                    desiredVeloBlue = shooter.calculateFlywheelVelocity(limelight.calculateDistanceToGoal(follower.getPose().getX(), follower.getPose().getY(), 12, 137)) + shooterIncrement;
                 }
 
                 //  if (zoneChecker.isInsideShootingZone(currentPose.getX(DistanceUnit.INCH), currentPose.getY(DistanceUnit.INCH))) {
@@ -511,6 +511,7 @@ public class v1Teleop extends OpMode {
         telemetry.addData("Distance Sensor", intake.getDistanceMM());
         telemetry.addData("Distance isRIghtDIstance", intake.isRightDistance()? "yeah" : "nah");
         telemetry.addData("Loop Time", timer.milliseconds());
+        telemetry.addData("Intake Current", intake.getIntakeMotorCurrent());
 
 
 

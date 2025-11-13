@@ -165,8 +165,11 @@ public class Shooter {
         // Safety check: ensure velocity doesn't go below the lowest tuned bound
         targetVelocity = Range.clip(targetVelocity, MIMIMUM_VELO, MAXIMUM_VELO);
 
-        return targetVelocity -25;
+        return targetVelocity -19;
     }
+
+
+
 
 
 

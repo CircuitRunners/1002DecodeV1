@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.CRServo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 @Configurable
@@ -147,7 +148,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
         // --- Utility methods ---
 
         public boolean isRightDistance(){
-            if( getDistanceMM()<= 70){
+            if( getDistanceMM()<= 120){
                 return true;
             }
             return false;
@@ -165,6 +166,10 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
         }
         public double getCurrentTargetRPM(){
             return targetRPM;
+        }
+
+        public double getIntakeMotorCurrent(){
+            return intake.getCurrent(CurrentUnit.MILLIAMPS);
         }
 
         public double getCurrentTargetVelocity(){
