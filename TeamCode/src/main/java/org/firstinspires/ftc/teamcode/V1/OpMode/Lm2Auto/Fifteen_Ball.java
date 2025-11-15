@@ -8,6 +8,7 @@ import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.V1.Config.subsystems.Intake;
@@ -17,7 +18,7 @@ import org.firstinspires.ftc.teamcode.V1.Config.util.Poses;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 import java.util.List;
-
+@Disabled
 @Configurable
 @Autonomous(name = "NEW  - GS 15 Ball Solo", group = "AA", preselectTeleOp = "v1Teleop")
 public class Fifteen_Ball extends OpMode {
@@ -33,7 +34,7 @@ public class Fifteen_Ball extends OpMode {
 
     private boolean ball_was_present = false;
 
-    private static final double shooterDesiredVelo = 1280;
+    private static  double shooterDesiredVelo = 1280;
     private static final double shooterDesiredDipVelo = 1192;
     private Poses.Alliance lastKnownAlliance = null;
     boolean shooterHasSpunUp = false;
@@ -70,7 +71,7 @@ public class Fifteen_Ball extends OpMode {
                 .build();
 
         travelBackToShoot1 = follower.pathBuilder()
-                .addPath(new BezierLine(Poses.get(Poses.lineupAtGate), Poses.get(Poses.shootPositionGoalSide)))
+                .addPath(new BezierLine(Poses.get(Poses.openGate), Poses.get(Poses.shootPositionGoalSide)))
                 .setLinearHeadingInterpolation(Poses.get(Poses.pickupLine1).getHeading(), Poses.get(Poses.shootPositionGoalSide).getHeading())
                 .build();
         intake2 = follower.pathBuilder()

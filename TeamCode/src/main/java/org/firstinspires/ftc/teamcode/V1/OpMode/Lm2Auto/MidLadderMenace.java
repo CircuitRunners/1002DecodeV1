@@ -11,6 +11,7 @@ import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -23,6 +24,7 @@ import org.firstinspires.ftc.teamcode.V1.Config.util.Poses;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 import java.util.List;
+@Disabled
 @Configurable
 @Autonomous(name = "NEW - GS 12 Ball - AP Far Only", group = "AA", preselectTeleOp = "v1Teleop")
 public class MidLadderMenace extends OpMode {
@@ -38,8 +40,8 @@ public class MidLadderMenace extends OpMode {
 
     private boolean ball_was_present = false;
 
-    private static final double shooterDesiredVelo = 1280;
-    private static final double shooterDesiredDipVelo = 1192;
+    private static  double shooterDesiredVelo = 1310;
+    private static final double shooterDesiredDipVelo = 1172;
     private Poses.Alliance lastKnownAlliance = null;
     boolean shooterHasSpunUp = false;
     boolean shooterBelow = false;;
@@ -71,12 +73,14 @@ public class MidLadderMenace extends OpMode {
                 .build();
         openGate = follower.pathBuilder()
                 .addPath(new BezierCurve(Poses.get(Poses.pickupLine1), Poses.get(Poses.pickupLine1ToGateControlPoint), Poses.get(Poses.openGate)))
-                .setConstantHeadingInterpolation(Poses.get(Poses.pickupLine1).getHeading())
+//                .setConstantHeadingInterpolation(Poses.get(Poses.pickupLine1).getHeading())
+                .setLinearHeadingInterpolation(Poses.get(Poses.pickupLine1).getHeading(), Math.toRadians(90),0.25)
                 .build();
 
         travelBackToShoot1 = follower.pathBuilder()
-                .addPath(new BezierLine(Poses.get(Poses.lineupAtGate), Poses.get(Poses.shootPositionGoalSide)))
-                .setLinearHeadingInterpolation(Poses.get(Poses.pickupLine1).getHeading(), Poses.get(Poses.shootPositionGoalSide).getHeading())
+                .addPath(new BezierLine(Poses.get(Poses.openGate), Poses.get(Poses.shootPositionGoalSide)))
+//                .setLinearHeadingInterpolation(Poses.get(Poses.pickupLine1).getHeading(), Poses.get(Poses.shootPositionGoalSide).getHeading())
+                .setLinearHeadingInterpolation(Math.toRadians(90), Poses.get(Poses.shootPositionGoalSide).getHeading())
                 .build();
         intake2 = follower.pathBuilder()
                 .addPath(new BezierCurve(Poses.get(Poses.shootPositionGoalSide), Poses.get(Poses.line2ControlPoint),Poses.get(Poses.pickupLine2)))
@@ -106,7 +110,7 @@ public class MidLadderMenace extends OpMode {
 
     public void autonomousPathUpdate() {
 
-            follower.setMaxPower(0.8);
+            follower.setMaxPower(1);
             switch (pathState) {
                 case 0: // Initial Travel to Shoot Position
                     intake.intakeRetainBalls();

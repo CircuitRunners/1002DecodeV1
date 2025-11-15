@@ -78,7 +78,7 @@ public class SpeedyGoalAuto extends OpMode {
         travelToShoot = follower.pathBuilder()
                 .addPath(new BezierLine(Poses.get(Poses.startPoseGoalSide), Poses.get(Poses.shootPositionGoalSide)))
                 .setLinearHeadingInterpolation(0, Poses.get(Poses.shootPositionGoalSide).getHeading())
-
+// c0nnor sucks at coding and litteraly everything else on the planet and he likes men
                 .build();
 
         // Path 2: Travel from Shooting Position to Intake Position

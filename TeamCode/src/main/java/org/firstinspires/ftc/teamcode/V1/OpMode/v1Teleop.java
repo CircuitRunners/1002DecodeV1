@@ -71,6 +71,8 @@ public class v1Teleop extends OpMode {
     private boolean preselectFromAuto = false;
     private boolean isIntakeInUse = false;
     private boolean intakeIn = false;
+
+    private boolean reversingShooterWheel = false;
     private final double MINIMUM_SHOOTER_VELO = 1600; //   tick/sec
     private final double MAXIMUM_SHOOTER_VELO = 1650; //   tick/sec
 
@@ -258,35 +260,30 @@ public class v1Teleop extends OpMode {
         double finalRotation = rotate;
 
         if (isHeadingLocked) {
+            LLResult resultLL = limelight.getResult();
 
-            if (limelight.getResult().isValid()) {
-                for (LLResultTypes.FiducialResult fr : limelight.getResult().getFiducialResults()) {
+            boolean hasGoalTag = false;
+
+            if (resultLL != null && resultLL.isValid()) {
+                for (LLResultTypes.FiducialResult fr : resultLL.getFiducialResults()) {
                     if (fr.getFiducialId() == 20 || fr.getFiducialId() == 24) {
-
-                        finalRotation = -limelight.autoAlign();
-
-
-//                            telemetry.addLine("Using Limelight Data for Heading Lock.");
-//                            telemetry.addData("Error from tag center", limelight.error);
-//                            //telemetry.addData("april tag id", fr.getFiducialId());
-//                            telemetry.addData("PID Rotation", limelightRotation);
-//                            telemetry.addData("PID Rotation from autoAlign()", limelight.autoAlign());
-                    } else {
-                        finalRotation = rotate;
+                        hasGoalTag = true;
+                        break;
                     }
-
                 }
             }
-            else {
-                finalRotation = rotate;
+
+            if (hasGoalTag) {
+                finalRotation = -limelight.autoAlign();  // ALWAYS use PID
+            } else {
+                finalRotation = rotate; // only when no tag is seen at all
             }
         }
-
-
         else {
-            finalRotation = rotate;
-           // telemetry.addData("Using Pinpoint IMU Heading.", "");
+            finalRotation = rotate; // heading lock off
         }
+
+
 
         double theta = Math.atan2(forward, strafe);
         double r = Math.hypot(forward, strafe);
@@ -361,18 +358,18 @@ public class v1Teleop extends OpMode {
 
                 if (intakeIn){
                     intake.intakeIn();
-                    if ( intake.getDistanceMM() <= distanceThreshold){
-                        intake.setServoPower(0);
-                    }
-                    else if(intake.getDistanceMM() >distanceThreshold){
-                        intake.setServoPower(1);
-                    }
+//                    if ( intake.getDistanceMM() <= distanceThreshold){
+//                        intake.setServoPower(0);
+//                    }
+//                    else if(intake.getDistanceMM() >distanceThreshold){
+//                        intake.setServoPower(1);
+//                    }
                 }
 
 
                 else if(!intakeIn){
                     if (leftTriggerValue > 0.25 && leftTriggerValue < 0.7){ // Replaced gamepad1.left_trigger
-                        intake.intakeOutDistance();
+                        intake.intakeOut();
                     }
                     else if (leftTriggerValue > 0.75 ){ // Replaced gamepad1.left_trigger
                         intake.fullIntakeIdle();
@@ -402,6 +399,11 @@ public class v1Teleop extends OpMode {
                 //score stuff
 
                 shooter.setLight(0.5);
+
+
+
+
+
 
                 if (!isIntakeInUse){
                     intake.intakeRetainBalls();
@@ -470,7 +472,9 @@ public class v1Teleop extends OpMode {
 
 
                 //shooting logic
-                if ((shooterVelo >= desiredVeloRed - 40) && (shooterVelo <= desiredVeloRed + 55)) { // Replaced shooter.getCurrentVelo()
+                double target = isRedAlliance ? desiredVeloRed : desiredVeloBlue;
+
+                if (shooterVelo >= target - 40 && shooterVelo <= target + 55) { // Replaced shooter.getCurrentVelo()
                     isIntakeInUse = true;
 
 
@@ -485,8 +489,22 @@ public class v1Teleop extends OpMode {
                 }
 
                 else {
-                    intake.setServoPower(0);
-                    intake.fullIntakeIdle();
+                    if (player1.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)){
+                        if (reversingShooterWheel){
+                            reversingShooterWheel = false;
+                        }
+                        else {
+                            reversingShooterWheel = true;
+                        }
+                    }
+                    if (reversingShooterWheel){
+                        intake.setServoPower(-1);
+                    }
+                    else if (!reversingShooterWheel){
+                        intake.setServoPower(0);
+                    }
+
+                    intake.intakeMotorIdle();
                     shooter.setLight(0);
 
                     isIntakeInUse = false;

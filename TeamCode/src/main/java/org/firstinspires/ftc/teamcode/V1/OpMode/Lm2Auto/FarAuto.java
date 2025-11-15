@@ -8,6 +8,7 @@ import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.V1.Config.subsystems.Intake;
@@ -18,7 +19,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 import java.util.List;
 
-
+@Disabled
 @Configurable
 @Autonomous(name = "NEW - HPS 9 Ball - AP Super Close Only", group = "AA", preselectTeleOp = "v1Teleop")
 public class FarAuto  extends OpMode {

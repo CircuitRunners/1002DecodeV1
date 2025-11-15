@@ -18,7 +18,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 import java.util.List;
 @Configurable
-    @Autonomous(name = "NEW - GS 12 Ball AP Friendly", group = "AA", preselectTeleOp = "v1Teleop")
+    @Autonomous(name = "GS 12 Ball AP Friendly", group = "AA", preselectTeleOp = "v1Teleop")
     public class ThePowerOfFriendship extends OpMode {
 
     private Follower follower;
@@ -32,8 +32,8 @@ import java.util.List;
 
     private boolean ball_was_present = false;
 
-    private static final double shooterDesiredVelo = 1060;
-    private static final double shooterDesiredDipVelo = 955;
+    private static  double shooterDesiredVelo = 1017;
+    private static final double shooterDesiredDipVelo = 882;
     private Poses.Alliance lastKnownAlliance = null;
 
     boolean shooterHasSpunUp = false;
@@ -65,12 +65,15 @@ import java.util.List;
                 .build();
         openGate = follower.pathBuilder()
                 .addPath(new BezierCurve(Poses.get(Poses.pickupLine1), Poses.get(Poses.pickupLine1ToGateControlPoint), Poses.get(Poses.openGate)))
-                .setConstantHeadingInterpolation(Poses.get(Poses.pickupLine1).getHeading())
+                //.setConstantHeadingInterpolation(Poses.get(Poses.pickupLine1).getHeading())
+//                .addPath(new BezierLine(Poses.get(Poses.openGate), Poses.get(Poses.shootPositionGoalSide2)))
+                .setLinearHeadingInterpolation(Poses.get(Poses.pickupLine1).getHeading(), Math.toRadians(90),0.45)
                 .build();
 
         travelBackToShoot1 = follower.pathBuilder()
-                .addPath(new BezierLine(Poses.get(Poses.lineupAtGate), Poses.get(Poses.shootPositionGoalSide2)))
-                .setLinearHeadingInterpolation(Poses.get(Poses.pickupLine1).getHeading(), Poses.get(Poses.shootPositionGoalSide2).getHeading())
+                .addPath(new BezierLine(Poses.get(Poses.openGate), Poses.get(Poses.shootPositionGoalSide2)))
+                //setLinearHeadingInterpolation(Poses.get(Poses.pickupLine1).getHeading(), Poses.get(Poses.shootPositionGoalSide2).getHeading())
+                .setLinearHeadingInterpolation(Math.toRadians(90), Poses.get(Poses.shootPositionGoalSide).getHeading())
                 .build();
         intake2 = follower.pathBuilder()
                 .addPath(new BezierCurve(Poses.get(Poses.shootPositionGoalSide2), Poses.get(Poses.line2ControlPoint), Poses.get(Poses.pickupLine2)))
@@ -87,8 +90,8 @@ import java.util.List;
                 .build();
 
         travelBackToShoot3 = follower.pathBuilder()
-                .addPath(new BezierCurve(Poses.get(Poses.pickupLine3), Poses.get(Poses.Line3ControlPoint), Poses.get(Poses.shootPositionGoalSide2)))
-                .setLinearHeadingInterpolation(Poses.get(Poses.pickupLine3).getHeading(), Poses.get(Poses.shootPositionGoalSide2).getHeading())
+                .addPath(new BezierCurve(Poses.get(Poses.pickupLine3), Poses.get(Poses.Line3ControlPoint), Poses.get(Poses.shootPositionGoalSide2LasthHot)))
+                .setLinearHeadingInterpolation(Poses.get(Poses.pickupLine3).getHeading(), Poses.get(Poses.shootPositionGoalSide2LasthHot).getHeading())
                 .build();
         travelToGate = follower.pathBuilder()
                 .addPath(new BezierLine(Poses.get(Poses.shootPositionGoalSide2), Poses.get(Poses.lineupAtGate)))
@@ -98,7 +101,7 @@ import java.util.List;
 
 
     public void autonomousPathUpdate() {
-        follower.setMaxPower(0.8);
+        follower.setMaxPower(1);
         switch (pathState) {
             case 0: // Initial Travel to Shoot Position
                 intake.intakeRetainBalls();
@@ -110,6 +113,7 @@ import java.util.List;
                 break;
             case 1: // Shooter Shoot
                 if (!follower.isBusy()) {
+                    shooter.shoot(shooterDesiredVelo);
                     shootBalls(shooterDesiredVelo, 3, 10,shooterDesiredDipVelo);
                 }
                 break;
@@ -123,8 +127,15 @@ import java.util.List;
                 }
                 break;
             case 3:
-                if (!follower.isBusy()) {
+                if (pathTimer.getElapsedTimeSeconds() <= 0.5) {
+                    intake.setServoPower(-1);
+                } else {
+                    intake.setServoPower(0);
                     intake.intakeIn();
+                }
+                if (!follower.isBusy()) {
+
+
                     //intake.intakeRetainBalls();
                     follower.followPath(openGate, true);
                     setPathState();
@@ -138,13 +149,18 @@ import java.util.List;
 
                 }
                 if (!follower.isBusy()) {
-                    follower.followPath(travelBackToShoot1, true);
 
-                    setPathState();
+                    if (pathTimer.getElapsedTimeSeconds() > 1.15) {
+                        follower.followPath(travelBackToShoot1, true);
+                        setPathState();
+                    }
+
+
                 }
                 break;
             case 5: //shoot
                 if (!follower.isBusy()) {
+                    shooter.shoot(shooterDesiredVelo);
                     shootBalls(shooterDesiredVelo, 3, 6,shooterDesiredDipVelo);
                 }
                 break;
@@ -153,7 +169,7 @@ import java.util.List;
 
                 if (!follower.isBusy()) {
 
-                    follower.followPath(intake2, true);
+                    follower.followPath(intake2, false);
                     setPathState();
                 }
                 break;
@@ -162,10 +178,10 @@ import java.util.List;
                     intake.setServoPower(-1);
                 } else {
                     intake.setServoPower(0);
-
+                    intake.intakeIn();
                 }
                 if (!follower.isBusy()) {
-                    intake.intakeIn();
+
                     //intake.intakeRetainBalls();
                     follower.followPath(travelBackToShoot2, true);
 
@@ -174,6 +190,7 @@ import java.util.List;
                 break;
             case 8: //shoot
                 if (!follower.isBusy()) {
+                    shooter.shoot(shooterDesiredVelo);
                     shootBalls(shooterDesiredVelo, 3, 6,shooterDesiredDipVelo);
                 }
                 break;
@@ -182,7 +199,7 @@ import java.util.List;
 
                 if (!follower.isBusy()) {
 
-                    follower.followPath(intake3, true);
+                    follower.followPath(intake3, false);
                     setPathState();
                 }
                 break;
@@ -191,10 +208,12 @@ import java.util.List;
                     intake.setServoPower(-1);
                 } else {
                     intake.setServoPower(0);
+                    intake.intakeIn();
 
                 }
                 if (!follower.isBusy()) {
-                    intake.intakeIn();
+
+
                     //intake.intakeRetainBalls();
                     follower.followPath(travelBackToShoot3, true);
 
@@ -203,15 +222,16 @@ import java.util.List;
                 break;
             case 11: //shoot
                 if (!follower.isBusy()) {
+                    shooter.shoot(shooterDesiredVelo);
                     shootBalls(shooterDesiredVelo, 3, 6,shooterDesiredDipVelo);
                 }
                 break;
-            case 12:
-                if (!follower.isBusy()) {
-                    follower.followPath(travelToGate, true);
-                    setPathState();
-                }
-                break;
+//            case 12:
+//                if (!follower.isBusy()) {
+//                    follower.followPath(travelToGate, true);
+//                    setPathState();
+//                }
+             //   break;
 
 
             default: // End State (-1)
@@ -239,7 +259,7 @@ import java.util.List;
         follower.update();
         telemetry.addData("X Pos", follower.getPose().getX());
         telemetry.addData("Y Pos", follower.getPose().getY());
-        telemetry.addData("Heading", follower.getPose().getHeading());
+        telemetry.addData("Heading", Math.toDegrees(follower.getPose().getHeading()));
         telemetry.addData("Path State", pathState);
         telemetry.addData("Shots Fired", shotCounter);
         telemetry.addData("Shooter Velocity", shooter.getCurrentVelo());
@@ -326,7 +346,7 @@ import java.util.List;
 
     public void shootBalls(double targetVelo, int numShots, int timerValue, double veloDipValue) {
 
-        shooter.shoot(targetVelo);
+        //shooter.shoot(targetVelo);
         double currentVelo = shooter.getCurrentVelo();
 
         long now = System.currentTimeMillis();

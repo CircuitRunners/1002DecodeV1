@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.V1.Config.subsystems;
 
+import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
@@ -9,13 +10,14 @@ import com.seattlesolvers.solverslib.controller.PIDFController;
 
 import java.util.List;
 
+@Configurable
 public class LimelightCamera {
 
     public Limelight3A limelightCamera;
 
-    public static double HEADING_KP_TX = 0.027; //0.02
+    public static double HEADING_KP_TX = 0.019; //0.02
     public static double HEADING_KI_TX = 0.0;
-    public static double HEADING_KD_TX = 0.0;
+    public static double HEADING_KD_TX = 0.0001;
     public static double HEADING_KF_TX = 0.0;
     public static double ROTATION_MIN_POWER = 0.0;
 
@@ -199,5 +201,88 @@ public class LimelightCamera {
 
         return totalResults;
     }
+
+
+    /*
+    FOR V2 ----- General Layout
+
+
+
+public void executeAdaptiveScoring(LimelightCamera.BallOrder targetOrder) {
+
+    // --- 1. Define Target Sequence and Get Inventory ---
+    String[] fullTargetSequence;
+    if (targetOrder == LimelightCamera.BallOrder.GREEN_PURPLE_PURPLE) {
+        fullTargetSequence = new String[]{"Green", "Purple", "Purple"};
+    } else if (targetOrder == LimelightCamera.BallOrder.PURPLE_GREEN_PURPLE) {
+        fullTargetSequence = new String[]{"Purple", "Green", "Purple"};
+    } else {
+        fullTargetSequence = new String[]{"Purple", "Purple", "Green"};
+    }
+
+    // Replace these with your actual mechanism's inventory count
+    int greenInventory = 1; // Example: You actually have 1 Green
+    int purpleInventory = 2; // Example: You actually have 2 Purple
+    int totalBalls = greenInventory + purpleInventory;
+
+    if (totalBalls == 0) {
+        System.out.println("No balls to score. Aborting.");
+        return;
+    }
+
+    // Determine the number of shots to take (Max 3, limited by total inventory)
+    int shotsToTake = Math.min(3, totalBalls);
+
+    System.out.println("Total balls to shoot: " + totalBalls);
+
+    // --- 2. Process Slots (1st, 2nd, 3rd) based on shotsToTake ---
+
+    for (int i = 0; i < shotsToTake; i++) {
+        String requiredColor = fullTargetSequence[i];
+        String colorToShoot = null;
+
+        System.out.println("Processing Slot " + (i + 1) + ". Required: " + requiredColor);
+
+        // --- A. TRY CORRECT COLOR (Maximize Bonus/Extend Prefix) ---
+        if (requiredColor.equals("Green") && greenInventory > 0) {
+            colorToShoot = "Green";
+            greenInventory--;
+            System.out.println("  -> Shooting correct Green ball.");
+
+        } else if (requiredColor.equals("Purple") && purpleInventory > 0) {
+            colorToShoot = "Purple";
+            purpleInventory--;
+            System.out.println("  -> Shooting correct Purple ball.");
+
+        // --- B. SUBSTITUTE WITH OTHER COLOR (Maintain Position) ---
+        } else if (greenInventory > 0) {
+            // Substitution: use Green ball when Purple was required (or vice versa)
+            colorToShoot = "Green";
+            greenInventory--;
+            System.out.println("  -> Shooting Green SUBSTITUTE ball.");
+
+        } else if (purpleInventory > 0) {
+            // Substitution: use Purple ball when Green was required (or vice versa)
+            colorToShoot = "Purple";
+            purpleInventory--;
+            System.out.println("  -> Shooting Purple SUBSTITUTE ball.");
+
+        // --- C. NO BALLS LEFT (Should not be reached if shotsToTake logic is correct) ---
+        } else {
+            System.out.println("  -> ERROR: Out of balls before sequence complete. Aborting shots.");
+            break;
+        }
+
+        // --- D. EXECUTE THE SHOT ---
+        if (colorToShoot != null) {
+            if (colorToShoot.equals("Green")) {
+                shootGreenBall();
+            } else {
+                shootPurpleBall();
+            }
+        }
+    }
+}
+     */
 
 }

@@ -19,7 +19,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import java.util.List;
 
     @Configurable
-    @Autonomous(name = "NEW  - GS 9 Ball Open Gate AP Friendly", group = "AA", preselectTeleOp = "v1Teleop")
+    @Autonomous(name = "UNTESTED - GS 9 Ball Open Gate AP Friendly", group = "AA", preselectTeleOp = "v1Teleop")
     public class Nine_BallGoalSideOpenGate extends OpMode {
 
         private Follower follower;
@@ -33,7 +33,7 @@ import java.util.List;
 
         private boolean ball_was_present = false;
 
-        private static final double shooterDesiredVelo = 1060;
+        private static  double shooterDesiredVelo = 1060;
         private static final double shooterDesiredDipVelo = 955;
         private Poses.Alliance lastKnownAlliance = null;
         boolean shooterHasSpunUp = false;
@@ -65,13 +65,13 @@ import java.util.List;
 
             openGate = follower.pathBuilder()
                     .addPath(new BezierCurve(Poses.get(Poses.pickupLine1), Poses.get(Poses.pickupLine1ToGateControlPoint), Poses.get(Poses.openGate)))
-                    .setConstantHeadingInterpolation(Poses.get(Poses.pickupLine1).getHeading())
+                    .setLinearHeadingInterpolation(Poses.get(Poses.pickupLine1).getHeading(), Math.toRadians(90),0.45)
                     .build();
 
 
             travelBackToShoot1 = follower.pathBuilder()
-                    .addPath(new BezierLine(Poses.get(Poses.pickupLine1), Poses.get(Poses.shootPositionGoalSide2)))
-                    .setLinearHeadingInterpolation(Poses.get(Poses.pickupLine1).getHeading(), Poses.get(Poses.shootPositionGoalSide2).getHeading())
+                    .addPath(new BezierLine(Poses.get(Poses.openGate), Poses.get(Poses.shootPositionGoalSide2)))
+                    .setLinearHeadingInterpolation(Math.toRadians(90), Poses.get(Poses.shootPositionGoalSide).getHeading())
                     .build();
             intake2 = follower.pathBuilder()
                     .addPath(new BezierCurve(Poses.get(Poses.shootPositionGoalSide2), Poses.get(Poses.line2ControlPoint), Poses.get(Poses.pickupLine2)))

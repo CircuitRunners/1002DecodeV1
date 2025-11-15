@@ -136,14 +136,19 @@ public class Poses {
 
     // SHOOT_POSITION_GOAL_SIDE
     public static final AlliancePose shootPositionGoalSide = new AlliancePose(
-            new Pose(84.5, 84.0, Math.toRadians(45.0)),     // Red: X=144-59.5=84.5, Theta=180-135=45
-            new Pose(59.5, 84, Math.toRadians(135))         // Blue
+            new Pose(86.5, 83.0, Math.toRadians(38)),     // Red: X=144-59.5=84.5, Theta=180-135=45
+            new Pose(57.5, 83, Math.toRadians(129.5))         // Blue
     );
 
     // SHOOT_POSITION_GOAL_SIDE_2
     public static final AlliancePose shootPositionGoalSide2 = new AlliancePose(
-            new Pose(105.5, 105.5, Math.toRadians(38.5)),     // Red: X=144-48=96, Theta=180-132.5=47.5
-            new Pose(38.5, 105.5, Math.toRadians(130.5))       // Blue
+            new Pose(105.5, 104.5, Math.toRadians(39.5)),     // Red: X=144-48=96, Theta=180-132.5=47.5
+            new Pose(38.5, 104.5, Math.toRadians(142.5))       // Blue
+    );
+
+    public static final AlliancePose shootPositionGoalSide2LasthHot = new AlliancePose(
+            new Pose(102.5, 119.5, Math.toRadians(22)),     // Red: X=144-48=96, Theta=180-132.5=47.5
+            new Pose(41.5, 119.5, Math.toRadians(158))      // Blue
     );
 
     // LINEUP_LINE_1
@@ -154,14 +159,14 @@ public class Poses {
 
     // CONTROL_POINT_LINE_1_FOR_SHOOT_POSE_2
     public static final AlliancePose controlPointLine1ForShootPose2 = new AlliancePose(
-            new Pose(99.0, 82.5, Math.toRadians(0)),
-            new Pose(51, 82.5, Math.toRadians(180))
+            new Pose(91.0, 80, Math.toRadians(0)),
+            new Pose(53, 80, Math.toRadians(180))
     );
 
     // PICKUP_LINE_1
     public static final AlliancePose pickupLine1 = new AlliancePose(
-            new Pose(126, 80.5, Math.toRadians(0)),
-            new Pose(13.5, 84, Math.toRadians(180))
+            new Pose(125, 80.5, Math.toRadians(0)),
+            new Pose(16.5, 82, Math.toRadians(180))
     );
 
     // LINEUP_LINE_2
@@ -172,43 +177,43 @@ public class Poses {
 
     // PICKUP_LINE_2
     public static final AlliancePose pickupLine2 = new AlliancePose(
-            new Pose(136, 55, Math.toRadians(0)),
-            new Pose(6.8, 55, Math.toRadians(180))
+            new Pose(133, 55, Math.toRadians(0)),
+            new Pose(7.1, 53, Math.toRadians(180))
     );
 
     // LINE_2_CONTROL_POINT
     public static final AlliancePose line2ControlPoint = new AlliancePose(
             new Pose(82.0, 53.0, Math.toRadians(0)),
-            new Pose(62, 53, Math.toRadians(180))
+            new Pose(64, 51, Math.toRadians(180))
     );
 
     // LINEUP_LINE_3
     public static final AlliancePose lineupLine3 = new AlliancePose(
-            new Pose(92.0, 38.0, Math.toRadians(0)),
+            new Pose(92.0, 36.5, Math.toRadians(0)),
             new Pose(52, 38, Math.toRadians(180))
     );
 
     // PICKUP_LINE_3
     public static final AlliancePose pickupLine3 = new AlliancePose(
-            new Pose(136, 36.5, Math.toRadians(0)),
-            new Pose(6.8, 36.5, Math.toRadians(180))
+            new Pose(136, 33.5, Math.toRadians(0)),
+            new Pose(6.8, 34.5, Math.toRadians(180))
     );
 
     // LINE_3_CONTROL_POINT
     public static final AlliancePose Line3ControlPoint = new AlliancePose(
-            new Pose(81.0, 29.5, Math.toRadians(0)),
-            new Pose(63, 29.5, Math.toRadians(180))
+            new Pose(81.0, 27.5, Math.toRadians(0)),
+            new Pose(64, 28, Math.toRadians(180))
     );
 
     // LINEUP_AT_GATE
     public static final AlliancePose lineupAtGate = new AlliancePose(
             new Pose(119.0, 61.0, Math.toRadians(0)),
-            new Pose(21, 73, Math.toRadians(180))
+            new Pose(24, 68, Math.toRadians(180))
     );
 
     public static final AlliancePose openGate = new AlliancePose(
-            new Pose(127.0, 70.0, Math.toRadians(180)),
-            new Pose(16.5, 70, Math.toRadians(0))
+            new Pose(130.0, 76.0, Math.toRadians(180)),
+            new Pose(14.5, 71, Math.toRadians(0))
     );
 
     // PICKUP_LINE_4
@@ -234,14 +239,15 @@ public class Poses {
     );
 
     public static final AlliancePose Line4ControlPointFarGoBack = new AlliancePose(
+
             new Pose(98, 1, Math.toRadians(0)),
             new Pose(46, 1, Math.toRadians(180))
     );
 
     // PICKUP_LINE_1_TO_GATE_CONTROL_POINT
     public static final AlliancePose pickupLine1ToGateControlPoint = new AlliancePose(
-            new Pose(103.0, 76.5, Math.toRadians(180)),
-            new Pose(41, 76.5, Math.toRadians(0))
+            new Pose(103.0, 77.5, Math.toRadians(180)),
+            new Pose(39, 77.5, Math.toRadians(0))
     );
 
     // =============== Far Side Poses (explicit red/blue) ===============

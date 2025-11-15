@@ -18,7 +18,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 import java.util.List;
 @Configurable
-@Autonomous(name = "NEW  - GS 9 Ball AP Friendly", group = "AA", preselectTeleOp = "v1Teleop")
+@Autonomous(name = "GS 9 Ball AP Friendly", group = "AA", preselectTeleOp = "v1Teleop")
 public class  Nine_BallGoalSide extends OpMode {
 
     private Follower follower;
@@ -29,7 +29,7 @@ public class  Nine_BallGoalSide extends OpMode {
     private int pathState;
     private int shotCounter = 0;
 
-    private static final double shooterDesiredVelo = 1043;
+    private static  double shooterDesiredVelo = 1043;
     private static final double shooterDesiredDipVelo = 955;
     private Poses.Alliance lastKnownAlliance = null;
 
