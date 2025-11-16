@@ -343,7 +343,13 @@ public class v1Teleop extends OpMode {
             case 0:
                 isHeadingLocked = false;
                 shooter.stopShooter();
-                shooter.setLight(0.611);
+
+                if (!isRedAlliance) {
+                    shooter.setLight(0.611);
+                }
+                else if (isRedAlliance){
+                    shooter.setLight(0.3);
+                }
                 //intake stuff
                 isIntakeInUse= true;
 

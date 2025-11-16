@@ -33,8 +33,8 @@ import java.util.List;
 
         private boolean ball_was_present = false;
 
-        private static  double shooterDesiredVelo = 1060;
-        private static final double shooterDesiredDipVelo = 955;
+        private static  double shooterDesiredVelo = 1020.5;
+        private static final double shooterDesiredDipVelo = 935;
         private Poses.Alliance lastKnownAlliance = null;
         boolean shooterHasSpunUp = false;
         boolean shooterBelow = false;;
@@ -111,7 +111,7 @@ import java.util.List;
                     break;
                 case 1: // Shooter Shoot
                     if (!follower.isBusy()) {
-                        shootBalls(shooterDesiredVelo,3,10,shooterDesiredDipVelo);
+                        shootBalls(shooterDesiredVelo,3,5,shooterDesiredDipVelo);
                     }
                     break;
                 case 2: //go to intake

@@ -29,8 +29,8 @@ public class  Nine_BallGoalSide extends OpMode {
     private int pathState;
     private int shotCounter = 0;
 
-    private static  double shooterDesiredVelo = 1043;
-    private static final double shooterDesiredDipVelo = 955;
+    private static  double shooterDesiredVelo = 1020.5;
+    private static final double shooterDesiredDipVelo = 935;
     private Poses.Alliance lastKnownAlliance = null;
 
     boolean shooterHasSpunUp = false;

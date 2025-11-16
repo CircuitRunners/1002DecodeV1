@@ -32,8 +32,8 @@ import java.util.List;
 
     private boolean ball_was_present = false;
 
-    private static  double shooterDesiredVelo = 1017;
-    private static final double shooterDesiredDipVelo = 882;
+    private static  double shooterDesiredVelo = 1025.5;
+    private static final double shooterDesiredDipVelo = 940;
     private Poses.Alliance lastKnownAlliance = null;
 
     boolean shooterHasSpunUp = false;
@@ -72,12 +72,12 @@ import java.util.List;
 
         travelBackToShoot1 = follower.pathBuilder()
                 .addPath(new BezierLine(Poses.get(Poses.openGate), Poses.get(Poses.shootPositionGoalSide2)))
-                //setLinearHeadingInterpolation(Poses.get(Poses.pickupLine1).getHeading(), Poses.get(Poses.shootPositionGoalSide2).getHeading())
-                .setLinearHeadingInterpolation(Math.toRadians(90), Poses.get(Poses.shootPositionGoalSide).getHeading())
+                //setLinearHeadingInterpolation(Poses.get(Poses.pickupLine1).getHeading(), 1Poses.get(Poses.shootPositionGoalSide2).getHeading())
+                .setLinearHeadingInterpolation(Math.toRadians(90), Poses.get(Poses.shootPositionGoalSide3).getHeading())
                 .build();
         intake2 = follower.pathBuilder()
                 .addPath(new BezierCurve(Poses.get(Poses.shootPositionGoalSide2), Poses.get(Poses.line2ControlPoint), Poses.get(Poses.pickupLine2)))
-                .setLinearHeadingInterpolation(Poses.get(Poses.shootPositionGoalSide2).getHeading(), Poses.get(Poses.pickupLine2).getHeading(), 0.45)
+                .setLinearHeadingInterpolation(Poses.get(Poses.shootPositionGoalSide3).getHeading(), Poses.get(Poses.pickupLine2).getHeading(), 0.45)
                 .build();
         travelBackToShoot2 = follower.pathBuilder()
                 .addPath(new BezierCurve(Poses.get(Poses.pickupLine2), Poses.get(Poses.line2ControlPoint), Poses.get(Poses.shootPositionGoalSide2)))
@@ -150,7 +150,8 @@ import java.util.List;
                 }
                 if (!follower.isBusy()) {
 
-                    if (pathTimer.getElapsedTimeSeconds() > 1.15) {
+//                    if (pathTimer.getElapsedTimeSeconds() > 1.15) {
+                    if (pathTimer.getElapsedTimeSeconds() > 0) {
                         follower.followPath(travelBackToShoot1, true);
                         setPathState();
                     }
