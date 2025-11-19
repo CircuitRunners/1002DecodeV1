@@ -50,11 +50,11 @@ public class  TwelveBallAuto extends OpMode {
     private PathChain travelToShoot,  intake1, travelBackToShoot1, intake2, travelBackToShoot2,  intake3, travelBackToShoot3, travelToGate;
     private static final Pose startPoseGoalSide = new Pose(32, 135.5, Math.toRadians(180));
     private static final Pose shootPositionGoalSide = new Pose(40, 103, Math.toRadians(135));
-    private static final Pose controlPickupLine1 = new Pose(97, 93.5);
+    private static final Pose controlPickupLine1 = new Pose(67, 81.5);
     private static final Pose pickupLine1 = new Pose(13, 81.5, Math.toRadians(180));
-    private static final Pose controlPickupLine2 = new Pose(97, 70);
+    private static final Pose controlPickupLine2 = new Pose(67, 58);
     private static final Pose pickupLine2 = new Pose(13, 57, Math.toRadians(180));
-    private static final Pose controlPickupLine3 = new Pose(97, 45.5);
+    private static final Pose controlPickupLine3 = new Pose(67, 34.5);
     private static final Pose pickupLine3 = new Pose(13, 36, Math.toRadians(180));
     private static final Pose controlPickupLineToShoot = new Pose(70, 81);
     private static final Pose lineupAtGate = new Pose(20, 65, Math.toRadians(270));
@@ -121,7 +121,7 @@ public class  TwelveBallAuto extends OpMode {
             case 1: // Shooter Shoot
                 if (!follower.isBusy()) {
                     desiredVeloBlue = shooter.calculateFlywheelVelocity(limelight.calculateDistanceToGoal(follower.getPose().getX(), follower.getPose().getY(), 12, 137));
-                    shootBalls(shooterDesiredVelo,3,10,shooterDesiredDipVelo);
+                    //shootBalls(shooterDesiredVelo,3,10,shooterDesiredDipVelo);
                     shootBalls(desiredVeloBlue,3,10,shooterDesiredDipVelo);
 
                 }
@@ -155,7 +155,7 @@ public class  TwelveBallAuto extends OpMode {
             case 4: //shoot
                 if (!follower.isBusy()) {
                     desiredVeloBlue = shooter.calculateFlywheelVelocity(limelight.calculateDistanceToGoal(follower.getPose().getX(), follower.getPose().getY(), 12, 137));
-                    shootBalls(shooterDesiredVelo,3,6,shooterDesiredDipVelo);
+                    //shootBalls(shooterDesiredVelo,3,6,shooterDesiredDipVelo);
                     shootBalls(desiredVeloBlue,3,10,shooterDesiredDipVelo);
                 }
                 break;
@@ -188,7 +188,7 @@ public class  TwelveBallAuto extends OpMode {
             case 7: //shoot
                 if (!follower.isBusy()) {
                     desiredVeloBlue = shooter.calculateFlywheelVelocity(limelight.calculateDistanceToGoal(follower.getPose().getX(), follower.getPose().getY(), 12, 137));
-                    shootBalls(shooterDesiredVelo,3,6,shooterDesiredDipVelo);
+                    //shootBalls(shooterDesiredVelo,3,6,shooterDesiredDipVelo);
                     shootBalls(desiredVeloBlue,3,10,shooterDesiredDipVelo);
                 }
                 break;
@@ -222,7 +222,7 @@ public class  TwelveBallAuto extends OpMode {
             case 10: //shoot
                 if (!follower.isBusy()) {
                     desiredVeloBlue = shooter.calculateFlywheelVelocity(limelight.calculateDistanceToGoal(follower.getPose().getX(), follower.getPose().getY(), 12, 137));
-                    shootBalls(shooterDesiredVelo,3,6,shooterDesiredDipVelo);
+                    //shootBalls(shooterDesiredVelo,3,6,shooterDesiredDipVelo);
                     shootBalls(desiredVeloBlue,3,10,shooterDesiredDipVelo);
                 }
                 break;
@@ -308,8 +308,8 @@ public class  TwelveBallAuto extends OpMode {
 
         intake = new Intake(hardwareMap, telemetry);
         shooter = new Shooter(hardwareMap, telemetry);
-//        limelight = new LimelightCamera(hardwareMap);
-//        limelight.limelightCamera.start();
+        limelight = new LimelightCamera(hardwareMap);
+        limelight.limelightCamera.start();
 //
 //        BallOrder detected = limelight.detectBallOrder();
 //
