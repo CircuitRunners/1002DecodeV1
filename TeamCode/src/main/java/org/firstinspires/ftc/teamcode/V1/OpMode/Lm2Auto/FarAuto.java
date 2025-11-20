@@ -19,7 +19,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 import java.util.List;
 
-@Disabled
+//@Disabled
 @Configurable
 @Autonomous(name = "NEW - HPS 9 Ball - AP Super Close Only", group = "AA", preselectTeleOp = "v1Teleop")
 public class FarAuto  extends OpMode {
@@ -34,8 +34,8 @@ public class FarAuto  extends OpMode {
 
     private boolean ball_was_present = false;
 
-    private static final double shooterDesiredVelo = 1280;
-    private static final double shooterDesiredDipVelo = 1192;
+    private static final double shooterDesiredVelo = 1270;
+    private static final double shooterDesiredDipVelo = 1182;
     private Poses.Alliance lastKnownAlliance = null;
     boolean shooterHasSpunUp = false;
     boolean shooterBelow = false;;
