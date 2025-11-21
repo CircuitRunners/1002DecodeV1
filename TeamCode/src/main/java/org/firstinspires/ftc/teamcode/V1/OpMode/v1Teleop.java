@@ -234,9 +234,9 @@ public class v1Teleop extends OpMode {
 
         //selector logic for alliance
 
-        if (player1.wasJustPressed(GamepadKeys.Button.RIGHT_STICK_BUTTON)) {
+        if (player1.wasJustPressed(GamepadKeys.Button.OPTIONS)) {
             isRedAlliance = true;
-        } else if (player1.wasJustPressed(GamepadKeys.Button.LEFT_STICK_BUTTON)) {
+        } else if (player1.wasJustPressed(GamepadKeys.Button.SHARE)) {
             isRedAlliance = false;
         }
 
@@ -386,7 +386,8 @@ public class v1Teleop extends OpMode {
                 break;
 
             case 1:
-                shooter.setLight(0.388);
+                intake.intakeIn();
+                shooter.setLight(0.0);
                 if (!timerStarted) {
                     newTimer.resetTimer();
                     timerStarted = true;
@@ -404,7 +405,7 @@ public class v1Teleop extends OpMode {
             case 2:
                 //score stuff
 
-                shooter.setLight(0.5);
+
 
 
 
@@ -418,11 +419,15 @@ public class v1Teleop extends OpMode {
                     if (isRedAlliance){
                         if (isHeadingLocked){
                             isHeadingLocked = false;
+
                             //follower.breakFollowing();
 
                         }
                         else if (!isHeadingLocked){
                             isHeadingLocked = true;
+                            gamepad1.rumble(500);
+
+
                             //follower.holdPoint(follower.getPose());
                         }
 
@@ -445,6 +450,14 @@ public class v1Teleop extends OpMode {
                         //follower.holdPoint(new BezierPoint(follower.getPose()), follower.getHeading());
                         //follower.followPath(pathChainBlue.get(), true);
                     }
+                }
+
+                if (isHeadingLocked){
+                    shooter.setLight(0.5);
+
+                }
+                else if (!isHeadingLocked){
+                    shooter.setLight(0.388);
                 }
 
 
@@ -489,6 +502,7 @@ public class v1Teleop extends OpMode {
                         intake.intakeIn();
                     }
                     else if (rightTriggerValue < 0.2){ // Replaced gamepad1.right_trigger
+                        intake.intakeRetainBalls();
                         intake.setServoPower(0);
                     }
 
