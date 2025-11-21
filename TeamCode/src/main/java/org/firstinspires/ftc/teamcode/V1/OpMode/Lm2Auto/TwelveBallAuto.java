@@ -10,7 +10,9 @@ import com.pedropathing.util.Timer;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.Gamepad;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.V1.Config.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.V1.Config.subsystems.LimelightCamera;
 import org.firstinspires.ftc.teamcode.V1.Config.subsystems.Shooter;
@@ -32,7 +34,7 @@ public class  TwelveBallAuto extends OpMode {
 
     private static final double shooterDesiredVelo = 1020.5;
     private static final double shooterDesiredDipVelo = 935;
-    private Poses.Alliance lastKnownAlliance = null;
+    private thisAlliance lastKnownAlliance = thisAlliance.RED;
 
     boolean shooterHasSpunUp = false;
     boolean shooterBelow = false;;
@@ -43,70 +45,135 @@ public class  TwelveBallAuto extends OpMode {
 
 
 
-    // Tolerance for alignment in radians (approx. 2 degrees)
-    // private static final double ALIGN_THRESHOLD = Math.toRadians(2);
+    private enum thisAlliance {RED, BLUE}
+    private static class thisAlliancePose {
+        private final Pose bluePose;
+        private final Pose redPose;
 
+        private thisAlliancePose(Pose bluePose, Pose redPose) {
+            this.redPose = redPose;
+            this.bluePose = bluePose;
+        }
+
+        private Pose getPose(thisAlliance alliance) {
+            return (alliance == thisAlliance.RED) ? redPose : bluePose;
+        }
+
+
+    }
+
+    private thisAlliance currentAlliance = thisAlliance.RED;
+
+//    private static thisAlliance getAlliance() {
+//        return currentAlliance;
+//    }
+//
+//    private static void setAlliance(thisAlliance Alliance) {
+//        currentAlliance = Alliance;
+//    }
+
+    private void updateAlliance(Gamepad g) {
+        if (g.dpad_up) {
+            currentAlliance = thisAlliance.RED;
+        }
+        else if (g.dpad_down) {
+            currentAlliance = thisAlliance.BLUE;
+        }
+    }
+
+    private thisAlliance getAlliance() {
+        return currentAlliance;
+    }
 
     private PathChain travelToShoot,  intake1, travelBackToShoot1, intake2, travelBackToShoot2,  intake3, travelBackToShoot3, travelToGate;
-    private static final Pose startPoseGoalSide = new Pose(32, 135.5, Math.toRadians(180));
-    private static final Pose shootPositionGoalSide = new Pose(40, 103, Math.toRadians(135));
-    private static final Pose controlPickupLine1 = new Pose(67, 81.5);
-    private static final Pose pickupLine1 = new Pose(13, 81.5, Math.toRadians(180));
-    private static final Pose controlPickupLine2 = new Pose(67, 58);
-    private static final Pose pickupLine2 = new Pose(13, 57, Math.toRadians(180));
-    private static final Pose controlPickupLine3 = new Pose(67, 34.5);
-    private static final Pose pickupLine3 = new Pose(13, 36, Math.toRadians(180));
-    private static final Pose controlPickupLineToShoot = new Pose(70, 81);
-    private static final Pose lineupAtGate = new Pose(20, 65, Math.toRadians(270));
-
+    private static final thisAlliancePose startPoseGoalSide = new thisAlliancePose(
+            new Pose(32, 135.5, Math.toRadians(180)),
+            new Pose(144-32, 135.5, Math.toRadians(0))
+    );
+    private static final thisAlliancePose shootPositionGoalSide = new thisAlliancePose(
+            new Pose(40, 103, Math.toRadians(137)),
+            new Pose(144-38, 105, Math.toRadians(43))
+    );
+    private static final thisAlliancePose controlPickupLine1 = new thisAlliancePose(
+            new Pose(90, 81.5),
+            new Pose(144-90, 81.5)
+    );
+    private static final thisAlliancePose pickupLine1 = new thisAlliancePose(
+            new Pose(13, 81.5, Math.toRadians(180)),
+            new Pose(144-13, 81.5, Math.toRadians(0))
+    );
+    private static final thisAlliancePose controlPickupLine2 = new thisAlliancePose(
+            new Pose(90, 58),
+            new Pose(144-90, 58)
+    );
+    private static final thisAlliancePose pickupLine2 = new thisAlliancePose(
+            new Pose(13, 57, Math.toRadians(180)),
+            new Pose(144-13, 57, Math.toRadians(0))
+    );
+    private static final thisAlliancePose controlPickupLine3 = new thisAlliancePose(
+            new Pose(90, 34.5),
+            new Pose(144-90, 34.5)
+    );
+    private static final thisAlliancePose pickupLine3 = new thisAlliancePose(
+            new Pose(13, 36, Math.toRadians(180)),
+            new Pose(144-13, 36, Math.toRadians(0))
+    );
+    private static final thisAlliancePose controlPickupLineToShoot = new thisAlliancePose(
+            new Pose(70, 81),
+            new Pose(144-70, 81)
+    );
+    private static final thisAlliancePose lineupAtGate = new thisAlliancePose(
+            new Pose(20, 65, Math.toRadians(270)),
+            new Pose(144-20, 65, Math.toRadians(270))
+    );
     public void buildPaths() {
         // --- Alliance-Aware Path Generation ---
         travelToShoot = follower.pathBuilder()
-                .addPath(new BezierLine(startPoseGoalSide, shootPositionGoalSide))
-                .setLinearHeadingInterpolation(startPoseGoalSide.getHeading(), shootPositionGoalSide.getHeading())
+                .addPath(new BezierLine(startPoseGoalSide.getPose(currentAlliance), shootPositionGoalSide.getPose(currentAlliance)))
+                .setLinearHeadingInterpolation(startPoseGoalSide.getPose(currentAlliance).getHeading(), shootPositionGoalSide.getPose(currentAlliance).getHeading())
 
                 .build();
 
         // Path 2: Travel from Shooting Position to Intake Position
         intake1 = follower.pathBuilder()
-                .addPath(new BezierCurve(shootPositionGoalSide, controlPickupLine1, pickupLine1))
-                .setLinearHeadingInterpolation(shootPositionGoalSide.getHeading(), pickupLine1.getHeading())
+                .addPath(new BezierCurve(shootPositionGoalSide.getPose(currentAlliance), controlPickupLine1.getPose(currentAlliance), pickupLine1.getPose(currentAlliance)))
+                .setLinearHeadingInterpolation(shootPositionGoalSide.getPose(currentAlliance).getHeading(), pickupLine1.getPose(currentAlliance).getHeading())
                 .build();
 
         travelBackToShoot1 = follower.pathBuilder()
-                .addPath(new BezierLine(pickupLine1, shootPositionGoalSide))
-                .setLinearHeadingInterpolation(pickupLine1.getHeading(), shootPositionGoalSide.getHeading())
+                .addPath(new BezierLine(pickupLine1.getPose(currentAlliance), shootPositionGoalSide.getPose(currentAlliance)))
+                .setLinearHeadingInterpolation(pickupLine1.getPose(currentAlliance).getHeading(), shootPositionGoalSide.getPose(currentAlliance).getHeading())
                 .build();
 
         intake2 = follower.pathBuilder()
-                .addPath(new BezierCurve(shootPositionGoalSide, controlPickupLine2, pickupLine2))
-                .setLinearHeadingInterpolation(shootPositionGoalSide.getHeading(), pickupLine2.getHeading())
+                .addPath(new BezierCurve(shootPositionGoalSide.getPose(currentAlliance), controlPickupLine2.getPose(currentAlliance), pickupLine2.getPose(currentAlliance)))
+                .setLinearHeadingInterpolation(shootPositionGoalSide.getPose(currentAlliance).getHeading(), pickupLine2.getPose(currentAlliance).getHeading())
                 .build();
 
         travelBackToShoot2 = follower.pathBuilder()
-                .addPath(new BezierCurve(pickupLine2, controlPickupLineToShoot, shootPositionGoalSide))
-                .setLinearHeadingInterpolation(pickupLine2.getHeading(), shootPositionGoalSide.getHeading())
+                .addPath(new BezierCurve(pickupLine2.getPose(currentAlliance), controlPickupLineToShoot.getPose(currentAlliance), shootPositionGoalSide.getPose(currentAlliance)))
+                .setLinearHeadingInterpolation(pickupLine2.getPose(currentAlliance).getHeading(), shootPositionGoalSide.getPose(currentAlliance).getHeading())
                 .build();
 
         intake3 = follower.pathBuilder()
-                .addPath(new BezierCurve(shootPositionGoalSide, controlPickupLine3, pickupLine3))
-                .setLinearHeadingInterpolation(shootPositionGoalSide.getHeading(), pickupLine3.getHeading())
+                .addPath(new BezierCurve(shootPositionGoalSide.getPose(currentAlliance), controlPickupLine3.getPose(currentAlliance), pickupLine3.getPose(currentAlliance)))
+                .setLinearHeadingInterpolation(shootPositionGoalSide.getPose(currentAlliance).getHeading(), pickupLine3.getPose(currentAlliance).getHeading())
                 .build();
 
         travelBackToShoot3 = follower.pathBuilder()
-                .addPath(new BezierCurve(pickupLine3, shootPositionGoalSide))
-                .setLinearHeadingInterpolation(pickupLine3.getHeading(), shootPositionGoalSide.getHeading())
+                .addPath(new BezierCurve(pickupLine3.getPose(currentAlliance), shootPositionGoalSide.getPose(currentAlliance)))
+                .setLinearHeadingInterpolation(pickupLine3.getPose(currentAlliance).getHeading(), shootPositionGoalSide.getPose(currentAlliance).getHeading())
                 .build();
 
         travelToGate = follower.pathBuilder()
-                .addPath(new BezierLine(shootPositionGoalSide, lineupAtGate))
-                .setLinearHeadingInterpolation(shootPositionGoalSide.getHeading(), lineupAtGate.getHeading())
+                .addPath(new BezierLine(shootPositionGoalSide.getPose(currentAlliance), lineupAtGate.getPose(currentAlliance)))
+                .setLinearHeadingInterpolation(shootPositionGoalSide.getPose(currentAlliance).getHeading(), lineupAtGate.getPose(currentAlliance).getHeading())
                 .build();
     }
 
 
     public void autonomousPathUpdate() {
-        follower.setMaxPower(0.8);
+        //follower.setMaxPower(0.8);
         double desiredVeloBlue;
         switch (pathState) {
             case 0: // Initial Travel to Shoot Position
@@ -122,7 +189,7 @@ public class  TwelveBallAuto extends OpMode {
                 if (!follower.isBusy()) {
                     desiredVeloBlue = shooter.calculateFlywheelVelocity(limelight.calculateDistanceToGoal(follower.getPose().getX(), follower.getPose().getY(), 12, 137));
                     //shootBalls(shooterDesiredVelo,3,10,shooterDesiredDipVelo);
-                    shootBalls(desiredVeloBlue,3,10,shooterDesiredDipVelo);
+                    shootBalls(desiredVeloBlue,3,6,shooterDesiredDipVelo);
 
                 }
                 break;
@@ -156,7 +223,7 @@ public class  TwelveBallAuto extends OpMode {
                 if (!follower.isBusy()) {
                     desiredVeloBlue = shooter.calculateFlywheelVelocity(limelight.calculateDistanceToGoal(follower.getPose().getX(), follower.getPose().getY(), 12, 137));
                     //shootBalls(shooterDesiredVelo,3,6,shooterDesiredDipVelo);
-                    shootBalls(desiredVeloBlue,3,10,shooterDesiredDipVelo);
+                    shootBalls(desiredVeloBlue,3,6,shooterDesiredDipVelo);
                 }
                 break;
 
@@ -189,7 +256,7 @@ public class  TwelveBallAuto extends OpMode {
                 if (!follower.isBusy()) {
                     desiredVeloBlue = shooter.calculateFlywheelVelocity(limelight.calculateDistanceToGoal(follower.getPose().getX(), follower.getPose().getY(), 12, 137));
                     //shootBalls(shooterDesiredVelo,3,6,shooterDesiredDipVelo);
-                    shootBalls(desiredVeloBlue,3,10,shooterDesiredDipVelo);
+                    shootBalls(desiredVeloBlue,3,6,shooterDesiredDipVelo);
                 }
                 break;
 
@@ -223,7 +290,7 @@ public class  TwelveBallAuto extends OpMode {
                 if (!follower.isBusy()) {
                     desiredVeloBlue = shooter.calculateFlywheelVelocity(limelight.calculateDistanceToGoal(follower.getPose().getX(), follower.getPose().getY(), 12, 137));
                     //shootBalls(shooterDesiredVelo,3,6,shooterDesiredDipVelo);
-                    shootBalls(desiredVeloBlue,3,10,shooterDesiredDipVelo);
+                    shootBalls(desiredVeloBlue,3,6,shooterDesiredDipVelo);
                 }
                 break;
 
@@ -239,7 +306,9 @@ public class  TwelveBallAuto extends OpMode {
                 shooter.stopShooter();
                 intake.fullIntakeIdle();
                 if (!follower.isBusy()) {
-                    requestOpModeStop();
+                    telemetry.addLine("ERROR: INVALID PATH STATE");
+                    telemetry.update();
+                    //requestOpModeStop();
                 }
         }
     }
@@ -321,14 +390,14 @@ public class  TwelveBallAuto extends OpMode {
     public void init_loop() {
 
 
-        Poses.updateAlliance(gamepad1, telemetry);
+        updateAlliance(gamepad1);
 
 
-        if (Poses.getAlliance() != lastKnownAlliance) {
-            follower.setStartingPose(Poses.get(Poses.startPoseGoalSide));
+        if (getAlliance() != lastKnownAlliance) {
+            follower.setStartingPose(startPoseGoalSide.getPose(currentAlliance));
             buildPaths();
 
-            lastKnownAlliance = Poses.getAlliance();
+            lastKnownAlliance = getAlliance();
             telemetry.addData("STATUS", "Paths Rebuilt for " + lastKnownAlliance);
             telemetry.addLine("");
         }
@@ -337,8 +406,8 @@ public class  TwelveBallAuto extends OpMode {
         telemetry.addLine("--- Alliance Selector ---");
         telemetry.addLine("D-pad UP → RED | D-pad DOWN → BLUE");
         telemetry.addLine("");
-        telemetry.addData("Alliance Set", Poses.getAlliance());
-        telemetry.addData("Start Pose", Poses.get(Poses.startPoseGoalSide));
+        telemetry.addData("Alliance Set", getAlliance());
+        telemetry.addData("Start Pose", startPoseGoalSide.getPose(currentAlliance));
         telemetry.addData("Distance Sensor", intake.getDistanceMM());
         telemetry.update();
     }
@@ -448,6 +517,8 @@ public class  TwelveBallAuto extends OpMode {
             shooter.stopShooter();
             intake.setServoPower(0);
             intake.fullIntakeIdle();
+            telemetry.addLine("Timer ran out");
+            telemetry.update();
 
             shotCounter = 0;
             shooterHasSpunUp = false;
