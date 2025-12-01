@@ -203,10 +203,10 @@ public class LimelightCamera {
     }
 
 
-    /*
-    FOR V2 ----- General Layout
 
+   // FOR V2 ----- General Layout
 
+/*
 
 public void executeAdaptiveScoring(LimelightCamera.BallOrder targetOrder) {
 
@@ -283,6 +283,6 @@ public void executeAdaptiveScoring(LimelightCamera.BallOrder targetOrder) {
         }
     }
 }
-     */
+*/
 
 }
