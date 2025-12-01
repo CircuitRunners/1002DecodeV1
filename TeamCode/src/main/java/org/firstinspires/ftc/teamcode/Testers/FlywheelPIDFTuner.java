@@ -24,7 +24,9 @@ import java.util.List;
  * This OpMode helps you tune your flywheel velocity PIDF loop.
  * Use FTC Dashboard to view and adjust parameters live.
  *
- * STEP 1: Connect Pannels
+ * STEP 1: Connect Pannels - online tuning website also used by pedropathing
+ *      Connect your laptop to the robot's wifi network
+ *      Go to this url in any webbrowser: 192.168.43.1:8001
  *    - Run this OpMode.
  *    - Open the Dashboard.
  *    - Watch telemetry for velocity, target, and power.
@@ -46,6 +48,7 @@ import java.util.List;
  * STEP 5: Tune Integral (kI)
  *    - Add a little kI if there’s a consistent steady-state error (flywheel settles below target).
  *    - Be careful: too much kI will cause oscillation or lag.
+ *    PROBABLY NEVER NEEDED
  *
  * STEP 6: Verify Response
  *    - Try different targetVelocity values.

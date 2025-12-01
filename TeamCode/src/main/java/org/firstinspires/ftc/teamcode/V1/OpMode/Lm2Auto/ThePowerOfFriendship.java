@@ -312,21 +312,22 @@ import java.util.List;
         telemetry.update();
     }
 
+
     @Override
     public void init_loop() {
-
-
         Poses.updateAlliance(gamepad1, telemetry);
 
+        // This is the CRITICAL change: set the pose and rebuild paths
+        // every loop to ensure the follower has the latest Alliance-based coordinates.
+        follower.setStartingPose(Poses.get(Poses.startPoseGoalSide));
+        buildPaths();
 
-        if (Poses.getAlliance() != lastKnownAlliance) {
-            follower.setStartingPose(Poses.get(Poses.startPoseGoalSide));
-            buildPaths();
 
-            lastKnownAlliance = Poses.getAlliance();
-            telemetry.addData("STATUS", "Paths Rebuilt for " + lastKnownAlliance);
-            telemetry.addLine("");
-        }
+
+        lastKnownAlliance = Poses.getAlliance();
+        telemetry.addData("STATUS", "Current Alliance " + lastKnownAlliance);
+        telemetry.addLine("");
+
 
 
         telemetry.addLine("--- Alliance Selector ---");
