@@ -91,8 +91,8 @@ public class  TwelveBallAuto extends OpMode {
             new Pose(144-32, 135.5, Math.toRadians(0))
     );
     private static final thisAlliancePose shootPositionGoalSide = new thisAlliancePose(
-            new Pose(40, 103, Math.toRadians(137)),
-            new Pose(144-40, 103, Math.toRadians(43))
+            new Pose(40, 104, Math.toRadians(140)),
+            new Pose(144-40, 104, Math.toRadians(40))
     );
     private static final thisAlliancePose controlPickupLine1 = new thisAlliancePose(
             new Pose(90, 81.5),
@@ -161,7 +161,7 @@ public class  TwelveBallAuto extends OpMode {
                 .build();
 
         travelBackToShoot3 = follower.pathBuilder()
-                .addPath(new BezierCurve(pickupLine3.getPose(currentAlliance), shootPositionGoalSide.getPose(currentAlliance)))
+                .addPath(new BezierCurve(pickupLine3.getPose(currentAlliance), controlPickupLineToShoot.getPose(currentAlliance), shootPositionGoalSide.getPose(currentAlliance)))
                 .setLinearHeadingInterpolation(pickupLine3.getPose(currentAlliance).getHeading(), shootPositionGoalSide.getPose(currentAlliance).getHeading())
                 .build();
 
@@ -284,7 +284,7 @@ public class  TwelveBallAuto extends OpMode {
                 break;
 
             case 9: //go to shoot
-                if (pathTimer.getElapsedTimeSeconds() <= 0.5) {
+                if (pathTimer.getElapsedTimeSeconds() <= 0.2) {
                     intake.setServoPower(-1);
                 } else {
                     intake.setServoPower(0);
@@ -294,11 +294,16 @@ public class  TwelveBallAuto extends OpMode {
                     intake.intakeIn();
                     follower.followPath(travelBackToShoot3, true);
 
-                    setPathState();
+                    setPathState(10);
                 }
                 break;
 
             case 10: //shoot
+
+                if (pathTimer.getElapsedTimeSeconds() > 0.1) {
+                    pathTimer.resetTimer();
+                }
+
                 if (!follower.isBusy()) {
                     if (currentAlliance == thisAlliance.BLUE) {
                         desiredVelo = shooter.calculateFlywheelVelocity(limelight.calculateDistanceToGoal(follower.getPose().getX(), follower.getPose().getY(), 12, 137));
@@ -306,7 +311,7 @@ public class  TwelveBallAuto extends OpMode {
                     else if (currentAlliance == thisAlliance.RED) {
                         desiredVelo = shooter.calculateFlywheelVelocity(limelight.calculateDistanceToGoal(follower.getPose().getX(), follower.getPose().getY(), 132, 137));
                     }                    //shootBalls(shooterDesiredVelo,3,6,shooterDesiredDipVelo);
-                    shootBalls(desiredVelo,3,6,shooterDesiredDipVelo);
+                    shootBalls(desiredVelo,3,10,shooterDesiredDipVelo);
                 }
                 break;
 
