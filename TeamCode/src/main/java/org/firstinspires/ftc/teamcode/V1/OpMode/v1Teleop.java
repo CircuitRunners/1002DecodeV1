@@ -413,7 +413,7 @@ public class v1Teleop extends OpMode {
 
 
                 if (!isIntakeInUse){
-                    intake.intakeRetainBalls();
+                    intake.intakeIn();
                 }
                 if (player1.wasJustPressed(GamepadKeys.Button.TRIANGLE)) {
                     if (isRedAlliance){
@@ -493,6 +493,8 @@ public class v1Teleop extends OpMode {
                 //shooting logic
                 double target = isRedAlliance ? desiredVeloRed : desiredVeloBlue;
 
+
+
                 if (shooterVelo >= target - 40 && shooterVelo <= target + 55) { // Replaced shooter.getCurrentVelo()
                     isIntakeInUse = true;
 
@@ -502,7 +504,7 @@ public class v1Teleop extends OpMode {
                         intake.intakeIn();
                     }
                     else if (rightTriggerValue < 0.2){ // Replaced gamepad1.right_trigger
-                        intake.intakeRetainBalls();
+                        intake.intakeIn();
                         intake.setServoPower(0);
                     }
 
@@ -550,6 +552,7 @@ public class v1Teleop extends OpMode {
         telemetry.addData("Distance isRIghtDIstance", intake.isRightDistance()? "yeah" : "nah");
         telemetry.addData("Loop Time", timer.milliseconds());
         telemetry.addData("Intake Current", intake.getIntakeMotorCurrent());
+        telemetry.addData("X Velocity",pinpoint.getVelX(DistanceUnit.INCH));
 
 
 

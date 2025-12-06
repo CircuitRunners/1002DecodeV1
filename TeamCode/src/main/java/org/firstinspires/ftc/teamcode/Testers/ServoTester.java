@@ -12,7 +12,7 @@ import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-@TeleOp
+@TeleOp(group = "Test")
 public class ServoTester extends OpMode {
 
     private GamepadEx player1;

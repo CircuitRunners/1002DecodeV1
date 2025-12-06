@@ -73,7 +73,7 @@ import java.util.List;
         travelBackToShoot1 = follower.pathBuilder()
                 .addPath(new BezierLine(Poses.get(Poses.openGate), Poses.get(Poses.shootPositionGoalSide2)))
                 //setLinearHeadingInterpolation(Poses.get(Poses.pickupLine1).getHeading(), 1Poses.get(Poses.shootPositionGoalSide2).getHeading())
-                .setLinearHeadingInterpolation(Math.toRadians(90), Poses.get(Poses.shootPositionGoalSide3).getHeading())
+                .setLinearHeadingInterpolation(Math.toRadians(90), Poses.get(Poses.shootPositionGoalSide2).getHeading())
                 .build();
         intake2 = follower.pathBuilder()
                 .addPath(new BezierCurve(Poses.get(Poses.shootPositionGoalSide2), Poses.get(Poses.line2ControlPoint), Poses.get(Poses.pickupLine2)))
@@ -317,16 +317,15 @@ import java.util.List;
     public void init_loop() {
         Poses.updateAlliance(gamepad1, telemetry);
 
-        // This is the CRITICAL change: set the pose and rebuild paths
-        // every loop to ensure the follower has the latest Alliance-based coordinates.
-        follower.setStartingPose(Poses.get(Poses.startPoseGoalSide));
-        buildPaths();
 
+        if (Poses.getAlliance() != lastKnownAlliance) {
+            follower.setStartingPose(Poses.get(Poses.startPoseGoalSide));
+            buildPaths();
 
-
-        lastKnownAlliance = Poses.getAlliance();
-        telemetry.addData("STATUS", "Current Alliance " + lastKnownAlliance);
-        telemetry.addLine("");
+            lastKnownAlliance = Poses.getAlliance();
+            telemetry.addData("STATUS", "Paths Rebuilt for " + lastKnownAlliance);
+            telemetry.addLine("");
+        }
 
 
 
@@ -336,6 +335,10 @@ import java.util.List;
         telemetry.addData("Alliance Set", Poses.getAlliance());
         telemetry.addData("Start Pose", Poses.get(Poses.startPoseGoalSide));
         telemetry.addData("Distance Sensor", intake.getDistanceMM());
+
+        telemetry.addData("X Pos", follower.getPose().getX());
+        telemetry.addData("Y Pos", follower.getPose().getY());
+        telemetry.addData("Heading", Math.toDegrees(follower.getPose().getHeading()));
         telemetry.update();
     }
 

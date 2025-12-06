@@ -103,7 +103,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
         motorPower = 1;
         servoIntake.setPower(1);
     }
-        public void intakeOutDistance(){
+    public void intakeOutDistance(){
         intake.setPower(-0.4);
         motorPower = -0.4;
             if (isRightDistance()){
