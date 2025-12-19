@@ -9,12 +9,12 @@ import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
 import org.firstinspires.ftc.teamcode.MemDevDecode.Config.MecanumDrive;
-@Disabled
+//@Disabled
 @TeleOp(name = "Mecanum -Robot Centric")
 public class MecanumRobotCentricTeleOp extends OpMode {
     private MecanumDrive drive;
     private GamepadEx player1;
-    private double speedMultiply = 0.0;
+    private double speedMultiply = 0.5;
 
     @Override
     public void init(){
